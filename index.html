@@ -5972,62 +5972,71 @@ function lgMaskTel(input) {
 
 <!-- ══ ESCOLHER PLANO (após cadastro sem plano pré-selecionado) ══ -->
 <div class="screen" id="s-escolher-plano">
-<div style="max-width:640px;margin:0 auto;padding:2rem 0 3rem;">
+<div style="max-width:960px;margin:0 auto;padding:2.5rem 0 3rem;">
 
   <!-- Cabeçalho -->
-  <div style="text-align:center;margin-bottom:2rem;">
-    <div style="display:inline-flex;align-items:center;gap:8px;background:#f0fdf8;border:.5px solid #a7f3d0;border-radius:99px;padding:5px 14px;font-size:12px;font-weight:600;color:#065f46;margin-bottom:1rem;">
+  <div style="text-align:center;margin-bottom:2.5rem;">
+    <div style="display:inline-flex;align-items:center;gap:8px;background:#f0fdf8;border:.5px solid #a7f3d0;border-radius:99px;padding:5px 16px;font-size:12px;font-weight:600;color:#065f46;margin-bottom:1rem;">
       ✅ Cadastro realizado com sucesso!
     </div>
-    <h2 style="font-family:'Sora',sans-serif;font-size:clamp(1.4rem,4vw,1.9rem);font-weight:800;color:#0f172a;letter-spacing:-.5px;margin-bottom:.5rem;line-height:1.25;">Escolha seu plano</h2>
+    <h2 style="font-family:'Sora',sans-serif;font-size:clamp(1.6rem,4vw,2.2rem);font-weight:800;color:#0f172a;letter-spacing:-.75px;margin-bottom:.5rem;line-height:1.2;">Custa menos que<br>1 erro financeiro por mês</h2>
     <p style="font-size:14px;color:#64748b;line-height:1.6;">14 dias grátis em todos os planos · Cancele quando quiser</p>
   </div>
 
-  <!-- Cards dos planos -->
-  <div style="display:flex;flex-direction:column;gap:12px;">
+  <!-- Grid de planos -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start;">
 
     <!-- Growth -->
-    <div style="background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;padding:1.125rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;cursor:pointer;transition:all .15s;" onclick="escolherPlanoLogado('growth','price_1TUWo3HkpdynZUBW6AVGmLeu')" onmouseover="this.style.borderColor='#1D9E75';this.style.boxShadow='0 4px 16px rgba(29,158,117,.1)'" onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow=''">
-      <div>
-        <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:2px;">Growth</div>
-        <div style="font-size:12px;color:#64748b;">DRE + análise IA + insights mensais</div>
+    <div onclick="escolherPlanoLogado('growth','price_1TUWo3HkpdynZUBW6AVGmLeu')" style="background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;padding:1.5rem;cursor:pointer;transition:all .18s;" onmouseover="this.style.borderColor='#1D9E75';this.style.boxShadow='0 6px 20px rgba(29,158,117,.12)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow='';this.style.transform=''">
+      <div style="font-size:11px;font-weight:700;color:#64748b;letter-spacing:.8px;text-transform:uppercase;margin-bottom:.75rem;">GROWTH</div>
+      <div style="font-family:'Sora',sans-serif;font-size:2rem;font-weight:800;color:#0f172a;letter-spacing:-1px;line-height:1;">R$97<span style="font-size:13px;font-weight:500;color:#94a3b8;">/mês</span></div>
+      <div style="font-size:12px;color:#64748b;margin:.5rem 0 1.25rem;">Para crescer com controle</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem;">
+        <div style="display:flex;gap:8px;align-items:center;font-size:13px;color:#334155;"><svg width="14" height="14" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>1 empresa</div>
+        <div style="display:flex;gap:8px;align-items:center;font-size:13px;color:#334155;"><svg width="14" height="14" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>15+ indicadores</div>
+        <div style="display:flex;gap:8px;align-items:center;font-size:13px;color:#334155;"><svg width="14" height="14" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Análise IA completa</div>
+        <div style="display:flex;gap:8px;align-items:center;font-size:13px;color:#334155;"><svg width="14" height="14" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Plano de ação em R$</div>
       </div>
-      <div style="text-align:right;flex-shrink:0;">
-        <div style="font-family:'Sora',sans-serif;font-size:18px;font-weight:800;color:#0f172a;">R$97<span style="font-size:12px;font-weight:500;color:#94a3b8;">/mês</span></div>
-        <button style="margin-top:6px;padding:6px 16px;border-radius:8px;border:1.5px solid #1D9E75;background:transparent;color:#1D9E75;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Escolher →</button>
-      </div>
+      <button style="width:100%;padding:11px;border-radius:10px;border:1.5px solid #e2e8f0;background:transparent;color:#0f172a;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;" onmouseover="this.style.borderColor='#1D9E75';this.style.color='#1D9E75'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#0f172a'">Começar 14 dias grátis</button>
     </div>
 
     <!-- PRO (destaque) -->
-    <div style="background:linear-gradient(135deg,#f0fdf8,#e8fef4);border:2px solid #1D9E75;border-radius:14px;padding:1.125rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;cursor:pointer;transition:all .15s;position:relative;" onclick="escolherPlanoLogado('pro','price_1TUWxWHkpdynZUBW2DLLEnlE')" onmouseover="this.style.boxShadow='0 6px 24px rgba(29,158,117,.2)'" onmouseout="this.style.boxShadow=''">
-      <div style="position:absolute;top:-11px;left:1.25rem;background:#1D9E75;color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;letter-spacing:.3px;">MAIS POPULAR</div>
-      <div>
-        <div style="font-size:15px;font-weight:700;color:#065f46;margin-bottom:2px;">PRO</div>
-        <div style="font-size:12px;color:#0d9488;">Tudo do Growth + valuation + plano de ação</div>
+    <div onclick="escolherPlanoLogado('pro','price_1TUWxWHkpdynZUBW2DLLEnlE')" style="background:linear-gradient(160deg,#f0fdf8,#e6fef2);border:2px solid #1D9E75;border-radius:16px;padding:1.5rem;cursor:pointer;transition:all .18s;position:relative;box-shadow:0 8px 30px rgba(29,158,117,.15);" onmouseover="this.style.boxShadow='0 12px 40px rgba(29,158,117,.25)';this.style.transform='translateY(-3px)'" onmouseout="this.style.boxShadow='0 8px 30px rgba(29,158,117,.15)';this.style.transform=''">
+      <div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:#1D9E75;color:#fff;font-size:10px;font-weight:700;padding:4px 14px;border-radius:99px;white-space:nowrap;letter-spacing:.4px;">MAIS VENDIDO</div>
+      <div style="font-size:11px;font-weight:700;color:#0d9488;letter-spacing:.8px;text-transform:uppercase;margin-bottom:.75rem;">PRO</div>
+      <div style="font-family:'Sora',sans-serif;font-size:2rem;font-weight:800;color:#065f46;letter-spacing:-1px;line-height:1;">R$197<span style="font-size:13px;font-weight:500;color:#6ee7b7;">/mês</span></div>
+      <div style="font-size:12px;color:#0d9488;margin:.5rem 0 1.25rem;">= R$6,57/dia · menos que decidir no escuro</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem;">
+        <div style="display:flex;gap:8px;align-items:center;font-size:13px;color:#065f46;font-weight:500;"><svg width="14" height="14" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>3 empresas</div>
+        <div style="display:flex;gap:8px;align-items:center;font-size:13px;color:#065f46;font-weight:500;"><svg width="14" height="14" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>15+ indicadores</div>
+        <div style="display:flex;gap:8px;align-items:center;font-size:13px;color:#065f46;font-weight:500;"><svg width="14" height="14" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>DRE + Balanço completo</div>
+        <div style="display:flex;gap:8px;align-items:center;font-size:13px;color:#065f46;font-weight:500;"><svg width="14" height="14" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Valuation automático</div>
+        <div style="display:flex;gap:8px;align-items:center;font-size:13px;color:#065f46;font-weight:500;"><svg width="14" height="14" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Ações com impacto em R$</div>
       </div>
-      <div style="text-align:right;flex-shrink:0;">
-        <div style="font-family:'Sora',sans-serif;font-size:18px;font-weight:800;color:#065f46;">R$197<span style="font-size:12px;font-weight:500;color:#6ee7b7;">/mês</span></div>
-        <button style="margin-top:6px;padding:6px 16px;border-radius:8px;border:none;background:#1D9E75;color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Escolher →</button>
-      </div>
+      <button style="width:100%;padding:13px;border-radius:10px;border:none;background:#1D9E75;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 6px 20px rgba(29,158,117,.35);transition:all .15s;" onmouseover="this.style.background='#15835f'" onmouseout="this.style.background='#1D9E75'">Começar 14 dias grátis →</button>
+      <div style="text-align:center;font-size:12px;color:#0d9488;margin-top:.625rem;font-weight:500;">Cancele quando quiser</div>
     </div>
 
     <!-- Premium -->
-    <div style="background:#0f172a;border:1.5px solid #334155;border-radius:14px;padding:1.125rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;cursor:pointer;transition:all .15s;" onclick="escolherPlanoLogado('premium','price_1TUX0UHkpdynZUBWS1WLFmE4')" onmouseover="this.style.borderColor='#1D9E75';this.style.boxShadow='0 4px 16px rgba(29,158,117,.15)'" onmouseout="this.style.borderColor='#334155';this.style.boxShadow=''">
-      <div>
-        <div style="font-size:15px;font-weight:700;color:#f1f5f9;margin-bottom:2px;">Premium</div>
-        <div style="font-size:12px;color:#94a3b8;">Tudo do PRO + múltiplas empresas + suporte prioritário</div>
+    <div onclick="escolherPlanoLogado('premium','price_1TUX0UHkpdynZUBWS1WLFmE4')" style="background:#0f172a;border:1.5px solid #334155;border-radius:16px;padding:1.5rem;cursor:pointer;transition:all .18s;" onmouseover="this.style.borderColor='#1D9E75';this.style.boxShadow='0 6px 20px rgba(29,158,117,.12)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#334155';this.style.boxShadow='';this.style.transform=''">
+      <div style="font-size:11px;font-weight:700;color:#64748b;letter-spacing:.8px;text-transform:uppercase;margin-bottom:.75rem;">PREMIUM</div>
+      <div style="font-family:'Sora',sans-serif;font-size:2rem;font-weight:800;color:#f1f5f9;letter-spacing:-1px;line-height:1;">R$347<span style="font-size:13px;font-weight:500;color:#475569;">/mês</span></div>
+      <div style="font-size:12px;color:#94a3b8;margin:.5rem 0 1.25rem;">Para múltiplas empresas</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem;">
+        <div style="display:flex;gap:8px;align-items:center;font-size:13px;color:#94a3b8;"><svg width="14" height="14" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Empresas ilimitadas</div>
+        <div style="display:flex;gap:8px;align-items:center;font-size:13px;color:#94a3b8;"><svg width="14" height="14" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Tudo do PRO</div>
+        <div style="display:flex;gap:8px;align-items:center;font-size:13px;color:#94a3b8;"><svg width="14" height="14" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Relatórios PDF exportáveis</div>
+        <div style="display:flex;gap:8px;align-items:center;font-size:13px;color:#94a3b8;"><svg width="14" height="14" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Acesso para contador</div>
+        <div style="display:flex;gap:8px;align-items:center;font-size:13px;color:#94a3b8;"><svg width="14" height="14" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Suporte prioritário</div>
       </div>
-      <div style="text-align:right;flex-shrink:0;">
-        <div style="font-family:'Sora',sans-serif;font-size:18px;font-weight:800;color:#f1f5f9;">R$347<span style="font-size:12px;font-weight:500;color:#475569;">/mês</span></div>
-        <button style="margin-top:6px;padding:6px 16px;border-radius:8px;border:1.5px solid #475569;background:transparent;color:#e2e8f0;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Escolher →</button>
-      </div>
+      <button style="width:100%;padding:11px;border-radius:10px;border:1.5px solid #334155;background:transparent;color:#e2e8f0;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;" onmouseover="this.style.borderColor='#1D9E75';this.style.color='#1D9E75'" onmouseout="this.style.borderColor='#334155';this.style.color='#e2e8f0'">Começar 14 dias grátis</button>
     </div>
 
   </div>
 
   <!-- Continuar grátis -->
-  <div style="text-align:center;margin-top:1.25rem;">
-    <button onclick="go('s-nova-dre')" style="background:none;border:none;cursor:pointer;font-size:13px;color:#94a3b8;font-family:inherit;padding:8px;">
+  <div style="text-align:center;margin-top:1.5rem;">
+    <button onclick="go('s-nova-dre')" style="background:none;border:none;cursor:pointer;font-size:13px;color:#94a3b8;font-family:inherit;padding:8px;transition:color .15s;" onmouseover="this.style.color='#475569'" onmouseout="this.style.color='#94a3b8'">
       Continuar com o plano gratuito por enquanto →
     </button>
   </div>
