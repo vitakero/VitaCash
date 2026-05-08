@@ -4389,75 +4389,10 @@ async function verificarPlanoPendente() {
   go('s-confirmacao');
 }
 
-// ── STRIPE: CHECKOUT EMBUTIDO NA PÁGINA DE CONFIRMAÇÃO ──────────────
+// ── STRIPE: CHECKOUT APÓS CONFIRMAÇÃO ───────────────────────────────
 async function mostrarCheckoutNaConfirmacao(planName, priceId) {
-  var nomes = { growth: 'Growth — R$97/mês', pro: 'PRO — R$197/mês', premium: 'Premium — R$347/mês' };
-
-  // Atualiza cabeçalho da página
-  var h2 = document.querySelector('#s-confirmacao h2');
-  var p  = document.querySelector('#s-confirmacao p');
-  if (h2) h2.innerHTML = '🎉 Cadastro criado!<br>Ative seus 14 dias grátis';
-  if (p)  p.innerHTML  = 'Insira os dados do cartão para ativar o plano <strong>' + (nomes[planName] || planName) + '</strong>.<br><span style="font-size:12px;color:#94a3b8;">Você só será cobrado após 14 dias. Cancele quando quiser.</span>';
-
-  // Oculta todos os elementos abaixo do cabeçalho
-  Array.from(document.querySelectorAll('#s-confirmacao > div > div > div')).forEach(function(el) {
-    el.style.display = 'none';
-  });
-
-  // Cria área do checkout embutido
-  var area = document.createElement('div');
-  area.id = 'conf-checkout-area';
-  area.innerHTML =
-    '<div id="conf-stripe-loading" style="text-align:center;padding:2.5rem 1rem;">' +
-      '<div style="width:36px;height:36px;border:3px solid #e2e8f0;border-top-color:#1D9E75;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1rem;"></div>' +
-      '<p style="font-size:14px;color:#475569;margin:0;">Carregando formulário de pagamento...</p>' +
-    '</div>' +
-    '<div id="conf-stripe-embed"></div>' +
-    '<div style="text-align:center;margin-top:1rem;">' +
-      '<button onclick="go(\'s-nova-dre\')" style="background:none;border:none;cursor:pointer;font-size:12px;color:#94a3b8;font-family:inherit;padding:6px 10px;border-radius:8px;transition:color .15s;" onmouseover="this.style.color=\'#475569\'" onmouseout="this.style.color=\'#94a3b8\'">' +
-        'Pular por agora e entrar no diagnóstico →' +
-      '</button>' +
-    '</div>';
-
-  document.querySelector('#s-confirmacao > div > div').appendChild(area);
-
-  // Busca clientSecret e monta o checkout do Stripe
-  try {
-    const { data: { session } } = await sb.auth.getSession();
-    const returnUrl = window.location.protocol === 'file:'
-      ? 'https://vitacash.com.br'
-      : window.location.href;
-
-    const res = await fetch(
-      'https://asrecwsocneepipvfymx.supabase.co/functions/v1/create-checkout-session',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + session.access_token,
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzcmVjd3NvY25lZXBpcHZmeW14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NzUzMTMsImV4cCI6MjA5MzA1MTMxM30.b_d06izv5S4SxA2UF-BjwB2lWCqOABCF7ODPLVtO1aA'
-        },
-        body: JSON.stringify({ priceId: priceId, planName: planName, returnUrl: returnUrl })
-      }
-    );
-
-    const data = await res.json();
-    if (!data.clientSecret) throw new Error(data.error || 'Erro ao criar sessão');
-
-    const stripe = Stripe('pk_test_51TUWfgHkpdynZUBWpZunowiMf3sJm0qij4pZYQ6fE8zMY4f7UA29kG3GXQQLjJXCnozxZKthgDxkShXuy2mCGzQj00LoFKZmDm');
-    const checkout = await stripe.initEmbeddedCheckout({ clientSecret: data.clientSecret });
-
-    document.getElementById('conf-stripe-loading').style.display = 'none';
-    checkout.mount('#conf-stripe-embed');
-
-  } catch (err) {
-    console.error(err);
-    document.getElementById('conf-stripe-loading').innerHTML =
-      '<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:12px 16px;font-size:13px;color:#dc2626;text-align:center;">' +
-        'Erro ao carregar o pagamento.<br>' +
-        '<button onclick="go(\'s-nova-dre\')" style="margin-top:8px;color:#1D9E75;background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;">Continuar para o diagnóstico →</button>' +
-      '</div>';
-  }
+  // Simplesmente abre a tela de checkout dedicada
+  await abrirTelaCheckout(planName, priceId);
 }
 
 // ── ETAPA 1: MOSTRAR CONFIRMAÇÃO (sem salvar nada ainda) ───────────
