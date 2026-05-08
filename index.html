@@ -3923,7 +3923,7 @@ div[style*="position:absolute;top:0;left:0;right:0;height:3px"]{height:2px;}
 
       <!-- CTA principal -->
       <div style="animation:fadeUp .5s .22s ease both;">
-        <button id="conf-btn-cta" onclick="lgConfirmarCadastro()" class="conf-cta">
+        <button id="conf-btn-cta" onclick="lgHandleConfirmacao()" class="conf-cta">
           Descobrir meu dinheiro perdido agora →
         </button>
       </div>
@@ -4267,18 +4267,10 @@ async function preencherConfirmacaoLogado() {
   if (el('conf-nicho')) el('conf-nicho').textContent = nicho;
   if (el('conf-fat'))   el('conf-fat').textContent   = fat;
 
-  // Muda o botão para ir direto ao checkout (sem criar conta nova)
+  // Muda o texto do botão (o onclick é gerenciado por lgHandleConfirmacao)
   var btn = el('conf-btn-cta');
   if (btn) {
     btn.textContent = 'Ativar meu plano agora →';
-    btn.onclick = async function() {
-      var planName = localStorage.getItem('vc_pending_plan');
-      var priceId  = localStorage.getItem('vc_pending_price');
-      if (!planName || !priceId) { go('s-nova-dre'); return; }
-      localStorage.removeItem('vc_pending_plan');
-      localStorage.removeItem('vc_pending_price');
-      await mostrarCheckoutNaConfirmacao(planName, priceId);
-    };
   }
 }
 
@@ -4329,7 +4321,7 @@ async function abrirTelaCheckout(planName, priceId) {
 function fecharCheckout() {
   if (_stripeCheckoutInstance) { _stripeCheckoutInstance.destroy(); _stripeCheckoutInstance = null; }
   document.getElementById('vc-chk-embed').innerHTML = '';
-  go('s-landing');
+  go('s-land');
 }
 
 // ── STRIPE: ABRIR PORTAL DO CLIENTE ───────────────────────────────
@@ -4359,6 +4351,30 @@ async function abrirPortal() {
     console.error(err);
     toast('Erro ao abrir portal: ' + err.message, 'erro');
   }
+}
+
+// ── HANDLER UNIFICADO DA TELA DE CONFIRMAÇÃO ─────────────────────
+async function lgHandleConfirmacao() {
+  // Captura plano do localStorage AGORA (antes de qualquer operação)
+  var planName = localStorage.getItem('vc_pending_plan');
+  var priceId  = localStorage.getItem('vc_pending_price');
+
+  // CASO 1: Novo usuário ainda não registrado (veio do formulário de cadastro)
+  if (window._cadPending) {
+    await lgConfirmarCadastro(planName, priceId);
+    return;
+  }
+
+  // CASO 2: Usuário já logado com plano pendente → ir direto ao checkout
+  if (currentUser && planName && priceId) {
+    localStorage.removeItem('vc_pending_plan');
+    localStorage.removeItem('vc_pending_price');
+    await mostrarCheckoutNaConfirmacao(planName, priceId);
+    return;
+  }
+
+  // CASO 3: Sem plano pendente → ir para o upload da DRE
+  go('s-nova-dre');
 }
 
 // ── STRIPE: VERIFICAR PLANO PENDENTE APÓS LOGIN/CADASTRO ───────────
@@ -4420,7 +4436,8 @@ function lgCadastrar() {
 }
 
 // ── ETAPA 2: CONFIRMAR E SALVAR NO SUPABASE ────────────────────────
-async function lgConfirmarCadastro() {
+// planName e priceId são passados de lgHandleConfirmacao (capturados antes de qualquer operação)
+async function lgConfirmarCadastro(planName, priceId) {
   var pending = window._cadPending;
   if (!pending) { go('s-login'); return; }
 
@@ -4432,18 +4449,42 @@ async function lgConfirmarCadastro() {
   btn.textContent = '⏳ Criando sua conta...';
   erro.style.display = 'none';
 
-  // 1. Criar conta no Supabase Auth
+  // 1. Tentar criar conta no Supabase Auth
   const { data: signUpData, error: signUpError } = await sb.auth.signUp({
     email: e,
     password: s,
     options: { data: { full_name: n } }
   });
 
+  // Se e-mail já cadastrado → fazer login com as credenciais fornecidas
+  if (signUpError && signUpError.message === 'User already registered') {
+    btn.textContent = '⏳ Identificando sua conta...';
+    const { data: signInData, error: signInError } = await sb.auth.signInWithPassword({ email: e, password: s });
+    if (signInError) {
+      erro.style.display = 'block';
+      erro.textContent = 'E-mail já cadastrado. Verifique a senha ou use a aba "Entrar".';
+      btn.disabled = false;
+      btn.textContent = 'Descobrir meu dinheiro perdido agora →';
+      return;
+    }
+    // Login ok → prosseguir como usuário existente
+    currentUser = signInData.user;
+    window._cadPending = null;
+    btn.disabled = false;
+    btn.textContent = 'Descobrir meu dinheiro perdido agora →';
+    if (planName && priceId) {
+      localStorage.removeItem('vc_pending_plan');
+      localStorage.removeItem('vc_pending_price');
+      await mostrarCheckoutNaConfirmacao(planName, priceId);
+    } else {
+      go('s-nova-dre');
+    }
+    return;
+  }
+
   if (signUpError) {
     erro.style.display = 'block';
-    erro.textContent = signUpError.message === 'User already registered'
-      ? 'Este e-mail já está cadastrado. Tente fazer login.'
-      : 'Erro: ' + signUpError.message;
+    erro.textContent = 'Erro: ' + signUpError.message;
     btn.disabled = false;
     btn.textContent = 'Descobrir meu dinheiro perdido agora →';
     return;
@@ -4451,11 +4492,9 @@ async function lgConfirmarCadastro() {
 
   // 2. Verificar se precisa confirmar e-mail
   if (!signUpData.session) {
-    // Guarda dados do perfil no localStorage para salvar após confirmação
     localStorage.setItem('vitacash_pending_profile', JSON.stringify({ n, e, tel, nicho, fat }));
     window._cadPending = null;
 
-    // Mostra mensagem de sucesso no lugar do botão
     btn.disabled = true;
     btn.style.background = '#f0fdf8';
     btn.style.color = '#065f46';
@@ -4465,7 +4504,6 @@ async function lgConfirmarCadastro() {
     btn.style.fontSize = '14px';
     btn.textContent = '✅ Cadastro realizado!';
 
-    // Insere card de instrução acima do botão
     var card = document.createElement('div');
     card.style.cssText = 'background:#f0fdf8;border:.5px solid #a7f3d0;border-radius:12px;padding:1rem 1.125rem;font-size:13px;color:#065f46;line-height:1.65;margin-bottom:.75rem;';
     card.innerHTML = '<strong>Verifique seu e-mail!</strong> Enviamos um link de confirmação para <strong>' + e + '</strong>.<br><span style="font-size:12px;color:#0d9488;">Clique no link do e-mail para ativar seu acesso. Verifique também o spam.</span>';
@@ -4473,7 +4511,7 @@ async function lgConfirmarCadastro() {
     return;
   }
 
-  // 3. Sem confirmação — fluxo direto (email confirmation desativado no Supabase)
+  // 3. Sem confirmação de e-mail — fluxo direto
   currentUser = signUpData.user;
   await sb.auth.setSession(signUpData.session);
 
@@ -4502,13 +4540,10 @@ async function lgConfirmarCadastro() {
   btn.disabled = false;
   btn.textContent = 'Descobrir meu dinheiro perdido agora →';
 
-  // Se veio de um plano pago, mostra checkout na própria página de confirmação
-  const _planPendente  = localStorage.getItem('vc_pending_plan');
-  const _pricePendente = localStorage.getItem('vc_pending_price');
-  if (_planPendente && _pricePendente) {
+  if (planName && priceId) {
     localStorage.removeItem('vc_pending_plan');
     localStorage.removeItem('vc_pending_price');
-    await mostrarCheckoutNaConfirmacao(_planPendente, _pricePendente);
+    await mostrarCheckoutNaConfirmacao(planName, priceId);
   } else {
     go('s-nova-dre');
   }
