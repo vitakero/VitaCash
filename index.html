@@ -4373,8 +4373,13 @@ async function lgHandleConfirmacao() {
     return;
   }
 
-  // CASO 3: Sem plano pendente → ir para o upload da DRE
-  go('s-nova-dre');
+  // CASO 3: Sem plano pendente → mostrar tela de escolha de plano
+  go('s-escolher-plano');
+}
+
+// ── ESCOLHER PLANO APÓS CADASTRO (usuário já logado) ──────────────
+async function escolherPlanoLogado(planName, priceId) {
+  await abrirTelaCheckout(planName, priceId);
 }
 
 // ── STRIPE: VERIFICAR PLANO PENDENTE APÓS LOGIN/CADASTRO ───────────
@@ -5963,6 +5968,71 @@ function lgMaskTel(input) {
 
     </div>
   </div>
+</div>
+
+<!-- ══ ESCOLHER PLANO (após cadastro sem plano pré-selecionado) ══ -->
+<div class="screen" id="s-escolher-plano">
+<div style="max-width:640px;margin:0 auto;padding:2rem 0 3rem;">
+
+  <!-- Cabeçalho -->
+  <div style="text-align:center;margin-bottom:2rem;">
+    <div style="display:inline-flex;align-items:center;gap:8px;background:#f0fdf8;border:.5px solid #a7f3d0;border-radius:99px;padding:5px 14px;font-size:12px;font-weight:600;color:#065f46;margin-bottom:1rem;">
+      ✅ Cadastro realizado com sucesso!
+    </div>
+    <h2 style="font-family:'Sora',sans-serif;font-size:clamp(1.4rem,4vw,1.9rem);font-weight:800;color:#0f172a;letter-spacing:-.5px;margin-bottom:.5rem;line-height:1.25;">Escolha seu plano</h2>
+    <p style="font-size:14px;color:#64748b;line-height:1.6;">14 dias grátis em todos os planos · Cancele quando quiser</p>
+  </div>
+
+  <!-- Cards dos planos -->
+  <div style="display:flex;flex-direction:column;gap:12px;">
+
+    <!-- Growth -->
+    <div style="background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;padding:1.125rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;cursor:pointer;transition:all .15s;" onclick="escolherPlanoLogado('growth','price_1TUWo3HkpdynZUBW6AVGmLeu')" onmouseover="this.style.borderColor='#1D9E75';this.style.boxShadow='0 4px 16px rgba(29,158,117,.1)'" onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow=''">
+      <div>
+        <div style="font-size:15px;font-weight:700;color:#0f172a;margin-bottom:2px;">Growth</div>
+        <div style="font-size:12px;color:#64748b;">DRE + análise IA + insights mensais</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="font-family:'Sora',sans-serif;font-size:18px;font-weight:800;color:#0f172a;">R$97<span style="font-size:12px;font-weight:500;color:#94a3b8;">/mês</span></div>
+        <button style="margin-top:6px;padding:6px 16px;border-radius:8px;border:1.5px solid #1D9E75;background:transparent;color:#1D9E75;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Escolher →</button>
+      </div>
+    </div>
+
+    <!-- PRO (destaque) -->
+    <div style="background:linear-gradient(135deg,#f0fdf8,#e8fef4);border:2px solid #1D9E75;border-radius:14px;padding:1.125rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;cursor:pointer;transition:all .15s;position:relative;" onclick="escolherPlanoLogado('pro','price_1TUWxWHkpdynZUBW2DLLEnlE')" onmouseover="this.style.boxShadow='0 6px 24px rgba(29,158,117,.2)'" onmouseout="this.style.boxShadow=''">
+      <div style="position:absolute;top:-11px;left:1.25rem;background:#1D9E75;color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;letter-spacing:.3px;">MAIS POPULAR</div>
+      <div>
+        <div style="font-size:15px;font-weight:700;color:#065f46;margin-bottom:2px;">PRO</div>
+        <div style="font-size:12px;color:#0d9488;">Tudo do Growth + valuation + plano de ação</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="font-family:'Sora',sans-serif;font-size:18px;font-weight:800;color:#065f46;">R$197<span style="font-size:12px;font-weight:500;color:#6ee7b7;">/mês</span></div>
+        <button style="margin-top:6px;padding:6px 16px;border-radius:8px;border:none;background:#1D9E75;color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Escolher →</button>
+      </div>
+    </div>
+
+    <!-- Premium -->
+    <div style="background:#0f172a;border:1.5px solid #334155;border-radius:14px;padding:1.125rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;cursor:pointer;transition:all .15s;" onclick="escolherPlanoLogado('premium','price_1TUX0UHkpdynZUBWS1WLFmE4')" onmouseover="this.style.borderColor='#1D9E75';this.style.boxShadow='0 4px 16px rgba(29,158,117,.15)'" onmouseout="this.style.borderColor='#334155';this.style.boxShadow=''">
+      <div>
+        <div style="font-size:15px;font-weight:700;color:#f1f5f9;margin-bottom:2px;">Premium</div>
+        <div style="font-size:12px;color:#94a3b8;">Tudo do PRO + múltiplas empresas + suporte prioritário</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="font-family:'Sora',sans-serif;font-size:18px;font-weight:800;color:#f1f5f9;">R$347<span style="font-size:12px;font-weight:500;color:#475569;">/mês</span></div>
+        <button style="margin-top:6px;padding:6px 16px;border-radius:8px;border:1.5px solid #475569;background:transparent;color:#e2e8f0;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Escolher →</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Continuar grátis -->
+  <div style="text-align:center;margin-top:1.25rem;">
+    <button onclick="go('s-nova-dre')" style="background:none;border:none;cursor:pointer;font-size:13px;color:#94a3b8;font-family:inherit;padding:8px;">
+      Continuar com o plano gratuito por enquanto →
+    </button>
+  </div>
+
+</div>
 </div>
 
 <!-- ══ TELA DE CHECKOUT ══ -->
