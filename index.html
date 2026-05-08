@@ -5966,8 +5966,11 @@ function lgMaskTel(input) {
 </div>
 
 <!-- ══ TELA DE CHECKOUT ══ -->
+<style>
+#s-checkout.active{position:fixed;inset:0;display:flex;flex-direction:column;z-index:200;overflow:hidden;}
+</style>
 <div class="screen" id="s-checkout">
-  <div style="min-height:100vh;background:#f8fafc;display:flex;flex-direction:column;">
+  <div style="flex:1;background:#f8fafc;display:flex;flex-direction:column;overflow:hidden;">
 
     <!-- Topo -->
     <div style="background:#fff;border-bottom:1px solid #e2e8f0;padding:.875rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
@@ -5982,7 +5985,7 @@ function lgMaskTel(input) {
     </div>
 
     <!-- Corpo -->
-    <div style="flex:1;overflow-y:auto;padding:1.5rem 1rem;max-width:600px;width:100%;margin:0 auto;">
+    <div style="flex:1;overflow-y:auto;padding:1.5rem 1rem;max-width:560px;width:100%;margin:0 auto;">
 
       <!-- Loading -->
       <div id="vc-chk-loading" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4rem 1rem;gap:12px;">
