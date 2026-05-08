@@ -4235,8 +4235,8 @@ let currentUser = null;
 let _stripeCheckoutInstance = null;
 
 async function iniciarCheckout(planName, priceId, btn) {
-  sessionStorage.setItem('vc_pending_plan', planName);
-  sessionStorage.setItem('vc_pending_price', priceId);
+  localStorage.setItem('vc_pending_plan', planName);
+  localStorage.setItem('vc_pending_price', priceId);
 
   if (!currentUser) {
     // Não logado → vai para cadastro
@@ -4272,11 +4272,11 @@ async function preencherConfirmacaoLogado() {
   if (btn) {
     btn.textContent = 'Ativar meu plano agora →';
     btn.onclick = async function() {
-      var planName = sessionStorage.getItem('vc_pending_plan');
-      var priceId  = sessionStorage.getItem('vc_pending_price');
+      var planName = localStorage.getItem('vc_pending_plan');
+      var priceId  = localStorage.getItem('vc_pending_price');
       if (!planName || !priceId) { go('s-nova-dre'); return; }
-      sessionStorage.removeItem('vc_pending_plan');
-      sessionStorage.removeItem('vc_pending_price');
+      localStorage.removeItem('vc_pending_plan');
+      localStorage.removeItem('vc_pending_price');
       await mostrarCheckoutNaConfirmacao(planName, priceId);
     };
   }
@@ -4363,8 +4363,8 @@ async function abrirPortal() {
 
 // ── STRIPE: VERIFICAR PLANO PENDENTE APÓS LOGIN/CADASTRO ───────────
 async function verificarPlanoPendente() {
-  const planName = sessionStorage.getItem('vc_pending_plan');
-  const priceId  = sessionStorage.getItem('vc_pending_price');
+  const planName = localStorage.getItem('vc_pending_plan');
+  const priceId  = localStorage.getItem('vc_pending_price');
   if (!planName || !priceId || !currentUser) return;
 
   // Verifica se o usuário já tem assinatura ativa
@@ -4378,8 +4378,8 @@ async function verificarPlanoPendente() {
 
   if (statusAtivo && planoAtivo) {
     // Já é assinante → limpa o pendente e vai para o dashboard
-    sessionStorage.removeItem('vc_pending_plan');
-    sessionStorage.removeItem('vc_pending_price');
+    localStorage.removeItem('vc_pending_plan');
+    localStorage.removeItem('vc_pending_price');
     toast('Você já possui o plano ' + profile.current_plan + ' ativo!', 'ok');
     return; // lgEntrar/lgConfirmarCadastro vai chamar go('s-dash')
   }
@@ -4568,11 +4568,11 @@ async function lgConfirmarCadastro() {
   btn.textContent = 'Descobrir meu dinheiro perdido agora →';
 
   // Se veio de um plano pago, mostra checkout na própria página de confirmação
-  const _planPendente  = sessionStorage.getItem('vc_pending_plan');
-  const _pricePendente = sessionStorage.getItem('vc_pending_price');
+  const _planPendente  = localStorage.getItem('vc_pending_plan');
+  const _pricePendente = localStorage.getItem('vc_pending_price');
   if (_planPendente && _pricePendente) {
-    sessionStorage.removeItem('vc_pending_plan');
-    sessionStorage.removeItem('vc_pending_price');
+    localStorage.removeItem('vc_pending_plan');
+    localStorage.removeItem('vc_pending_price');
     await mostrarCheckoutNaConfirmacao(_planPendente, _pricePendente);
   } else {
     go('s-nova-dre');
