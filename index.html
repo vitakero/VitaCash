@@ -4622,8 +4622,11 @@ async function lgEntrar() {
     } catch(err) { console.error('Erro ao salvar perfil pendente:', err); }
   }
 
+  const _temPlanoPendente = localStorage.getItem('vc_pending_plan');
   await verificarPlanoPendente();
-  go('s-dash');
+  if (!_temPlanoPendente) {
+    go('s-dash');
+  }
 }
 
 // ── ESQUECI A SENHA ────────────────────────────────────────────────
