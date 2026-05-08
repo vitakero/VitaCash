@@ -5971,8 +5971,11 @@ function lgMaskTel(input) {
 </div>
 
 <!-- ══ ESCOLHER PLANO (após cadastro sem plano pré-selecionado) ══ -->
+<style>
+#s-escolher-plano.active{position:fixed;inset:0;display:block;z-index:100;overflow-y:auto;background:#f5f4f0;}
+</style>
 <div class="screen" id="s-escolher-plano">
-<div style="max-width:960px;margin:0 auto;padding:2.5rem 0 3rem;">
+<div style="max-width:960px;margin:0 auto;padding:2.5rem 1.5rem 3rem;">
 
   <!-- Cabeçalho -->
   <div style="text-align:center;margin-bottom:2.5rem;">
@@ -5984,7 +5987,21 @@ function lgMaskTel(input) {
   </div>
 
   <!-- Grid de planos -->
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start;">
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;align-items:start;">
+
+    <!-- Starter (Grátis) -->
+    <div onclick="go('s-nova-dre')" style="background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;padding:1.5rem;cursor:pointer;transition:all .18s;" onmouseover="this.style.borderColor='#1D9E75';this.style.boxShadow='0 6px 20px rgba(29,158,117,.12)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow='';this.style.transform=''">
+      <div style="font-size:11px;font-weight:700;color:#64748b;letter-spacing:.8px;text-transform:uppercase;margin-bottom:.75rem;">STARTER</div>
+      <div style="font-family:'Sora',sans-serif;font-size:2rem;font-weight:800;color:#0f172a;letter-spacing:-1px;line-height:1;">R$0<span style="font-size:13px;font-weight:500;color:#94a3b8;">/mês</span></div>
+      <div style="font-size:12px;color:#64748b;margin:.5rem 0 1.25rem;">Para começar</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem;">
+        <div style="display:flex;gap:8px;align-items:center;font-size:13px;color:#334155;"><svg width="14" height="14" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>1 empresa</div>
+        <div style="display:flex;gap:8px;align-items:center;font-size:13px;color:#334155;"><svg width="14" height="14" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>5 indicadores básicos</div>
+        <div style="display:flex;gap:8px;align-items:center;font-size:13px;color:#334155;"><svg width="14" height="14" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Comparativo setorial</div>
+        <div style="display:flex;gap:8px;align-items:center;font-size:13px;color:#94a3b8;"><svg width="14" height="14" viewBox="0 0 12 12" fill="none"><line x1="2" y1="6" x2="10" y2="6" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round"/></svg><span style="text-decoration:line-through;">Análise IA completa</span></div>
+      </div>
+      <button style="width:100%;padding:11px;border-radius:10px;border:1.5px solid #e2e8f0;background:transparent;color:#0f172a;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;" onmouseover="this.style.borderColor='#1D9E75';this.style.color='#1D9E75'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#0f172a'">Começar grátis</button>
+    </div>
 
     <!-- Growth -->
     <div onclick="escolherPlanoLogado('growth','price_1TUWo3HkpdynZUBW6AVGmLeu')" style="background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;padding:1.5rem;cursor:pointer;transition:all .18s;" onmouseover="this.style.borderColor='#1D9E75';this.style.boxShadow='0 6px 20px rgba(29,158,117,.12)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#e2e8f0';this.style.boxShadow='';this.style.transform=''">
@@ -6034,11 +6051,9 @@ function lgMaskTel(input) {
 
   </div>
 
-  <!-- Continuar grátis -->
-  <div style="text-align:center;margin-top:1.5rem;">
-    <button onclick="go('s-nova-dre')" style="background:none;border:none;cursor:pointer;font-size:13px;color:#94a3b8;font-family:inherit;padding:8px;transition:color .15s;" onmouseover="this.style.color='#475569'" onmouseout="this.style.color='#94a3b8'">
-      Continuar com o plano gratuito por enquanto →
-    </button>
+  <!-- Rodapé -->
+  <div style="text-align:center;margin-top:1.25rem;font-size:12px;color:#94a3b8;">
+    🔒 Pagamento 100% seguro via Stripe · Cancele quando quiser
   </div>
 
 </div>
