@@ -6061,45 +6061,40 @@ function lgMaskTel(input) {
 
 <!-- ══ TELA DE CHECKOUT ══ -->
 <style>
-#s-checkout.active{position:fixed;inset:0;display:flex;flex-direction:column;z-index:200;overflow:hidden;}
+#s-checkout.active{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:200;overflow-y:auto;background:#f5f4f0;padding:2rem 1rem;}
 </style>
 <div class="screen" id="s-checkout">
-  <div style="flex:1;background:#f8fafc;display:flex;flex-direction:column;overflow:hidden;">
+  <div style="width:100%;max-width:520px;">
 
-    <!-- Topo -->
-    <div style="background:#fff;border-bottom:1px solid #e2e8f0;padding:.875rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-      <div style="font-family:'Sora',sans-serif;font-size:17px;font-weight:800;color:#0f172a;letter-spacing:-.4px;">
-        Vita<span style="color:#1D9E75;">Cash</span>
-        <span id="vc-chk-plan-label" style="font-size:12px;font-weight:600;color:#1D9E75;background:#f0fdf8;padding:3px 10px;border-radius:99px;border:1px solid #a7f3d0;margin-left:8px;"></span>
+    <!-- Mini cabeçalho integrado -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-family:'Sora',sans-serif;font-size:15px;font-weight:800;color:#0f172a;">Vita<span style="color:#1D9E75;">Cash</span></span>
+        <span id="vc-chk-plan-label" style="font-size:11px;font-weight:600;color:#1D9E75;background:#f0fdf8;padding:3px 10px;border-radius:99px;border:1px solid #a7f3d0;"></span>
       </div>
-      <button onclick="fecharCheckout()" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:13px;font-family:inherit;display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:8px;transition:all .15s;" onmouseover="this.style.background='#f1f5f9';this.style.color='#475569'" onmouseout="this.style.background='none';this.style.color='#94a3b8'">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <button onclick="fecharCheckout()" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:13px;font-family:inherit;display:flex;align-items:center;gap:4px;padding:5px 8px;border-radius:8px;transition:all .15s;" onmouseover="this.style.background='#e8edf2';this.style.color='#475569'" onmouseout="this.style.background='none';this.style.color='#94a3b8'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
         Voltar
       </button>
     </div>
 
-    <!-- Corpo -->
-    <div style="flex:1;overflow-y:auto;padding:1.5rem 1rem;max-width:560px;width:100%;margin:0 auto;">
-
-      <!-- Loading -->
-      <div id="vc-chk-loading" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4rem 1rem;gap:12px;">
-        <div style="width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#1D9E75;border-radius:50%;animation:spin .8s linear infinite;"></div>
-        <div style="font-size:14px;color:#64748b;">Carregando checkout seguro...</div>
-      </div>
-
-      <!-- Erro -->
-      <div id="vc-chk-erro" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:1rem 1.25rem;font-size:13px;color:#dc2626;text-align:center;margin-bottom:1rem;">
-        Erro ao carregar o pagamento.
-        <button onclick="fecharCheckout()" style="display:block;margin:.5rem auto 0;color:#1D9E75;background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;">Voltar →</button>
-      </div>
-
-      <!-- Checkout embutido -->
-      <div id="vc-chk-embed"></div>
-
+    <!-- Loading -->
+    <div id="vc-chk-loading" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4rem 1rem;gap:12px;background:#fff;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,.07);">
+      <div style="width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#1D9E75;border-radius:50%;animation:spin .8s linear infinite;"></div>
+      <div style="font-size:14px;color:#64748b;">Carregando pagamento seguro...</div>
     </div>
 
+    <!-- Erro -->
+    <div id="vc-chk-erro" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:1rem 1.25rem;font-size:13px;color:#dc2626;text-align:center;margin-bottom:1rem;">
+      Erro ao carregar o pagamento.
+      <button onclick="fecharCheckout()" style="display:block;margin:.5rem auto 0;color:#1D9E75;background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;">Voltar →</button>
+    </div>
+
+    <!-- Checkout embutido -->
+    <div id="vc-chk-embed"></div>
+
     <!-- Rodapé segurança -->
-    <div style="text-align:center;padding:.75rem;font-size:11.5px;color:#94a3b8;border-top:1px solid #f1f5f9;background:#fff;display:flex;align-items:center;justify-content:center;gap:5px;flex-shrink:0;">
+    <div style="text-align:center;margin-top:1rem;font-size:11.5px;color:#94a3b8;display:flex;align-items:center;justify-content:center;gap:5px;">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1D9E75" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
       Pagamento 100% seguro via Stripe · Você só é cobrado após 14 dias
     </div>
