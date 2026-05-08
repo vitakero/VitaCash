@@ -4482,7 +4482,7 @@ async function lgConfirmarCadastro(planName, priceId) {
       localStorage.removeItem('vc_pending_price');
       await mostrarCheckoutNaConfirmacao(planName, priceId);
     } else {
-      go('s-nova-dre');
+      go('s-escolher-plano');
     }
     return;
   }
@@ -4550,7 +4550,7 @@ async function lgConfirmarCadastro(planName, priceId) {
     localStorage.removeItem('vc_pending_price');
     await mostrarCheckoutNaConfirmacao(planName, priceId);
   } else {
-    go('s-nova-dre');
+    go('s-escolher-plano');
   }
 }
 
