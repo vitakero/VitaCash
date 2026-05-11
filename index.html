@@ -1735,17 +1735,11 @@ div[style*="position:absolute;top:0;left:0;right:0;height:3px"]{height:2px;}
         Nova análise
       </button>
 
-      <!-- BADGE PLANO ATUAL -->
-      <div id="dash-plano-badge" style="display:none;align-items:center;gap:6px;padding:7px 13px;border-radius:9px;border:.5px solid var(--border2);background:var(--surface);font-size:12px;font-weight:600;font-family:inherit;white-space:nowrap;">
-        <span id="dash-plano-dot" style="width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;flex-shrink:0;"></span>
-        <span id="dash-plano-label">PRO</span>
+      <!-- BOTÃO MINHA ASSINATURA + PLANO -->
+      <button onclick="abrirPortal()" title="Gerenciar assinatura" id="dash-plano-badge" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;border:.5px solid var(--border2);background:var(--surface);color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;" onmouseover="this.style.background='var(--surface2)';this.style.color='var(--text)'" onmouseout="this.style.background='var(--surface)';this.style.color='var(--text2)'">
+        <span id="dash-plano-dot" style="width:7px;height:7px;border-radius:50%;background:var(--border2);display:inline-block;flex-shrink:0;"></span>
+        <span id="dash-plano-label">Minha assinatura</span>
         <span id="dash-plano-status" style="color:var(--text3);font-weight:500;"></span>
-      </div>
-
-      <!-- BOTÃO MINHA ASSINATURA -->
-      <button onclick="abrirPortal()" title="Gerenciar assinatura" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;border:.5px solid var(--border2);background:var(--surface);color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;" onmouseover="this.style.background='var(--surface2)';this.style.color='var(--text)'" onmouseout="this.style.background='var(--surface)';this.style.color='var(--text2)'">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-        Minha assinatura
       </button>
 
       <!-- Saudação + Avatar -->
@@ -4720,38 +4714,35 @@ async function carregarPerfilDash() {
     var mc = document.getElementById('dash-microcopy');
     if (mc) mc.textContent = 'Diagnóstico financeiro · ' + nicho;
 
-    // Badge de plano/assinatura
-    var badge = document.getElementById('dash-plano-badge');
-    var dot   = document.getElementById('dash-plano-dot');
-    var label = document.getElementById('dash-plano-label');
+    // Badge de plano/assinatura no botão
+    var dot      = document.getElementById('dash-plano-dot');
+    var label    = document.getElementById('dash-plano-label');
     var statusEl = document.getElementById('dash-plano-status');
-    if (badge && data.current_plan && data.current_plan !== 'starter') {
-      var planoNome = (data.current_plan || 'starter').toUpperCase();
-      var st = data.subscription_status || '';
-      var dotColor = '#6b7280'; // cinza padrão
+    if (dot && label && statusEl) {
+      var st = data.subscription_status || 'free';
+      var plano = (data.current_plan || 'starter');
+      var dotColor = '#9ca3af';
       var statusTxt = '';
-      if (st === 'trialing') {
-        dotColor = '#f59e0b'; // amarelo
-        if (data.current_period_end) {
-          var diasRestantes = Math.ceil((new Date(data.current_period_end) - new Date()) / (1000*60*60*24));
-          statusTxt = '· Trial · ' + diasRestantes + ' dias';
-        } else {
-          statusTxt = '· Em trial';
+      if (plano !== 'starter' && plano !== 'free') {
+        label.textContent = plano.toUpperCase();
+        if (st === 'trialing') {
+          dotColor = '#f59e0b';
+          statusTxt = '· Trial';
+        } else if (st === 'active') {
+          dotColor = '#1d9e75';
+          statusTxt = '· Ativo';
+        } else if (st === 'past_due') {
+          dotColor = '#ef4444';
+          statusTxt = '· Pendente';
+        } else if (st === 'canceled') {
+          dotColor = '#9ca3af';
+          statusTxt = '· Cancelado';
         }
-      } else if (st === 'active') {
-        dotColor = 'var(--green)';
-        statusTxt = '· Ativo';
-      } else if (st === 'past_due') {
-        dotColor = '#ef4444';
-        statusTxt = '· Pagamento pendente';
-      } else if (st === 'canceled') {
-        dotColor = '#6b7280';
-        statusTxt = '· Cancelado';
+      } else {
+        label.textContent = 'Minha assinatura';
       }
       dot.style.background = dotColor;
-      label.textContent = planoNome;
       statusEl.textContent = statusTxt;
-      badge.style.display = 'inline-flex';
     }
   } catch(e) { console.warn('carregarPerfilDash:', e); }
 }
