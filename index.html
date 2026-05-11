@@ -1735,6 +1735,13 @@ div[style*="position:absolute;top:0;left:0;right:0;height:3px"]{height:2px;}
         Nova análise
       </button>
 
+      <!-- BADGE PLANO ATUAL -->
+      <div id="dash-plano-badge" style="display:none;align-items:center;gap:6px;padding:7px 13px;border-radius:9px;border:.5px solid var(--border2);background:var(--surface);font-size:12px;font-weight:600;font-family:inherit;white-space:nowrap;">
+        <span id="dash-plano-dot" style="width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;flex-shrink:0;"></span>
+        <span id="dash-plano-label">PRO</span>
+        <span id="dash-plano-status" style="color:var(--text3);font-weight:500;"></span>
+      </div>
+
       <!-- BOTÃO MINHA ASSINATURA -->
       <button onclick="abrirPortal()" title="Gerenciar assinatura" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;border:.5px solid var(--border2);background:var(--surface);color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;" onmouseover="this.style.background='var(--surface2)';this.style.color='var(--text)'" onmouseout="this.style.background='var(--surface)';this.style.color='var(--text2)'">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
@@ -3923,7 +3930,7 @@ div[style*="position:absolute;top:0;left:0;right:0;height:3px"]{height:2px;}
 
       <!-- CTA principal -->
       <div style="animation:fadeUp .5s .22s ease both;">
-        <button id="conf-btn-cta" onclick="lgConfirmarCadastro()" class="conf-cta">
+        <button id="conf-btn-cta" onclick="lgHandleConfirmacao()" class="conf-cta">
           Descobrir meu dinheiro perdido agora →
         </button>
       </div>
@@ -4267,18 +4274,10 @@ async function preencherConfirmacaoLogado() {
   if (el('conf-nicho')) el('conf-nicho').textContent = nicho;
   if (el('conf-fat'))   el('conf-fat').textContent   = fat;
 
-  // Muda o botão para ir direto ao checkout (sem criar conta nova)
+  // Muda o texto do botão (o onclick é gerenciado por lgHandleConfirmacao)
   var btn = el('conf-btn-cta');
   if (btn) {
     btn.textContent = 'Ativar meu plano agora →';
-    btn.onclick = async function() {
-      var planName = localStorage.getItem('vc_pending_plan');
-      var priceId  = localStorage.getItem('vc_pending_price');
-      if (!planName || !priceId) { go('s-nova-dre'); return; }
-      localStorage.removeItem('vc_pending_plan');
-      localStorage.removeItem('vc_pending_price');
-      await mostrarCheckoutNaConfirmacao(planName, priceId);
-    };
   }
 }
 
@@ -4329,7 +4328,12 @@ async function abrirTelaCheckout(planName, priceId) {
 function fecharCheckout() {
   if (_stripeCheckoutInstance) { _stripeCheckoutInstance.destroy(); _stripeCheckoutInstance = null; }
   document.getElementById('vc-chk-embed').innerHTML = '';
-  go('s-landing');
+  // Se logado → volta para escolher plano; senão → landing page
+  if (currentUser) {
+    go('s-escolher-plano');
+  } else {
+    go('s-land');
+  }
 }
 
 // ── STRIPE: ABRIR PORTAL DO CLIENTE ───────────────────────────────
@@ -4361,6 +4365,35 @@ async function abrirPortal() {
   }
 }
 
+// ── HANDLER UNIFICADO DA TELA DE CONFIRMAÇÃO ─────────────────────
+async function lgHandleConfirmacao() {
+  // Captura plano do localStorage AGORA (antes de qualquer operação)
+  var planName = localStorage.getItem('vc_pending_plan');
+  var priceId  = localStorage.getItem('vc_pending_price');
+
+  // CASO 1: Novo usuário ainda não registrado (veio do formulário de cadastro)
+  if (window._cadPending) {
+    await lgConfirmarCadastro(planName, priceId);
+    return;
+  }
+
+  // CASO 2: Usuário já logado com plano pendente → ir direto ao checkout
+  if (currentUser && planName && priceId) {
+    localStorage.removeItem('vc_pending_plan');
+    localStorage.removeItem('vc_pending_price');
+    await mostrarCheckoutNaConfirmacao(planName, priceId);
+    return;
+  }
+
+  // CASO 3: Sem plano pendente → mostrar tela de escolha de plano
+  go('s-escolher-plano');
+}
+
+// ── ESCOLHER PLANO APÓS CADASTRO (usuário já logado) ──────────────
+async function escolherPlanoLogado(planName, priceId) {
+  await abrirTelaCheckout(planName, priceId);
+}
+
 // ── STRIPE: VERIFICAR PLANO PENDENTE APÓS LOGIN/CADASTRO ───────────
 async function verificarPlanoPendente() {
   const planName = localStorage.getItem('vc_pending_plan');
@@ -4389,75 +4422,10 @@ async function verificarPlanoPendente() {
   go('s-confirmacao');
 }
 
-// ── STRIPE: CHECKOUT EMBUTIDO NA PÁGINA DE CONFIRMAÇÃO ──────────────
+// ── STRIPE: CHECKOUT APÓS CONFIRMAÇÃO ───────────────────────────────
 async function mostrarCheckoutNaConfirmacao(planName, priceId) {
-  var nomes = { growth: 'Growth — R$97/mês', pro: 'PRO — R$197/mês', premium: 'Premium — R$347/mês' };
-
-  // Atualiza cabeçalho da página
-  var h2 = document.querySelector('#s-confirmacao h2');
-  var p  = document.querySelector('#s-confirmacao p');
-  if (h2) h2.innerHTML = '🎉 Cadastro criado!<br>Ative seus 14 dias grátis';
-  if (p)  p.innerHTML  = 'Insira os dados do cartão para ativar o plano <strong>' + (nomes[planName] || planName) + '</strong>.<br><span style="font-size:12px;color:#94a3b8;">Você só será cobrado após 14 dias. Cancele quando quiser.</span>';
-
-  // Oculta todos os elementos abaixo do cabeçalho
-  Array.from(document.querySelectorAll('#s-confirmacao > div > div > div')).forEach(function(el) {
-    el.style.display = 'none';
-  });
-
-  // Cria área do checkout embutido
-  var area = document.createElement('div');
-  area.id = 'conf-checkout-area';
-  area.innerHTML =
-    '<div id="conf-stripe-loading" style="text-align:center;padding:2.5rem 1rem;">' +
-      '<div style="width:36px;height:36px;border:3px solid #e2e8f0;border-top-color:#1D9E75;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1rem;"></div>' +
-      '<p style="font-size:14px;color:#475569;margin:0;">Carregando formulário de pagamento...</p>' +
-    '</div>' +
-    '<div id="conf-stripe-embed"></div>' +
-    '<div style="text-align:center;margin-top:1rem;">' +
-      '<button onclick="go(\'s-nova-dre\')" style="background:none;border:none;cursor:pointer;font-size:12px;color:#94a3b8;font-family:inherit;padding:6px 10px;border-radius:8px;transition:color .15s;" onmouseover="this.style.color=\'#475569\'" onmouseout="this.style.color=\'#94a3b8\'">' +
-        'Pular por agora e entrar no diagnóstico →' +
-      '</button>' +
-    '</div>';
-
-  document.querySelector('#s-confirmacao > div > div').appendChild(area);
-
-  // Busca clientSecret e monta o checkout do Stripe
-  try {
-    const { data: { session } } = await sb.auth.getSession();
-    const returnUrl = window.location.protocol === 'file:'
-      ? 'https://vitacash.com.br'
-      : window.location.href;
-
-    const res = await fetch(
-      'https://asrecwsocneepipvfymx.supabase.co/functions/v1/create-checkout-session',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + session.access_token,
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzcmVjd3NvY25lZXBpcHZmeW14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NzUzMTMsImV4cCI6MjA5MzA1MTMxM30.b_d06izv5S4SxA2UF-BjwB2lWCqOABCF7ODPLVtO1aA'
-        },
-        body: JSON.stringify({ priceId: priceId, planName: planName, returnUrl: returnUrl })
-      }
-    );
-
-    const data = await res.json();
-    if (!data.clientSecret) throw new Error(data.error || 'Erro ao criar sessão');
-
-    const stripe = Stripe('pk_test_51TUWfgHkpdynZUBWpZunowiMf3sJm0qij4pZYQ6fE8zMY4f7UA29kG3GXQQLjJXCnozxZKthgDxkShXuy2mCGzQj00LoFKZmDm');
-    const checkout = await stripe.initEmbeddedCheckout({ clientSecret: data.clientSecret });
-
-    document.getElementById('conf-stripe-loading').style.display = 'none';
-    checkout.mount('#conf-stripe-embed');
-
-  } catch (err) {
-    console.error(err);
-    document.getElementById('conf-stripe-loading').innerHTML =
-      '<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:12px 16px;font-size:13px;color:#dc2626;text-align:center;">' +
-        'Erro ao carregar o pagamento.<br>' +
-        '<button onclick="go(\'s-nova-dre\')" style="margin-top:8px;color:#1D9E75;background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;">Continuar para o diagnóstico →</button>' +
-      '</div>';
-  }
+  // Simplesmente abre a tela de checkout dedicada
+  await abrirTelaCheckout(planName, priceId);
 }
 
 // ── ETAPA 1: MOSTRAR CONFIRMAÇÃO (sem salvar nada ainda) ───────────
@@ -4485,7 +4453,8 @@ function lgCadastrar() {
 }
 
 // ── ETAPA 2: CONFIRMAR E SALVAR NO SUPABASE ────────────────────────
-async function lgConfirmarCadastro() {
+// planName e priceId são passados de lgHandleConfirmacao (capturados antes de qualquer operação)
+async function lgConfirmarCadastro(planName, priceId) {
   var pending = window._cadPending;
   if (!pending) { go('s-login'); return; }
 
@@ -4497,18 +4466,42 @@ async function lgConfirmarCadastro() {
   btn.textContent = '⏳ Criando sua conta...';
   erro.style.display = 'none';
 
-  // 1. Criar conta no Supabase Auth
+  // 1. Tentar criar conta no Supabase Auth
   const { data: signUpData, error: signUpError } = await sb.auth.signUp({
     email: e,
     password: s,
     options: { data: { full_name: n } }
   });
 
+  // Se e-mail já cadastrado → fazer login com as credenciais fornecidas
+  if (signUpError && signUpError.message === 'User already registered') {
+    btn.textContent = '⏳ Identificando sua conta...';
+    const { data: signInData, error: signInError } = await sb.auth.signInWithPassword({ email: e, password: s });
+    if (signInError) {
+      erro.style.display = 'block';
+      erro.textContent = 'E-mail já cadastrado. Verifique a senha ou use a aba "Entrar".';
+      btn.disabled = false;
+      btn.textContent = 'Descobrir meu dinheiro perdido agora →';
+      return;
+    }
+    // Login ok → prosseguir como usuário existente
+    currentUser = signInData.user;
+    window._cadPending = null;
+    btn.disabled = false;
+    btn.textContent = 'Descobrir meu dinheiro perdido agora →';
+    if (planName && priceId) {
+      localStorage.removeItem('vc_pending_plan');
+      localStorage.removeItem('vc_pending_price');
+      await mostrarCheckoutNaConfirmacao(planName, priceId);
+    } else {
+      go('s-escolher-plano');
+    }
+    return;
+  }
+
   if (signUpError) {
     erro.style.display = 'block';
-    erro.textContent = signUpError.message === 'User already registered'
-      ? 'Este e-mail já está cadastrado. Tente fazer login.'
-      : 'Erro: ' + signUpError.message;
+    erro.textContent = 'Erro: ' + signUpError.message;
     btn.disabled = false;
     btn.textContent = 'Descobrir meu dinheiro perdido agora →';
     return;
@@ -4516,11 +4509,9 @@ async function lgConfirmarCadastro() {
 
   // 2. Verificar se precisa confirmar e-mail
   if (!signUpData.session) {
-    // Guarda dados do perfil no localStorage para salvar após confirmação
     localStorage.setItem('vitacash_pending_profile', JSON.stringify({ n, e, tel, nicho, fat }));
     window._cadPending = null;
 
-    // Mostra mensagem de sucesso no lugar do botão
     btn.disabled = true;
     btn.style.background = '#f0fdf8';
     btn.style.color = '#065f46';
@@ -4530,7 +4521,6 @@ async function lgConfirmarCadastro() {
     btn.style.fontSize = '14px';
     btn.textContent = '✅ Cadastro realizado!';
 
-    // Insere card de instrução acima do botão
     var card = document.createElement('div');
     card.style.cssText = 'background:#f0fdf8;border:.5px solid #a7f3d0;border-radius:12px;padding:1rem 1.125rem;font-size:13px;color:#065f46;line-height:1.65;margin-bottom:.75rem;';
     card.innerHTML = '<strong>Verifique seu e-mail!</strong> Enviamos um link de confirmação para <strong>' + e + '</strong>.<br><span style="font-size:12px;color:#0d9488;">Clique no link do e-mail para ativar seu acesso. Verifique também o spam.</span>';
@@ -4538,7 +4528,7 @@ async function lgConfirmarCadastro() {
     return;
   }
 
-  // 3. Sem confirmação — fluxo direto (email confirmation desativado no Supabase)
+  // 3. Sem confirmação de e-mail — fluxo direto
   currentUser = signUpData.user;
   await sb.auth.setSession(signUpData.session);
 
@@ -4567,15 +4557,12 @@ async function lgConfirmarCadastro() {
   btn.disabled = false;
   btn.textContent = 'Descobrir meu dinheiro perdido agora →';
 
-  // Se veio de um plano pago, mostra checkout na própria página de confirmação
-  const _planPendente  = localStorage.getItem('vc_pending_plan');
-  const _pricePendente = localStorage.getItem('vc_pending_price');
-  if (_planPendente && _pricePendente) {
+  if (planName && priceId) {
     localStorage.removeItem('vc_pending_plan');
     localStorage.removeItem('vc_pending_price');
-    await mostrarCheckoutNaConfirmacao(_planPendente, _pricePendente);
+    await mostrarCheckoutNaConfirmacao(planName, priceId);
   } else {
-    go('s-nova-dre');
+    go('s-escolher-plano');
   }
 }
 
@@ -4622,8 +4609,11 @@ async function lgEntrar() {
     } catch(err) { console.error('Erro ao salvar perfil pendente:', err); }
   }
 
+  const _temPlanoPendente = localStorage.getItem('vc_pending_plan');
   await verificarPlanoPendente();
-  go('s-dash');
+  if (!_temPlanoPendente) {
+    go('s-dash');
+  }
 }
 
 // ── ESQUECI A SENHA ────────────────────────────────────────────────
@@ -4703,7 +4693,7 @@ async function carregarPerfilDash() {
   if (!currentUser) return;
   try {
     var { data, error } = await sb.from('profiles')
-      .select('full_name, nicho, faturamento_faixa')
+      .select('full_name, nicho, faturamento_faixa, current_plan, subscription_status, current_period_end')
       .eq('id', currentUser.id)
       .single();
     if (error || !data) return;
@@ -4729,6 +4719,40 @@ async function carregarPerfilDash() {
     // Microcopy abaixo do logo
     var mc = document.getElementById('dash-microcopy');
     if (mc) mc.textContent = 'Diagnóstico financeiro · ' + nicho;
+
+    // Badge de plano/assinatura
+    var badge = document.getElementById('dash-plano-badge');
+    var dot   = document.getElementById('dash-plano-dot');
+    var label = document.getElementById('dash-plano-label');
+    var statusEl = document.getElementById('dash-plano-status');
+    if (badge && data.current_plan && data.current_plan !== 'starter') {
+      var planoNome = (data.current_plan || 'starter').toUpperCase();
+      var st = data.subscription_status || '';
+      var dotColor = '#6b7280'; // cinza padrão
+      var statusTxt = '';
+      if (st === 'trialing') {
+        dotColor = '#f59e0b'; // amarelo
+        if (data.current_period_end) {
+          var diasRestantes = Math.ceil((new Date(data.current_period_end) - new Date()) / (1000*60*60*24));
+          statusTxt = '· Trial · ' + diasRestantes + ' dias';
+        } else {
+          statusTxt = '· Em trial';
+        }
+      } else if (st === 'active') {
+        dotColor = 'var(--green)';
+        statusTxt = '· Ativo';
+      } else if (st === 'past_due') {
+        dotColor = '#ef4444';
+        statusTxt = '· Pagamento pendente';
+      } else if (st === 'canceled') {
+        dotColor = '#6b7280';
+        statusTxt = '· Cancelado';
+      }
+      dot.style.background = dotColor;
+      label.textContent = planoNome;
+      statusEl.textContent = statusTxt;
+      badge.style.display = 'inline-flex';
+    }
   } catch(e) { console.warn('carregarPerfilDash:', e); }
 }
 let abertos=new Set();
@@ -5992,48 +6016,137 @@ function lgMaskTel(input) {
   </div>
 </div>
 
-<!-- ══ TELA DE CHECKOUT ══ -->
-<div class="screen" id="s-checkout">
-  <div style="min-height:100vh;background:#f8fafc;display:flex;flex-direction:column;">
+<!-- ══ ESCOLHER PLANO (após cadastro sem plano pré-selecionado) ══ -->
+<style>
+#s-escolher-plano.active{position:fixed;inset:0;display:block;z-index:100;overflow-y:auto;background:#fff;}
+</style>
+<div class="screen" id="s-escolher-plano">
+<div style="padding:4rem 1.5rem 5rem;border-bottom:1px solid #f1f5f9;background:#fff;">
+<div style="max-width:1120px;margin:0 auto;">
 
-    <!-- Topo -->
-    <div style="background:#fff;border-bottom:1px solid #e2e8f0;padding:.875rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-      <div style="font-family:'Sora',sans-serif;font-size:17px;font-weight:800;color:#0f172a;letter-spacing:-.4px;">
-        Vita<span style="color:#1D9E75;">Cash</span>
-        <span id="vc-chk-plan-label" style="font-size:12px;font-weight:600;color:#1D9E75;background:#f0fdf8;padding:3px 10px;border-radius:99px;border:1px solid #a7f3d0;margin-left:8px;"></span>
+  <div style="text-align:center;margin-bottom:3.5rem;">
+    <div style="display:inline-flex;align-items:center;gap:8px;background:#f0fdf8;border:.5px solid #a7f3d0;border-radius:99px;padding:5px 16px;font-size:12px;font-weight:600;color:#065f46;margin-bottom:1rem;">✅ Cadastro realizado! Escolha seu plano</div>
+    <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#1D9E75;margin-bottom:1rem;">PLANOS</div>
+    <h2 style="font-family:'Sora',sans-serif;font-size:clamp(1.75rem,4vw,2.75rem);font-weight:800;letter-spacing:-2px;color:#0f172a;margin-bottom:1rem;line-height:1.1;">Custa menos que<br>1 erro financeiro por mês</h2>
+    <p style="font-size:16px;color:#64748b;max-width:440px;margin:0 auto;">Comece grátis. Se em 5 minutos você não encontrar nada a recuperar, não paga nada. Mas vai encontrar.</p>
+  </div>
+
+  <!-- Grid de planos -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;align-items:stretch;">
+
+      <!-- STARTER -->
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:22px;padding:2rem;display:flex;flex-direction:column;box-shadow:0 2px 16px rgba(0,0,0,.04);">
+        <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:.75rem;">Starter</div>
+        <div style="font-family:'Sora',sans-serif;font-size:38px;font-weight:800;color:#0f172a;letter-spacing:-2px;line-height:1;margin-bottom:.375rem;">R$0</div>
+        <div style="font-size:13px;color:#94a3b8;margin-bottom:1.75rem;">Para começar</div>
+        <div style="display:flex;flex-direction:column;gap:11px;flex:1;margin-bottom:1.75rem;">
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#475569;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>1 empresa</div>
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#475569;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>5 indicadores básicos</div>
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#475569;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Comparativo setorial</div>
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#cbd5e1;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><line x1="2" y1="6" x2="10" y2="6" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round"/></svg><span style="text-decoration:line-through;">Análise IA completa</span></div>
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#cbd5e1;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><line x1="2" y1="6" x2="10" y2="6" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round"/></svg><span style="text-decoration:line-through;">Plano de ação em R$</span></div>
+        </div>
+        <button onclick="go('s-nova-dre')" style="width:100%;padding:13px;border-radius:10px;border:1.5px solid #e2e8f0;background:transparent;color:#0f172a;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;" onmouseover="this.style.borderColor='#1D9E75';this.style.color='#1D9E75'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#0f172a'">Começar grátis</button>
       </div>
-      <button onclick="fecharCheckout()" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:13px;font-family:inherit;display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:8px;transition:all .15s;" onmouseover="this.style.background='#f1f5f9';this.style.color='#475569'" onmouseout="this.style.background='none';this.style.color='#94a3b8'">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        Voltar
-      </button>
-    </div>
 
-    <!-- Corpo -->
-    <div style="flex:1;overflow-y:auto;padding:1.5rem 1rem;max-width:600px;width:100%;margin:0 auto;">
+      <!-- GROWTH -->
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:22px;padding:2rem;display:flex;flex-direction:column;box-shadow:0 2px 16px rgba(0,0,0,.04);">
+        <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:.75rem;">Growth</div>
+        <div style="font-family:'Sora',sans-serif;font-size:38px;font-weight:800;color:#0f172a;letter-spacing:-2px;line-height:1;margin-bottom:.375rem;">R$97<span style="font-size:16px;font-weight:500;color:#94a3b8;">/mês</span></div>
+        <div style="font-size:13px;color:#94a3b8;margin-bottom:1.75rem;">Para crescer com controle</div>
+        <div style="display:flex;flex-direction:column;gap:11px;flex:1;margin-bottom:1.75rem;">
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#475569;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>1 empresa</div>
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#475569;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>15+ indicadores</div>
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#475569;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Análise IA completa</div>
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#475569;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Plano de ação em R$</div>
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#cbd5e1;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><line x1="2" y1="6" x2="10" y2="6" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round"/></svg><span style="text-decoration:line-through;">DRE + Balanço completo</span></div>
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#cbd5e1;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><line x1="2" y1="6" x2="10" y2="6" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round"/></svg><span style="text-decoration:line-through;">Múltiplas empresas</span></div>
+        </div>
+        <button onclick="escolherPlanoLogado('growth','price_1TUWo3HkpdynZUBW6AVGmLeu')" style="width:100%;padding:13px;border-radius:10px;border:1.5px solid #e2e8f0;background:transparent;color:#0f172a;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;" onmouseover="this.style.borderColor='#1D9E75';this.style.color='#1D9E75'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#0f172a'">Começar 14 dias grátis</button>
+      </div>
+
+      <!-- PRO — DESTAQUE -->
+      <div style="background:linear-gradient(180deg,#f0fdf8 0%,#fff 60%);border:2px solid #1D9E75;border-radius:22px;padding:2rem;display:flex;flex-direction:column;position:relative;box-shadow:0 16px 56px rgba(29,158,117,.18);">
+        <div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:#1D9E75;color:#fff;font-size:11px;font-weight:800;padding:5px 20px;border-radius:99px;white-space:nowrap;letter-spacing:.5px;box-shadow:0 4px 16px rgba(29,158,117,.4);">MAIS VENDIDO</div>
+        <div style="font-size:12px;font-weight:700;color:#065f46;text-transform:uppercase;letter-spacing:1px;margin-bottom:.75rem;">PRO</div>
+        <div style="font-family:'Sora',sans-serif;font-size:38px;font-weight:800;color:#1D9E75;letter-spacing:-2px;line-height:1;margin-bottom:.375rem;">R$197<span style="font-size:16px;font-weight:500;color:#6ee7b7;">/mês</span></div>
+        <div style="font-size:12px;color:#065f46;font-weight:700;margin-bottom:1.75rem;">= R$6,57/dia · menos que decidir no escuro</div>
+        <div style="display:flex;flex-direction:column;gap:11px;flex:1;margin-bottom:1.75rem;">
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#065f46;font-weight:500;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>3 empresas</div>
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#065f46;font-weight:500;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>15+ indicadores</div>
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#065f46;font-weight:500;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>DRE + Balanço completo</div>
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#065f46;font-weight:500;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Capital de giro + Simulador</div>
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#065f46;font-weight:500;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Valuation automático</div>
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#065f46;font-weight:500;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Ações com impacto em R$</div>
+        </div>
+        <button onclick="escolherPlanoLogado('pro','price_1TUWxWHkpdynZUBW2DLLEnlE')" style="width:100%;padding:15px;border-radius:11px;border:none;background:#1D9E75;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 8px 28px rgba(29,158,117,.4);transition:all .2s;" onmouseover="this.style.background='#15835f';this.style.transform='translateY(-1px)'" onmouseout="this.style.background='#1D9E75';this.style.transform=''">Começar 14 dias grátis →</button>
+        <div style="text-align:center;font-size:12px;color:#065f46;margin-top:.625rem;font-weight:500;">Cancele quando quiser</div>
+      </div>
+
+      <!-- PREMIUM -->
+      <div style="background:#0f172a;border:1px solid #1e293b;border-radius:22px;padding:2rem;display:flex;flex-direction:column;box-shadow:0 2px 16px rgba(0,0,0,.12);">
+        <div style="font-size:12px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:1px;margin-bottom:.75rem;">Premium</div>
+        <div style="font-family:'Sora',sans-serif;font-size:38px;font-weight:800;color:#fff;letter-spacing:-2px;line-height:1;margin-bottom:.375rem;">R$347<span style="font-size:16px;font-weight:500;color:#475569;">/mês</span></div>
+        <div style="font-size:13px;color:#475569;margin-bottom:1.75rem;">Para múltiplas empresas</div>
+        <div style="display:flex;flex-direction:column;gap:11px;flex:1;margin-bottom:1.75rem;">
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#94a3b8;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Empresas ilimitadas</div>
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#94a3b8;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Tudo do PRO</div>
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#94a3b8;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Relatórios PDF exportáveis</div>
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#94a3b8;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Acesso para contador</div>
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#94a3b8;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Suporte prioritário</div>
+        </div>
+        <button onclick="escolherPlanoLogado('premium','price_1TUX0UHkpdynZUBWS1WLFmE4')" style="width:100%;padding:13px;border-radius:10px;border:1.5px solid #334155;background:transparent;color:#e2e8f0;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;" onmouseover="this.style.borderColor='#1D9E75';this.style.color='#1D9E75'" onmouseout="this.style.borderColor='#334155';this.style.color='#e2e8f0'">Começar 14 dias grátis</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══ TELA DE CHECKOUT ══ -->
+<style>
+#s-checkout.active{position:fixed;inset:0;display:flex;flex-direction:column;z-index:200;overflow:hidden;background:#f5f4f0;}
+#s-checkout .chk-inner{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:.75rem 1rem 1rem;}
+</style>
+<div class="screen" id="s-checkout">
+  <!-- Cabeçalho fixo no topo -->
+  <div style="background:#f5f4f0;padding:.625rem 1.25rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e8edf2;flex-shrink:0;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="font-family:'Sora',sans-serif;font-size:20px;font-weight:800;color:#0f172a;letter-spacing:-.5px;">Vita<span style="color:#1D9E75;">Cash</span></span>
+      <span id="vc-chk-plan-label" style="font-size:12px;font-weight:600;color:#1D9E75;background:#f0fdf8;padding:4px 12px;border-radius:99px;border:1px solid #a7f3d0;"></span>
+    </div>
+    <button onclick="fecharCheckout()" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:13px;font-family:inherit;display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:8px;transition:all .15s;" onmouseover="this.style.background='#e8edf2';this.style.color='#475569'" onmouseout="this.style.background='none';this.style.color='#94a3b8'">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Voltar aos planos
+    </button>
+  </div>
+
+  <!-- Conteúdo rolável -->
+  <div class="chk-inner">
+    <div style="width:100%;max-width:500px;">
 
       <!-- Loading -->
-      <div id="vc-chk-loading" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4rem 1rem;gap:12px;">
-        <div style="width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#1D9E75;border-radius:50%;animation:spin .8s linear infinite;"></div>
-        <div style="font-size:14px;color:#64748b;">Carregando checkout seguro...</div>
+      <div id="vc-chk-loading" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3rem 1rem;gap:12px;background:#fff;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,.07);">
+        <div style="width:36px;height:36px;border:3px solid #e2e8f0;border-top-color:#1D9E75;border-radius:50%;animation:spin .8s linear infinite;"></div>
+        <div style="font-size:13px;color:#64748b;">Carregando pagamento seguro...</div>
       </div>
 
       <!-- Erro -->
       <div id="vc-chk-erro" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:1rem 1.25rem;font-size:13px;color:#dc2626;text-align:center;margin-bottom:1rem;">
         Erro ao carregar o pagamento.
-        <button onclick="fecharCheckout()" style="display:block;margin:.5rem auto 0;color:#1D9E75;background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;">Voltar →</button>
+        <button onclick="fecharCheckout()" style="display:block;margin:.5rem auto 0;color:#1D9E75;background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;">← Voltar aos planos</button>
       </div>
 
       <!-- Checkout embutido -->
       <div id="vc-chk-embed"></div>
 
-    </div>
+      <!-- Rodapé segurança -->
+      <div style="text-align:center;margin-top:.75rem;font-size:11px;color:#94a3b8;display:flex;align-items:center;justify-content:center;gap:5px;padding-bottom:.5rem;">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#1D9E75" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Pagamento 100% seguro via Stripe · Você só é cobrado após 14 dias
+      </div>
 
-    <!-- Rodapé segurança -->
-    <div style="text-align:center;padding:.75rem;font-size:11.5px;color:#94a3b8;border-top:1px solid #f1f5f9;background:#fff;display:flex;align-items:center;justify-content:center;gap:5px;flex-shrink:0;">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1D9E75" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-      Pagamento 100% seguro via Stripe · Você só é cobrado após 14 dias
     </div>
-
   </div>
 </div>
 
