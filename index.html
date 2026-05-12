@@ -4333,8 +4333,8 @@ async function iniciarCheckout(planName, priceId, btn) {
     // Não logado → vai para cadastro
     goLogin('cadastro');
   } else {
-    // Já logado → vai para a aba Entrar para confirmar identidade
-    goLogin('login');
+    // Já logado → vai direto para checkout
+    abrirTelaCheckout(planName, priceId);
   }
 }
 
