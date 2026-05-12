@@ -4723,7 +4723,7 @@ async function carregarPerfilDash() {
       .select('full_name, nicho, faturamento_faixa, current_plan, subscription_status, current_period_end')
       .eq('id', currentUser.id)
       .single();
-    if (error || !data) return;
+    if (error || !data) { aplicarRestricoesDePlano('starter'); return; }
 
     // Atualiza variáveis globais
     if (data.full_name) nome = data.full_name.split(' ')[0];
@@ -4859,8 +4859,13 @@ async function irParaDash() {
       .select('subscription_status, current_plan')
       .eq('id', currentUser.id)
       .single();
+    const plano = profile?.current_plan || 'starter';
     const ativo = profile?.subscription_status === 'active' || profile?.subscription_status === 'trialing';
-    if (ativo) {
+    // Starter/free sempre vai pro dashboard (vê conteúdo limitado com blur)
+    // Planos pagos exigem status ativo
+    if (plano === 'starter' || plano === 'free' || !plano) {
+      go('s-dash');
+    } else if (ativo) {
       go('s-dash');
     } else {
       go('s-escolher-plano');
