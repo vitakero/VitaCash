@@ -9,6 +9,7 @@
 <title>VitaCash · Diagnóstico Financeiro Inteligente</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
+.plan-hidden{display:none!important;}
 :root{
   --green:#1D9E75;--green-light:#E1F5EE;--green-mid:#9FE1CB;--green-dark:#085041;--green-bg:#0F6E56;
   --amber:#EF9F27;--amber-light:#FAEEDA;--amber-border:#FAC775;--amber-dark:#633806;
@@ -4846,10 +4847,10 @@ function aplicarRestricoesDePlano(plan) {
 
   // Esconde/mostra elementos exclusivos de planos pagos
   document.querySelectorAll('.growth-only').forEach(function(el) {
-    if (nivel >= 1) { el.style.removeProperty('display'); } else { el.style.setProperty('display','none','important'); }
+    if (nivel >= 1) { el.classList.remove('plan-hidden'); } else { el.classList.add('plan-hidden'); }
   });
   document.querySelectorAll('.pro-only').forEach(function(el) {
-    if (nivel >= 2) { el.style.removeProperty('display'); } else { el.style.setProperty('display','none','important'); }
+    if (nivel >= 2) { el.classList.remove('plan-hidden'); } else { el.classList.add('plan-hidden'); }
   });
 
   // Banner geral de upgrade no tg para STARTER
