@@ -1782,9 +1782,9 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
 
   <div class="tag-file">📄 DRE_GJoaoDosSantos_2022.pdf + Balanço_Patrimonial_GJoao.pdf · analisados automaticamente</div>
 
-  <!-- SELETOR DE EMPRESA — PREMIUM ONLY -->
+  <!-- SELETOR DE EMPRESA -->
   <div class="empresa-switcher">
-    <div class="empresa-atual" onclick="checkPremium('Adicionar e alternar entre múltiplas empresas', togEmpresas)">
+    <div class="empresa-atual" onclick="togEmpresas()">
       <div style="display:flex;align-items:center;gap:10px;">
         <div style="width:32px;height:32px;border-radius:8px;background:var(--green);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;">GJ</div>
         <div>
@@ -1798,7 +1798,7 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
       </div>
     </div>
     <div id="empresa-list" style="display:none;">
-      <div class="empresa-item" style="opacity:.5;cursor:default;">
+      <div class="empresa-item" style="cursor:pointer;" onclick="tentarAdicionarEmpresa()">
         <div style="width:28px;height:28px;border-radius:6px;background:var(--surface2);display:flex;align-items:center;justify-content:center;border:1.5px dashed var(--border2);">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         </div>
@@ -6603,6 +6603,42 @@ function checkPremium(desc, callback) {
 function togEmpresas() {
   var list = document.getElementById('empresa-list');
   list.style.display = list.style.display === 'none' ? 'block' : 'none';
+}
+
+// Limite de empresas por plano
+var EMPRESA_LIMIT = { starter: 1, free: 1, growth: 1, pro: 3, premium: 999 };
+
+function tentarAdicionarEmpresa() {
+  // Conta quantas empresas o usuário já tem (itens reais no switcher, sem contar o botão de adicionar)
+  var items = document.querySelectorAll('#empresa-list .empresa-item');
+  // O último item é sempre o "Adicionar", os anteriores são empresas reais
+  // Por enquanto temos 1 empresa fixa (a atual)
+  var totalEmpresas = 1; // TODO: buscar do Supabase quando tabela companies existir
+
+  var planoAtual = 'starter';
+  try { planoAtual = document.querySelector('[data-current-plan]')?.dataset.currentPlan || 'starter'; } catch(e) {}
+  // Usa nivelAtual para determinar o plano
+  var planoNome = nivelAtual >= 3 ? 'premium' : nivelAtual >= 2 ? 'pro' : nivelAtual >= 1 ? 'growth' : 'starter';
+  var limite = EMPRESA_LIMIT[planoNome] || 1;
+
+  if (totalEmpresas >= limite) {
+    // Atingiu o limite — mostra upgrade
+    if (nivelAtual < 2) {
+      // Free/Growth → precisa do PRO (3 empresas)
+      document.getElementById('premium-upgrade-desc').textContent = 'Seu plano permite apenas ' + limite + ' empresa. Faça upgrade para o PRO e gerencie até 3 empresas.';
+      document.getElementById('modal-premium-upgrade').style.display = 'flex';
+    } else if (nivelAtual < 3) {
+      // PRO → precisa do Premium (ilimitadas)
+      document.getElementById('premium-upgrade-desc').textContent = 'Seu plano PRO permite até 3 empresas. Faça upgrade para o Premium e tenha empresas ilimitadas.';
+      document.getElementById('modal-premium-upgrade').style.display = 'flex';
+    } else {
+      // Premium — nunca deveria cair aqui, mas por segurança
+      alert('Em breve: adicionar nova empresa');
+    }
+  } else {
+    // Tem espaço — pode adicionar
+    alert('Em breve: formulário para adicionar nova empresa');
+  }
 }
 
 // Modal contador
