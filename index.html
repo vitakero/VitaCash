@@ -2330,7 +2330,7 @@ div[style*="position:absolute;top:0;left:0;right:0;height:3px"]{height:2px;}
 
 
     <!-- ALERTA RENTABILIDADE -->
-    <div class="ab aok pro-only" style="margin-bottom:1.5rem;">
+    <div class="ab aok growth-only" style="margin-bottom:1.5rem;">
       <div style="font-size:14px;flex-shrink:0;">✓</div>
       <div class="at">O <strong>ROE de 25,3%</strong> está acima da Selic (13,75% em 2022), o que significa que a empresa está <strong>criando valor</strong> — o dinheiro investido pelos sócios rende mais do que a renda fixa. ROI de 17,4% é muito acima da média do setor.</div>
     </div>
@@ -4829,6 +4829,9 @@ function aplicarRestricoesDePlano(plan) {
   });
 
   // Esconde/mostra elementos exclusivos de planos pagos
+  document.querySelectorAll('#tg .growth-only').forEach(function(el) {
+    el.style.display = nivel >= 1 ? '' : 'none';
+  });
   document.querySelectorAll('#tg .pro-only').forEach(function(el) {
     el.style.display = nivel >= 2 ? '' : 'none';
   });
