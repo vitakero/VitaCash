@@ -4409,7 +4409,8 @@ async function lgHandleConfirmacao() {
     return;
   }
 
-  // CASO 3: Sem plano pendente → mostrar tela de escolha de plano
+  // CASO 3: Sem plano pendente → mostrar tela de escolha de plano (vindo do cadastro)
+  sessionStorage.setItem('vc_novo_cadastro', '1');
   go('s-escolher-plano');
 }
 
@@ -4920,10 +4921,15 @@ function go(id){
     // Carrega análises salvas e popula o filtro do dashboard
     if(id==='s-dash') popularFiltroDash();
   }
-  // Mostra botão voltar ao dashboard na página de planos se usuário já está logado
+  // Limpa flag de novo cadastro ao sair da pagina de planos
+  if(id !== 's-escolher-plano') sessionStorage.removeItem('vc_novo_cadastro');
+  // Controla badge cadastro vs botão voltar na página de planos
   if(id==='s-escolher-plano'){
     const btnVoltar = document.getElementById('btn-voltar-dash');
-    if(btnVoltar) btnVoltar.style.display = currentUser ? 'block' : 'none';
+    const badgeCadastro = document.getElementById('badge-cadastro');
+    const veioDosCadastro = !!sessionStorage.getItem('vc_novo_cadastro');
+    if(btnVoltar) btnVoltar.style.display = (currentUser && !veioDosCadastro) ? 'block' : 'none';
+    if(badgeCadastro) badgeCadastro.style.display = veioDosCadastro ? 'block' : 'none';
   }
   if(id==='s-anl'){
     // Textos de cada passo (usados no reset e na animação)
@@ -6179,22 +6185,26 @@ function lgMaskTel(input) {
 #s-escolher-plano.active{position:fixed;inset:0;display:block;z-index:100;overflow-y:auto;background:#fff;}
 </style>
 <div class="screen" id="s-escolher-plano">
-<div style="padding:4rem 1.5rem 5rem;border-bottom:1px solid #f1f5f9;background:#fff;">
+<div style="padding:1.75rem 1.5rem 3rem;border-bottom:1px solid #f1f5f9;background:#fff;">
 <div style="max-width:1120px;margin:0 auto;">
 
-  <!-- Botão voltar ao dashboard (só aparece se usuário está logado) -->
-  <div id="btn-voltar-dash" style="display:none;margin-bottom:1.5rem;">
-    <button onclick="go('s-dash')" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;border:.5px solid #e2e8f0;background:#fff;color:#64748b;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;" onmouseover="this.style.background='#f8fafc';this.style.color='#0f172a'" onmouseout="this.style.background='#fff';this.style.color='#64748b'">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-      Voltar ao dashboard
-    </button>
+  <!-- Barra superior: voltar (logado) ou badge cadastro (novo) -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;min-height:32px;">
+    <div id="btn-voltar-dash" style="display:none;">
+      <button onclick="go('s-dash')" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;border:.5px solid #e2e8f0;background:#fff;color:#64748b;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;" onmouseover="this.style.background='#f8fafc';this.style.color='#0f172a'" onmouseout="this.style.background='#fff';this.style.color='#64748b'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Voltar ao dashboard
+      </button>
+    </div>
+    <div id="badge-cadastro" style="display:none;margin:0 auto;">
+      <div style="display:inline-flex;align-items:center;gap:8px;background:#f0fdf8;border:.5px solid #a7f3d0;border-radius:99px;padding:5px 16px;font-size:12px;font-weight:600;color:#065f46;">✅ Cadastro realizado! Escolha seu plano</div>
+    </div>
   </div>
 
-  <div style="text-align:center;margin-bottom:3.5rem;">
-    <div style="display:inline-flex;align-items:center;gap:8px;background:#f0fdf8;border:.5px solid #a7f3d0;border-radius:99px;padding:5px 16px;font-size:12px;font-weight:600;color:#065f46;margin-bottom:1rem;">✅ Cadastro realizado! Escolha seu plano</div>
-    <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#1D9E75;margin-bottom:1rem;">PLANOS</div>
-    <h2 style="font-family:'Sora',sans-serif;font-size:clamp(1.75rem,4vw,2.75rem);font-weight:800;letter-spacing:-2px;color:#0f172a;margin-bottom:1rem;line-height:1.1;">Custa menos que<br>1 erro financeiro por mês</h2>
-    <p style="font-size:16px;color:#64748b;max-width:440px;margin:0 auto;">Comece grátis. Se em 5 minutos você não encontrar nada a recuperar, não paga nada. Mas vai encontrar.</p>
+  <div style="text-align:center;margin-bottom:2rem;">
+    <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#1D9E75;margin-bottom:.75rem;">PLANOS</div>
+    <h2 style="font-family:'Sora',sans-serif;font-size:clamp(1.5rem,3.5vw,2.25rem);font-weight:800;letter-spacing:-1.5px;color:#0f172a;margin-bottom:.75rem;line-height:1.1;">Custa menos que<br>1 erro financeiro por mês</h2>
+    <p style="font-size:14px;color:#64748b;max-width:420px;margin:0 auto;">Comece grátis. Se em 5 minutos você não encontrar nada a recuperar, não paga nada. Mas vai encontrar.</p>
   </div>
 
   <!-- Grid de planos -->
