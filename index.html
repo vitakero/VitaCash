@@ -209,6 +209,14 @@ input:focus,select:focus{outline:none;border-color:var(--green);box-shadow:0 0 0
 .snav.on .snav-icon{background:transparent;}
 .snav-label{flex:1;line-height:1;font-size:13px;font-weight:500;}
 .snav.on .snav-label{font-weight:600;}
+.snav-locked{opacity:.45;cursor:not-allowed!important;}
+.snav-locked .snav-label::after{content:' 🔒';font-size:10px;opacity:.8;}
+.snav-lock-btn{display:none;pointer-events:all;cursor:pointer;}
+.snav-locked .snav-lock-btn{display:inline-flex;align-items:center;margin-left:auto;}
+.dash-upgrade-banner{background:linear-gradient(135deg,#0a2818,#0f3426);border:1px solid rgba(29,158,117,.25);border-radius:12px;padding:1.25rem 1.5rem;margin:1.25rem 0;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+.dash-upgrade-banner .dub-text{font-size:13px;color:#c8e8da;line-height:1.5;}
+.dash-upgrade-banner .dub-text strong{color:#4ade80;font-weight:700;}
+.dash-upgrade-banner .dub-btn{padding:.5rem 1.1rem;border-radius:8px;border:none;background:#1d9e75;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;}
 .snav-badge{font-size:9px;background:transparent;color:var(--text3);border:.5px solid var(--border2);border-radius:99px;padding:1px 6px;font-weight:600;}
 .banco-card{background:var(--surface);border:.5px solid var(--border);border-radius:10px;margin-bottom:6px;overflow:hidden;transition:all .15s;}
 .banco-card:hover{border-color:var(--green-mid);}
@@ -1963,7 +1971,7 @@ div[style*="position:absolute;top:0;left:0;right:0;height:3px"]{height:2px;}
       <div class="mc"><div class="mc-top"><div class="mlb">Lucro líquido</div><div class="help-icon"><svg width="9" height="9" viewBox="0 0 10 10"><text x="2.5" y="8.5" font-size="9" fill="var(--text2)" font-family="sans-serif" font-weight="600">?</text></svg><div class="tooltip"><div class="tt-titulo">Lucro Líquido</div><div class="tt-def">O valor final que sobra para os donos depois de todas as deduções. É o resultado definitivo da empresa.</div><div class="tt-formula">= Receita − CMV − Despesas − Juros − Impostos</div><span class="tt-bench">G Joao 2022: R$ 1,70 mi (positivo ✓)</span></div></div></div><div class="mc-sub">Resultado final após todos os custos, juros e impostos</div><div class="mv">R$ 1,70 mi</div><div class="mc2 above">▲ positivo</div><div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;"><span style="font-size:10px;background:#E1F5EE;color:#085041;border:.5px solid #9FE1CB;border-radius:99px;padding:2px 7px;font-weight:600;">Margem: 3,7%</span><span style="font-size:10px;background:var(--surface2);color:var(--text3);border:.5px solid var(--border);border-radius:99px;padding:2px 7px;">Média: 2–5%</span></div></div>
     </div>
     <div class="sl">Outros indicadores</div>
-    <div class="mg">
+    <div class="mg mg-section-pro" data-plan-required="growth">
       <div class="mc"><div class="mc-top"><div class="mlb">EBIT</div><div class="help-icon"><svg width="9" height="9" viewBox="0 0 10 10"><text x="2.5" y="8.5" font-size="9" fill="var(--text2)" font-family="sans-serif" font-weight="600">?</text></svg><div class="tooltip"><div class="tt-titulo">EBIT</div><div class="tt-def">Lucro operacional — o que sobra depois de pagar custos e despesas, antes de juros e impostos.</div><div class="tt-formula">= Lucro Bruto − Despesas Operacionais</div><span class="tt-bench">G Joao 2022: R$ 2,91 mi · Margem op.: 6,3%</span></div></div></div><div class="mc-sub">Lucro da operação pura, antes de juros e impostos</div><div class="mv">R$ 2,91 mi</div><div class="mc2" style="color:var(--text3);">Margem op.: 6,3%</div><div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;"><span style="font-size:10px;background:#FAEEDA;color:#633806;border:.5px solid #FAC775;border-radius:99px;padding:2px 7px;font-weight:600;">Você: 6,3%</span><span style="font-size:10px;background:var(--surface2);color:var(--text3);border:.5px solid var(--border);border-radius:99px;padding:2px 7px;">Média: 4–8%</span></div></div>
       <div class="mc"><div class="mc-top"><div class="mlb">Cobertura de juros</div><div class="help-icon"><svg width="9" height="9" viewBox="0 0 10 10"><text x="2.5" y="8.5" font-size="9" fill="var(--text2)" font-family="sans-serif" font-weight="600">?</text></svg><div class="tooltip"><div class="tt-titulo">Índice de Cobertura de Juros</div><div class="tt-def">Quantas vezes a empresa consegue pagar os juros da dívida com o lucro operacional.</div><div class="tt-formula">= EBIT / Despesas Financeiras<br>Abaixo 1→grave · 2-3→ok · +3→espaço</div><span class="tt-bench">G Joao: 248x — sem dívida relevante ✓</span></div></div></div><div class="mc-sub">Quantas vezes o lucro cobre os juros da dívida</div><div class="mv">248x</div><div class="mc2 above">▲ excelente</div><div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;"><span style="font-size:10px;background:#E1F5EE;color:#085041;border:.5px solid #9FE1CB;border-radius:99px;padding:2px 7px;font-weight:600;">Você: 248x</span><span style="font-size:10px;background:var(--surface2);color:var(--text3);border:.5px solid var(--border);border-radius:99px;padding:2px 7px;">Ideal: acima 2x</span></div></div>
       <div class="mc"><div class="mc-top"><div class="mlb">Desp. financeiras</div><div class="help-icon"><svg width="9" height="9" viewBox="0 0 10 10"><text x="2.5" y="8.5" font-size="9" fill="var(--text2)" font-family="sans-serif" font-weight="600">?</text></svg><div class="tooltip"><div class="tt-titulo">Despesas Financeiras</div><div class="tt-def">Juros pagos sobre dívidas. No lucro real, reduzem a base tributável do IR.</div><div class="tt-formula">= Juros + Encargos financeiros do período</div><span class="tt-bench">G Joao: R$ 34,8 mil · 0,08% ✓</span></div></div></div><div class="mc-sub">Juros efetivamente pagos sobre empréstimos no período</div><div class="mv">R$ 34,8 mil</div><div class="mc2 above">▲ muito baixo</div><div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;"><span style="font-size:10px;background:#E1F5EE;color:#085041;border:.5px solid #9FE1CB;border-radius:99px;padding:2px 7px;font-weight:600;">Você: 0,08%</span><span style="font-size:10px;background:var(--surface2);color:var(--text3);border:.5px solid var(--border);border-radius:99px;padding:2px 7px;">Ideal: abaixo 2%</span></div></div>
@@ -1972,7 +1980,7 @@ div[style*="position:absolute;top:0;left:0;right:0;height:3px"]{height:2px;}
 
     <!-- RENTABILIDADE -->
     <div class="sl">Rentabilidade do capital</div>
-    <div class="mg">
+    <div class="mg mg-section-pro" data-plan-required="growth">
 
       <!-- ROI -->
       <div class="mc">
@@ -2065,6 +2073,7 @@ div[style*="position:absolute;top:0;left:0;right:0;height:3px"]{height:2px;}
     </div>
 
     <!-- VALUATION BY EQUITY -->
+    <div class="mg-section-pro" data-plan-required="pro" style="position:relative;border-radius:12px;overflow:hidden;">
     <div class="sl">Valuation — quanto vale sua empresa</div>
     <div class="ab aok" style="margin-bottom:1.25rem;">
       <div style="flex-shrink:0;display:flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 1 7 7c0 2.62-1.45 4.92-3.6 6.17L15 17H9l-.4-1.83A7.004 7.004 0 0 1 5 9a7 7 0 0 1 7-7z"/></svg></div>
@@ -2320,6 +2329,8 @@ div[style*="position:absolute;top:0;left:0;right:0;height:3px"]{height:2px;}
       </div>
     </div>
 
+    </div><!-- /mg-section-pro valuation -->
+
     <!-- ALERTA RENTABILIDADE -->
     <div class="ab aok" style="margin-bottom:1.5rem;">
       <div style="font-size:14px;flex-shrink:0;">✓</div>
@@ -2328,7 +2339,7 @@ div[style*="position:absolute;top:0;left:0;right:0;height:3px"]{height:2px;}
 
     <!-- RESUMO ENDIVIDAMENTO NA VISÃO GERAL -->
     <div class="sl">Saúde do endividamento</div>
-    <div class="mg">
+    <div class="mg mg-section-pro" data-plan-required="pro">
       <div class="mc">
         <div class="mc-top">
           <div class="mlb">Limite máximo seguro</div>
@@ -4766,12 +4777,80 @@ async function carregarPerfilDash() {
       dot.style.background = dotColor;
       statusEl.textContent = statusTxt;
     }
+    // Aplica restricoes de acesso baseadas no plano
+    aplicarRestricoesDePlano(data.current_plan || 'starter');
   } catch(e) { console.warn('carregarPerfilDash:', e); }
 }
 let abertos=new Set();
 const gastosDiarios=116952;
 
 
+
+const PLAN_LEVEL = { starter: 0, free: 0, growth: 1, pro: 2, premium: 3 };
+
+function aplicarRestricoesDePlano(plan) {
+  const nivel = PLAN_LEVEL[plan] || 0;
+  // Nível mínimo para acessar cada aba
+  const tabPerms = { tg: 0, ta: 1, tcg: 2, tend: 2, td: 2, tbp: 2, te: 0 };
+
+  // Bloqueia/desbloqueia itens do sidebar
+  document.querySelectorAll('.snav[data-tab]').forEach(function(el) {
+    const required = tabPerms[el.dataset.tab] !== undefined ? tabPerms[el.dataset.tab] : 0;
+    if (nivel < required) {
+      el.classList.add('snav-locked');
+    } else {
+      el.classList.remove('snav-locked');
+    }
+  });
+
+  // Processa cada seção bloqueável dentro de tg
+  document.querySelectorAll('#tg .mg-section-pro').forEach(function(sec) {
+    const planReq = sec.dataset.planRequired || 'growth';
+    const required = PLAN_LEVEL[planReq] || 1;
+    const existingOv = sec.querySelector('.mg-locked-overlay');
+    if (nivel < required) {
+      // Adiciona overlay se ainda não existe
+      if (!existingOv) {
+        const planLabel = planReq === 'pro' ? 'PRO' : 'GROWTH';
+        const ov = document.createElement('div');
+        ov.className = 'mg-locked-overlay';
+        ov.style.cssText = 'position:absolute;inset:0;background:rgba(10,20,16,.88);border-radius:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;z-index:10;backdrop-filter:blur(3px);';
+        ov.innerHTML = '<span style="font-size:20px;">🔒</span><span style="font-size:12px;color:#c8e8da;font-weight:600;text-align:center;padding:0 1.5rem;">Disponível no plano ' + planLabel + ' ou superior</span><button onclick="go(\'s-escolher-plano\')" style="margin-top:.35rem;padding:.4rem 1rem;border-radius:7px;border:none;background:#1d9e75;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Ver planos →</button>';
+        sec.style.position = 'relative';
+        sec.style.overflow = 'hidden';
+        sec.appendChild(ov);
+      }
+    } else {
+      // Remove overlay se existir
+      if (existingOv) {
+        existingOv.remove();
+        sec.style.position = '';
+        sec.style.overflow = '';
+      }
+    }
+  });
+
+  // Banner geral de upgrade no tg para STARTER
+  const existingBanner = document.getElementById('plan-upgrade-tg');
+  if (nivel < 1) {
+    if (!existingBanner) {
+      const banner = document.createElement('div');
+      banner.id = 'plan-upgrade-tg';
+      banner.className = 'dash-upgrade-banner';
+      banner.innerHTML = '<div class="dub-text"><strong>Desbloqueie análise completa</strong><br>No plano GROWTH voce acessa Análise IA, Plano de ação com impacto em R$, mais de 15 indicadores e muito mais.</div><button class="dub-btn" onclick="go(\'s-escolher-plano\')">Ver planos →</button>';
+      // Insere após o primeiro .mg (os 4 indicadores básicos)
+      const tgEl = document.getElementById('tg');
+      if (tgEl) {
+        const firstMg = tgEl.querySelector('.mg:not(.mg-section-pro)');
+        if (firstMg && firstMg.parentNode) {
+          firstMg.parentNode.insertBefore(banner, firstMg.nextSibling);
+        }
+      }
+    }
+  } else {
+    if (existingBanner) existingBanner.remove();
+  }
+}
 
 async function irParaDash() {
   if (!currentUser) { go('s-land'); return; }
@@ -4872,6 +4951,7 @@ function copiar(){
 }
 
 function swTab(id,el){
+  if(el && el.classList.contains('snav-locked')){go('s-escolher-plano');return;}
   document.querySelectorAll('.nt,.snav').forEach(t=>t.classList.remove('on'));
   document.querySelectorAll('.tc2').forEach(c=>{c.classList.remove('on');});
   document.querySelectorAll('[data-tab="'+id+'"]').forEach(t=>t.classList.add('on'));
