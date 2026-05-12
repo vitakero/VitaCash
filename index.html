@@ -4920,6 +4920,11 @@ function go(id){
     // Carrega análises salvas e popula o filtro do dashboard
     if(id==='s-dash') popularFiltroDash();
   }
+  // Mostra botão voltar ao dashboard na página de planos se usuário já está logado
+  if(id==='s-escolher-plano'){
+    const btnVoltar = document.getElementById('btn-voltar-dash');
+    if(btnVoltar) btnVoltar.style.display = currentUser ? 'block' : 'none';
+  }
   if(id==='s-anl'){
     // Textos de cada passo (usados no reset e na animação)
     const stepTexts={sc2:'Lendo receitas, custos e despesas',sc3:'Calculando margens e lucro real',sc4:'Identificando onde o dinheiro vaza',sc5:'Comparando com a média do setor'};
@@ -6176,6 +6181,14 @@ function lgMaskTel(input) {
 <div class="screen" id="s-escolher-plano">
 <div style="padding:4rem 1.5rem 5rem;border-bottom:1px solid #f1f5f9;background:#fff;">
 <div style="max-width:1120px;margin:0 auto;">
+
+  <!-- Botão voltar ao dashboard (só aparece se usuário está logado) -->
+  <div id="btn-voltar-dash" style="display:none;margin-bottom:1.5rem;">
+    <button onclick="go('s-dash')" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;border:.5px solid #e2e8f0;background:#fff;color:#64748b;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;" onmouseover="this.style.background='#f8fafc';this.style.color='#0f172a'" onmouseout="this.style.background='#fff';this.style.color='#64748b'">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Voltar ao dashboard
+    </button>
+  </div>
 
   <div style="text-align:center;margin-bottom:3.5rem;">
     <div style="display:inline-flex;align-items:center;gap:8px;background:#f0fdf8;border:.5px solid #a7f3d0;border-radius:99px;padding:5px 16px;font-size:12px;font-weight:600;color:#065f46;margin-bottom:1rem;">✅ Cadastro realizado! Escolha seu plano</div>
