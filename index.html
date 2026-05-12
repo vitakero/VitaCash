@@ -2079,8 +2079,8 @@ div[style*="position:absolute;top:0;left:0;right:0;height:3px"]{height:2px;}
     </div>
 
     <!-- Card principal de valor -->
-    <div class="mg-section-pro" data-plan-required="pro" style="background:var(--surface);border:.5px solid transparent;border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.25rem;position:relative;overflow:hidden;">
-      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(to right,var(--green),var(--green-mid));"></div>
+    <div class="card mg-section-pro" data-plan-required="pro" style="padding:1.5rem;margin-bottom:1.25rem;position:relative;overflow:hidden;">
+      <div class="valuation-topbar" style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(to right,var(--green),var(--green-mid));"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:center;">
         <div>
           <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:600;margin-bottom:.5rem;">Valor estimado da empresa</div>
@@ -4828,6 +4828,9 @@ function aplicarRestricoesDePlano(plan) {
         sec.style.overflow = 'hidden';
         sec.appendChild(ov);
       }
+      // Esconde barra verde do valuation quando bloqueado
+      var topbar = sec.querySelector('.valuation-topbar');
+      if (topbar) topbar.style.display = 'none';
     } else {
       // Remove overlay se existir
       if (existingOv) {
@@ -4835,6 +4838,9 @@ function aplicarRestricoesDePlano(plan) {
         sec.style.position = '';
         sec.style.overflow = '';
       }
+      // Restaura barra verde do valuation quando desbloqueado
+      var topbar2 = sec.querySelector('.valuation-topbar');
+      if (topbar2) topbar2.style.display = '';
     }
   });
 
