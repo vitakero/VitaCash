@@ -2564,7 +2564,7 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
     <!-- SIMULADOR DE EMPRÉSTIMO -->
     <div class="sl">Simule um novo empréstimo</div>
     <p style="font-size:11px;color:var(--text3);line-height:1.4;margin:-0.5rem 0 0.875rem;">Ajuste valor e taxa para ver como o novo crédito impacta sua cobertura de juros</p>
-    <div class="card" style="margin-bottom:1.25rem;">
+    <div class="card mg-section-pro" data-plan-required="growth" style="margin-bottom:1.25rem;">
       <div style="font-size:12px;color:var(--text2);margin-bottom:1rem;line-height:1.6;">Ajuste o valor e a taxa para ver o impacto nos seus indicadores:</div>
       <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Valor do empréstimo</span><span class="slider-val" id="emp-val">R$ 50 mi</span></div><input type="range" min="10" max="500" value="50" step="10" id="emp-slider" oninput="calcEmp()"></div>
       <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Taxa anual</span><span class="slider-val" id="emp-taxa">20% a.a.</span></div><input type="range" min="10" max="35" value="20" step="1" id="taxa-slider" oninput="calcEmp()"></div>
