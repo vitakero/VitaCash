@@ -2507,9 +2507,9 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
     <!-- CAPACIDADE CALCULADA -->
     <div class="sl">Sua capacidade de endividamento</div>
     <p style="font-size:11px;color:var(--text3);line-height:1.4;margin:-0.5rem 0 0.875rem;">Quanto a empresa pode tomar emprestado mantendo o caixa saudável e os juros sob controle</p>
-    <div class="ab aok growth-only"><div style="flex-shrink:0;margin-top:1px;"><svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="at">Com base na sua DRE, calculamos quanto você pode pegar emprestado sem colocar o caixa em risco. Situação atual: <strong>saudável</strong> — índice de cobertura de juros em 2,1x.</div></div>
+    <div class="ab aok pro-only"><div style="flex-shrink:0;margin-top:1px;"><svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="at">Com base na sua DRE, calculamos quanto você pode pegar emprestado sem colocar o caixa em risco. Situação atual: <strong>saudável</strong> — índice de cobertura de juros em 2,1x.</div></div>
 
-    <div class="mg-section-pro" data-plan-required="growth" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem;">
+    <div class="mg-section-pro" data-plan-required="pro" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem;">
       <div style="background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;box-shadow:var(--shadow-sm);position:relative;">
         <div style="font-size:11px;color:var(--text2);margin-bottom:4px;display:flex;align-items:center;gap:5px;">Limite máximo seguro
           <div class="help-icon"><svg width="9" height="9" viewBox="0 0 10 10"><text x="2.5" y="8.5" font-size="9" fill="var(--text2)" font-family="sans-serif" font-weight="600">?</text></svg>
@@ -2547,7 +2547,7 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
     <!-- TERMÔMETRO -->
     <div class="sl">Termômetro de endividamento</div>
     <p style="font-size:11px;color:var(--text3);line-height:1.4;margin:-0.5rem 0 0.875rem;">Onde a empresa está na escala de risco — do saudável ao crítico</p>
-    <div class="card mg-section-pro" data-plan-required="growth" style="margin-bottom:1.25rem;">
+    <div class="card mg-section-pro" data-plan-required="pro" style="margin-bottom:1.25rem;">
       <div style="position:relative;height:14px;border-radius:99px;background:linear-gradient(to right,#5DCAA5,#EF9F27,#F0997B);margin-bottom:.75rem;overflow:visible;">
         <div style="position:absolute;top:-4px;left:4%;transform:translateX(-50%);width:4px;height:22px;background:var(--text);border-radius:2px;"></div>
         <div style="position:absolute;top:20px;left:4%;transform:translateX(-50%);font-size:10px;color:var(--green);font-weight:600;white-space:nowrap;">Você está aqui</div>
@@ -2564,7 +2564,7 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
     <!-- SIMULADOR DE EMPRÉSTIMO -->
     <div class="sl">Simule um novo empréstimo</div>
     <p style="font-size:11px;color:var(--text3);line-height:1.4;margin:-0.5rem 0 0.875rem;">Ajuste valor e taxa para ver como o novo crédito impacta sua cobertura de juros</p>
-    <div class="card mg-section-pro" data-plan-required="growth" style="margin-bottom:1.25rem;">
+    <div class="card mg-section-pro" data-plan-required="pro" style="margin-bottom:1.25rem;">
       <div style="font-size:12px;color:var(--text2);margin-bottom:1rem;line-height:1.6;">Ajuste o valor e a taxa para ver o impacto nos seus indicadores:</div>
       <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Valor do empréstimo</span><span class="slider-val" id="emp-val">R$ 50 mi</span></div><input type="range" min="10" max="500" value="50" step="10" id="emp-slider" oninput="calcEmp()"></div>
       <div class="slider-wrap"><div class="slider-label"><span class="slider-name">Taxa anual</span><span class="slider-val" id="emp-taxa">20% a.a.</span></div><input type="range" min="10" max="35" value="20" step="1" id="taxa-slider" oninput="calcEmp()"></div>
