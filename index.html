@@ -4846,10 +4846,10 @@ function aplicarRestricoesDePlano(plan) {
 
   // Esconde/mostra elementos exclusivos de planos pagos
   document.querySelectorAll('.growth-only').forEach(function(el) {
-    el.style.display = nivel >= 1 ? '' : 'none';
+    if (nivel >= 1) { el.style.removeProperty('display'); } else { el.style.setProperty('display','none','important'); }
   });
   document.querySelectorAll('.pro-only').forEach(function(el) {
-    el.style.display = nivel >= 2 ? '' : 'none';
+    if (nivel >= 2) { el.style.removeProperty('display'); } else { el.style.setProperty('display','none','important'); }
   });
 
   // Banner geral de upgrade no tg para STARTER
