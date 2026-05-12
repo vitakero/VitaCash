@@ -4796,7 +4796,7 @@ const PLAN_LEVEL = { starter: 0, free: 0, growth: 1, pro: 2, premium: 3 };
 function aplicarRestricoesDePlano(plan) {
   const nivel = PLAN_LEVEL[plan] || 0;
   // Nível mínimo para acessar cada aba
-  const tabPerms = { tg: 0, ta: 1, tcg: 2, tend: 2, td: 2, tbp: 2, te: 0 };
+  const tabPerms = { tg: 0, ta: 0, tcg: 0, tend: 0, td: 0, tbp: 0, te: 0 };
 
   // Bloqueia/desbloqueia itens do sidebar
   document.querySelectorAll('.snav[data-tab]').forEach(function(el) {
