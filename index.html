@@ -2510,7 +2510,7 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
     <div class="ab aok"><div style="flex-shrink:0;margin-top:1px;"><svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="at">Com base na sua DRE, calculamos quanto você pode pegar emprestado sem colocar o caixa em risco. Situação atual: <strong>saudável</strong> — índice de cobertura de juros em 2,1x.</div></div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem;">
-      <div style="background:var(--surface2);border-radius:var(--radius);padding:1rem;position:relative;">
+      <div style="background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;box-shadow:var(--shadow-sm);position:relative;">
         <div style="font-size:11px;color:var(--text2);margin-bottom:4px;display:flex;align-items:center;gap:5px;">Limite máximo seguro
           <div class="help-icon"><svg width="9" height="9" viewBox="0 0 10 10"><text x="2.5" y="8.5" font-size="9" fill="var(--text2)" font-family="sans-serif" font-weight="600">?</text></svg>
             <div class="tooltip" style="right:0;left:auto;"><div class="tt-titulo">Limite Máximo Seguro</div><div class="tt-def">Valor máximo que a empresa pode tomar emprestado sem comprometer o pagamento dos juros. Calculado para manter cobertura de juros acima de 2x — faixa considerada saudável pelo mercado.</div><div class="tt-formula">= EBIT / (Taxa anual × 2)<br>= 2.907.853 / (25% × 2) ≈ R$ 5,8 mi</div><span class="tt-bench">Cobertura de 2x = dívida saudável</span></div>
@@ -2520,7 +2520,7 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
         <div style="font-size:22px;font-weight:600;color:var(--green);">R$ 5,82 mi</div>
         <div style="font-size:11px;color:var(--text2);margin-top:3px;">mantendo cobertura de juros 2x</div>
       </div>
-      <div style="background:var(--surface2);border-radius:var(--radius);padding:1rem;position:relative;">
+      <div style="background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;position:relative;">
         <div style="font-size:11px;color:var(--text2);margin-bottom:4px;display:flex;align-items:center;gap:5px;">Dívida atual
           <div class="help-icon"><svg width="9" height="9" viewBox="0 0 10 10"><text x="2.5" y="8.5" font-size="9" fill="var(--text2)" font-family="sans-serif" font-weight="600">?</text></svg>
             <div class="tooltip" style="right:0;left:auto;"><div class="tt-titulo">Dívida Atual</div><div class="tt-def">Valor aproximado das dívidas financeiras da empresa, calculado com base nas despesas financeiras anuais divididas pela taxa média de juros.</div><div class="tt-formula">≈ Despesas financeiras / Taxa média<br>= 211.989 (empréstimos CP + LP reais)</div><span class="tt-bench">G Joao: dívida muito baixa</span></div>
@@ -2530,13 +2530,13 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
         <div style="font-size:22px;font-weight:600;color:var(--green);">R$ 212 mil</div>
         <div style="font-size:11px;color:var(--text2);margin-top:3px;">em dívidas financeiras estimadas</div>
       </div>
-      <div style="background:var(--surface2);border-radius:var(--radius);padding:1rem;">
+      <div style="background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;">
         <div style="font-size:11px;color:var(--text2);margin-bottom:4px;display:flex;align-items:center;gap:5px;">Espaço disponível <div class="help-icon"><svg width="9" height="9" viewBox="0 0 10 10"><text x="2.5" y="8.5" font-size="9" fill="var(--text2)" font-family="sans-serif" font-weight="600">?</text></svg><div class="tooltip" style="right:0;left:auto;"><div class="tt-titulo">Espaço Disponível para Novo Crédito</div><div class="tt-def">Quanto a empresa ainda pode tomar emprestado sem ultrapassar o limite máximo seguro de endividamento.</div><div class="tt-formula">= Limite máximo seguro − Dívida atual<br>= R$ 5,8 mi − R$ 0,21 mi = R$ 5,6 mi</div><span class="tt-bench">Abaixo de R$ 0 → empresa já ultrapassou o limite seguro</span></div></div></div>
         <div class="mc-sub">Novo crédito disponível sem ultrapassar o limite seguro</div>
         <div style="font-size:22px;font-weight:600;color:var(--green);">R$ 20 mi</div>
         <div style="font-size:11px;color:var(--text2);margin-top:3px;">margem para novo crédito</div>
       </div>
-      <div style="background:var(--surface2);border-radius:var(--radius);padding:1rem;">
+      <div style="background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;">
         <div style="font-size:11px;color:var(--text2);margin-bottom:4px;display:flex;align-items:center;gap:5px;">Cobertura de juros atual <div class="help-icon"><svg width="9" height="9" viewBox="0 0 10 10"><text x="2.5" y="8.5" font-size="9" fill="var(--text2)" font-family="sans-serif" font-weight="600">?</text></svg><div class="tooltip" style="right:0;left:auto;"><div class="tt-titulo">Índice de Cobertura de Juros (ICJ)</div><div class="tt-def">Quantas vezes a empresa consegue pagar os juros da dívida com o seu lucro operacional (EBIT). Quanto maior, mais saudável e mais espaço para contrair nova dívida.</div><div class="tt-formula">= EBIT / Despesas financeiras anuais<br>= 2.907.853 / 34.830 = 83,5x</div><span class="tt-bench">Abaixo de 1x → grave · 1–2x → atenção · 2–3x → saudável · Acima de 3x → espaço para mais crédito</span></div></div></div>
         <div class="mc-sub">Quantas vezes o lucro cobre os juros da dívida atual</div>
         <div style="font-size:22px;font-weight:600;color:var(--green);">2,1x</div>
