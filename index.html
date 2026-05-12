@@ -1782,6 +1782,34 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
 
   <div class="tag-file">📄 DRE_GJoaoDosSantos_2022.pdf + Balanço_Patrimonial_GJoao.pdf · analisados automaticamente</div>
 
+  <!-- SELETOR DE EMPRESA — PREMIUM ONLY -->
+  <div class="premium-only empresa-switcher" style="display:none;">
+    <div class="empresa-atual" onclick="togEmpresas()">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:32px;height:32px;border-radius:8px;background:var(--green);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;">GJ</div>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);">G JOAO DOS SANTOS</div>
+          <div style="font-size:10px;color:var(--text3);">CNPJ: 12.988.127/0001-40</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:9px;background:var(--green-light);color:var(--green);padding:2px 8px;border-radius:99px;font-weight:600;">Ativa</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>
+    <div id="empresa-list" style="display:none;">
+      <div class="empresa-item" style="opacity:.5;cursor:default;">
+        <div style="width:28px;height:28px;border-radius:6px;background:var(--surface2);display:flex;align-items:center;justify-content:center;border:1.5px dashed var(--border2);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:500;color:var(--text2);">Adicionar nova empresa</div>
+          <div style="font-size:10px;color:var(--text3);">Envie DRE + Balanço para analisar</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- LAYOUT: SIDEBAR + CONTEÚDO -->
   <div style="display:grid;grid-template-columns:200px 1fr;gap:2rem;align-items:start;">
 
@@ -1848,6 +1876,14 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
         <div style="font-size:10px;color:#f87171;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;display:flex;align-items:center;gap:5px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Trial · 11 dias restantes</div>
         <div style="font-size:12px;color:#e8f5ee;line-height:1.5;margin-bottom:.75rem;">Seu relatório PDF e o comparativo de bancos estão bloqueados — você pode estar perdendo R$ 277 mil/ano sem saber.</div>
         <button style="width:100%;padding:8px;border-radius:8px;border:none;background:var(--green);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Quero desbloquear tudo →</button>
+      </div>
+
+      <!-- ACESSO PARA CONTADOR — PREMIUM ONLY -->
+      <div class="premium-only" style="display:none;margin-top:1rem;">
+        <button onclick="abrirContador()" style="width:100%;display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;border:1.5px solid var(--green-mid);background:var(--green-light);color:var(--green-dark);font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+          Compartilhar com contador
+        </button>
       </div>
 
       <!-- Mini resumo sidebar -->
@@ -6387,6 +6423,79 @@ function lgMaskTel(input) {
 @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 
+<!-- SUPORTE PRIORITÁRIO — PREMIUM ONLY -->
+<div id="btn-suporte-premium" class="premium-only" style="display:none;position:fixed;bottom:24px;left:24px;z-index:9999;">
+  <button onclick="abrirSuporte()" style="display:flex;align-items:center;gap:8px;background:#fff;color:var(--green);border:1.5px solid var(--green);border-radius:50px;padding:12px 20px;font-size:12px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.1);transition:all .2s;font-family:inherit;">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    <span>Suporte prioritário</span>
+    <span style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;"></span>
+  </button>
+</div>
+
+<!-- MODAL CONTADOR -->
+<div id="modal-contador" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;display:none;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:16px;padding:2rem;max-width:420px;width:90%;position:relative;">
+    <button onclick="fecharContador()" style="position:absolute;top:12px;right:12px;background:none;border:none;font-size:18px;cursor:pointer;color:var(--text3);">✕</button>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.25rem;">
+      <div style="width:40px;height:40px;border-radius:10px;background:var(--green-light);display:flex;align-items:center;justify-content:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+      </div>
+      <div>
+        <div style="font-size:16px;font-weight:700;color:var(--text);">Compartilhar com contador</div>
+        <div style="font-size:11px;color:var(--text3);">Envie acesso somente leitura ao seu contador</div>
+      </div>
+    </div>
+    <div style="margin-bottom:1rem;">
+      <label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;">E-mail do contador</label>
+      <input id="email-contador" type="email" placeholder="contador@exemplo.com" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;transition:border .2s;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'">
+    </div>
+    <div style="margin-bottom:1.25rem;">
+      <label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;">Permissões</label>
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;padding:10px;border:1.5px solid var(--green);border-radius:8px;background:var(--green-light);text-align:center;font-size:11px;font-weight:600;color:var(--green-dark);cursor:pointer;">👁 Somente leitura</div>
+        <div style="flex:1;padding:10px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface);text-align:center;font-size:11px;font-weight:500;color:var(--text3);cursor:pointer;">📄 Leitura + PDF</div>
+      </div>
+    </div>
+    <button onclick="enviarConvite()" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--green);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;">Enviar convite →</button>
+    <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:.75rem;">O contador recebe um link seguro com acesso ao dashboard</div>
+  </div>
+</div>
+
+<!-- MODAL SUPORTE -->
+<div id="modal-suporte" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;display:none;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:16px;padding:2rem;max-width:380px;width:90%;position:relative;">
+    <button onclick="fecharSuporte()" style="position:absolute;top:12px;right:12px;background:none;border:none;font-size:18px;cursor:pointer;color:var(--text3);">✕</button>
+    <div style="text-align:center;margin-bottom:1.5rem;">
+      <div style="width:48px;height:48px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto .75rem;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      </div>
+      <div style="font-size:16px;font-weight:700;color:var(--text);">Suporte prioritário</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:4px;">Atendimento exclusivo para assinantes Premium</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <a href="https://wa.me/5500000000000?text=Olá! Sou assinante Premium VitaCash e preciso de ajuda." target="_blank" style="display:flex;align-items:center;gap:10px;padding:14px;border:1.5px solid #25D366;border-radius:10px;text-decoration:none;transition:all .2s;background:#fff;">
+        <div style="width:36px;height:36px;border-radius:8px;background:#25D366;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.553 4.12 1.52 5.855L0 24l6.335-1.652A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75c-1.97 0-3.837-.53-5.445-1.455l-.39-.232-3.758.98.998-3.648-.254-.403A9.72 9.72 0 012.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75z"/></svg>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:#075E54;">WhatsApp direto</div>
+          <div style="font-size:10px;color:var(--text3);">Resposta em até 2 horas</div>
+        </div>
+      </a>
+      <a href="mailto:suporte@vitacash.com.br?subject=Suporte Premium — G JOAO DOS SANTOS" style="display:flex;align-items:center;gap:10px;padding:14px;border:1.5px solid var(--border);border-radius:10px;text-decoration:none;transition:all .2s;background:#fff;">
+        <div style="width:36px;height:36px;border-radius:8px;background:var(--surface2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);">E-mail</div>
+          <div style="font-size:10px;color:var(--text3);">suporte@vitacash.com.br</div>
+        </div>
+      </a>
+    </div>
+    <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:1rem;">Horário: seg–sex, 9h–18h · Prioridade sobre fila padrão</div>
+  </div>
+</div>
+
 <!-- BOTÃO EXPORTAR PDF — PREMIUM ONLY -->
 <div id="btn-export-pdf" class="premium-only" style="display:none;position:fixed;bottom:24px;right:24px;z-index:9999;">
   <button onclick="exportarPDF()" style="display:flex;align-items:center;gap:8px;background:var(--green);color:#fff;border:none;border-radius:50px;padding:14px 22px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(29,158,117,.4);transition:all .2s;">
@@ -6438,8 +6547,76 @@ function lgMaskTel(input) {
 .pdf-tab-btn button:hover { background:var(--green); color:#fff; }
 .pdf-tab-btn button:hover svg { stroke:#fff; }
 @media print { .pdf-tab-btn { display:none!important; } }
+
+/* Seletor de empresa */
+.empresa-switcher { margin-bottom:1rem; }
+.empresa-atual {
+  display:flex; align-items:center; justify-content:space-between;
+  background:var(--surface); border:1.5px solid var(--border);
+  border-radius:12px; padding:12px 16px; cursor:pointer; transition:all .2s;
+}
+.empresa-atual:hover { border-color:var(--green); background:var(--green-light); }
+.empresa-item {
+  display:flex; align-items:center; gap:10px;
+  padding:12px 16px; border:1.5px dashed var(--border);
+  border-radius:10px; margin-top:8px; transition:all .2s;
+}
+.empresa-item:hover { border-color:var(--green); }
+
+/* Suporte button hover */
+#btn-suporte-premium button:hover { background:var(--green)!important; color:#fff!important; }
+#btn-suporte-premium button:hover svg { stroke:#fff; }
+#btn-suporte-premium button:hover span:last-child { background:#fff; }
+
+/* Modal backdrop */
+#modal-contador, #modal-suporte { align-items:center; justify-content:center; }
+
+@media print { #btn-suporte-premium, .empresa-switcher { display:none!important; } }
 </style>
 
+<script>
+// Toggle empresa list
+function togEmpresas() {
+  var list = document.getElementById('empresa-list');
+  list.style.display = list.style.display === 'none' ? 'block' : 'none';
+}
+
+// Modal contador
+function abrirContador() {
+  var m = document.getElementById('modal-contador');
+  m.style.display = 'flex';
+}
+function fecharContador() {
+  document.getElementById('modal-contador').style.display = 'none';
+}
+function enviarConvite() {
+  var email = document.getElementById('email-contador').value;
+  if (!email || !email.includes('@')) { alert('Digite um e-mail válido'); return; }
+  var btn = event.target;
+  btn.innerHTML = '✅ Convite enviado!';
+  btn.style.background = '#065f46';
+  setTimeout(function() {
+    btn.innerHTML = 'Enviar convite →';
+    btn.style.background = '';
+    fecharContador();
+  }, 2000);
+}
+
+// Modal suporte
+function abrirSuporte() {
+  var m = document.getElementById('modal-suporte');
+  m.style.display = 'flex';
+}
+function fecharSuporte() {
+  document.getElementById('modal-suporte').style.display = 'none';
+}
+
+// Fechar modais clicando fora
+document.addEventListener('click', function(e) {
+  if (e.target.id === 'modal-contador') fecharContador();
+  if (e.target.id === 'modal-suporte') fecharSuporte();
+});
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
 function exportarPDF() {
