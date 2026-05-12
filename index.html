@@ -6440,24 +6440,59 @@ function lgMaskTel(input) {
 @media print { .pdf-tab-btn { display:none!important; } }
 </style>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
 function exportarPDF() {
-  // Adiciona header temporário para o PDF
-  var header = document.createElement('div');
-  header.className = 'print-header';
-  header.innerHTML = '<div style="font-size:22px;font-weight:700;color:#1D9E75;margin-bottom:4px;">VitaCash — Relatório Financeiro</div><div style="font-size:12px;color:#666;">G JOAO DOS SANTOS · Gerado em ' + new Date().toLocaleDateString('pt-BR') + '</div>';
+  var content = document.querySelector('.tc2.on') || document.querySelector('.tc2.active') || document.querySelector('.tc2');
+  if (!content) return;
 
-  var content = document.querySelector('.tc2.active') || document.querySelector('.tc2');
-  if (content) {
-    content.insertBefore(header, content.firstChild);
-  }
+  // Nomes das abas
+  var tabNames = { tg:'Visao-Geral', ta:'Acoes', tcg:'Capital-de-Giro', tend:'Endividamento', td:'DRE', tbp:'Balanco-Patrimonial', te:'Estrategias' };
+  var tabId = content.id || 'relatorio';
+  var tabName = tabNames[tabId] || 'Relatorio';
+  var dataHoje = new Date().toLocaleDateString('pt-BR');
 
-  window.print();
+  // Cria wrapper temporário com header
+  var wrapper = document.createElement('div');
+  wrapper.style.cssText = 'background:#fff;padding:1.5rem;';
+  wrapper.innerHTML = '<div style="text-align:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #1D9E75;"><div style="font-size:22px;font-weight:700;color:#1D9E75;margin-bottom:4px;">VitaCash — Relatório Financeiro</div><div style="font-size:13px;color:#666;">G JOAO DOS SANTOS · ' + tabName.replace(/-/g,' ') + ' · ' + dataHoje + '</div></div>';
 
-  // Remove o header após imprimir
-  setTimeout(function() {
-    if (header.parentNode) header.parentNode.removeChild(header);
-  }, 1000);
+  // Clona o conteúdo da aba
+  var clone = content.cloneNode(true);
+  // Remove botões de PDF e overlays do clone
+  clone.querySelectorAll('.pdf-tab-btn, .plan-overlay, .plan-lock-overlay').forEach(function(el) { el.remove(); });
+  // Remove blur do clone
+  clone.querySelectorAll('.mg-section-pro').forEach(function(el) {
+    el.style.filter = 'none';
+    el.style.pointerEvents = 'auto';
+    var after = el.querySelector('.plan-lock-overlay');
+    if (after) after.remove();
+  });
+  clone.style.display = 'block';
+
+  wrapper.appendChild(clone);
+  document.body.appendChild(wrapper);
+
+  // Feedback visual no botão
+  var btns = document.querySelectorAll('.pdf-tab-btn button, #btn-export-pdf button');
+  btns.forEach(function(b) { b.dataset.orig = b.innerHTML; b.innerHTML = '⏳ Gerando PDF...'; b.disabled = true; });
+
+  var opt = {
+    margin: [10, 8, 10, 8],
+    filename: 'VitaCash-' + tabName + '-' + dataHoje.replace(/\//g,'-') + '.pdf',
+    image: { type: 'jpeg', quality: 0.95 },
+    html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+  };
+
+  html2pdf().set(opt).from(wrapper).save().then(function() {
+    document.body.removeChild(wrapper);
+    btns.forEach(function(b) { b.innerHTML = '✅ PDF salvo!'; setTimeout(function() { b.innerHTML = b.dataset.orig; b.disabled = false; }, 2000); });
+  }).catch(function() {
+    document.body.removeChild(wrapper);
+    btns.forEach(function(b) { b.innerHTML = b.dataset.orig; b.disabled = false; });
+  });
 }
 </script>
 
