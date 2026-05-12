@@ -4628,7 +4628,7 @@ async function lgEntrar() {
   const _temPlanoPendente = localStorage.getItem('vc_pending_plan');
   await verificarPlanoPendente();
   if (!_temPlanoPendente) {
-    go('s-dash');
+    await irParaDash();
   }
 }
 
@@ -4773,7 +4773,29 @@ const gastosDiarios=116952;
 
 
 
+async function irParaDash() {
+  if (!currentUser) { go('s-land'); return; }
+  try {
+    const { data: profile } = await sb.from('profiles')
+      .select('subscription_status, current_plan')
+      .eq('id', currentUser.id)
+      .single();
+    const ativo = profile?.subscription_status === 'active' || profile?.subscription_status === 'trialing';
+    if (ativo) {
+      go('s-dash');
+    } else {
+      go('s-escolher-plano');
+    }
+  } catch(e) {
+    console.warn('irParaDash:', e);
+    go('s-dash');
+  }
+}
+
 function go(id){
+  // Guard: bloqueia acesso ao dashboard sem estar logado
+  if (id === 's-dash' && !currentUser) { go('s-land'); return; }
+
   document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.opacity='';s.style.transform='';s.style.transition='';});
   const el=document.getElementById(id);
   if(!el){console.error('Screen not found:',id);return;}
