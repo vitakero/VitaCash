@@ -4249,15 +4249,25 @@ let currentUser = null;
   // Detecta retorno do Stripe após pagamento (?checkout=success&plan=xxx)
   const params = new URLSearchParams(window.location.search);
   if (params.get('checkout') === 'success') {
-    // Limpa a URL sem recarregar a página
     window.history.replaceState({}, '', window.location.pathname);
-
     const planName = params.get('plan') || '';
     const nomes = { growth: 'Growth — R$97/mês', pro: 'PRO — R$197/mês', premium: 'Premium — R$347/mês' };
     var el = document.getElementById('ok-plano-nome');
     if (el) el.textContent = nomes[planName] || 'Plano VitaCash';
-
     go('s-pagamento-ok');
+    return;
+  }
+
+  // Restaura última tela visitada se usuário ainda está logado
+  if (currentUser) {
+    const telasSalvas = ['s-dash','s-escolher-plano','s-anl','s-nova-dre'];
+    const ultimaTela = localStorage.getItem('vc_ultima_tela');
+    if (ultimaTela && telasSalvas.includes(ultimaTela)) {
+      go(ultimaTela);
+      return;
+    }
+    // Sem tela salva mas logado → vai pro dashboard
+    await irParaDash();
     return;
   }
 })();
@@ -4885,6 +4895,14 @@ async function irParaDash() {
 function go(id){
   // Guard: bloqueia acesso ao dashboard sem estar logado
   if (id === 's-dash' && !currentUser) { go('s-land'); return; }
+
+  // Salva tela atual para restaurar no F5
+  const telasSalvar = ['s-dash','s-escolher-plano','s-anl','s-nova-dre'];
+  if (currentUser && telasSalvar.includes(id)) {
+    localStorage.setItem('vc_ultima_tela', id);
+  } else if (!currentUser || id === 's-land') {
+    localStorage.removeItem('vc_ultima_tela');
+  }
 
   document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.opacity='';s.style.transform='';s.style.transition='';});
   const el=document.getElementById(id);
