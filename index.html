@@ -1904,6 +1904,15 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
           <div style="font-size:11px;color:var(--green-dark);font-weight:600;">Saúde geral: Excelente</div>
         </div>
       </div>
+
+      <!-- SUPORTE PRIORITÁRIO — SIDEBAR -->
+      <div style="margin-top:1rem;">
+        <button onclick="checkPremium('Canal de suporte exclusivo com resposta em até 2 horas via WhatsApp', abrirSuporte)" style="width:100%;display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          Suporte prioritário
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--green);margin-left:auto;"></span>
+        </button>
+      </div>
     </div>
 
     <!-- CONTEÚDO PRINCIPAL -->
@@ -6440,14 +6449,6 @@ function lgMaskTel(input) {
   </div>
 </div>
 
-<!-- SUPORTE PRIORITÁRIO — PREMIUM ONLY -->
-<div id="btn-suporte-premium" style="position:fixed;bottom:24px;left:24px;z-index:9999;">
-  <button onclick="checkPremium('Canal de suporte exclusivo com resposta em até 2 horas via WhatsApp', abrirSuporte)" style="display:flex;align-items:center;gap:8px;background:#fff;color:var(--green);border:1.5px solid var(--green);border-radius:50px;padding:12px 20px;font-size:12px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.1);transition:all .2s;font-family:inherit;">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-    <span>Suporte prioritário</span>
-    <span style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;"></span>
-  </button>
-</div>
 
 <!-- MODAL CONTADOR -->
 <div id="modal-contador" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;display:none;align-items:center;justify-content:center;">
@@ -6580,15 +6581,11 @@ function lgMaskTel(input) {
 }
 .empresa-item:hover { border-color:var(--green); }
 
-/* Suporte button hover */
-#btn-suporte-premium button:hover { background:var(--green)!important; color:#fff!important; }
-#btn-suporte-premium button:hover svg { stroke:#fff; }
-#btn-suporte-premium button:hover span:last-child { background:#fff; }
 
 /* Modal backdrop */
 #modal-contador, #modal-suporte { align-items:center; justify-content:center; }
 
-@media print { #btn-suporte-premium, .empresa-switcher { display:none!important; } }
+@media print { .empresa-switcher { display:none!important; } }
 </style>
 
 <script>
