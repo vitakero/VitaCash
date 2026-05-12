@@ -4908,7 +4908,9 @@ function go(id){
     ['ut','ut2','dt'].forEach(x=>{const e=document.getElementById(x);if(e)e.textContent=tag;});
     ['uav','uav2','dav'].forEach(x=>{const e=document.getElementById(x);if(e)e.textContent=nome.substring(0,2).toUpperCase();});
     const dn=document.getElementById('dn');if(dn)dn.textContent=nome;
-    // Carrega perfil real do Supabase (nicho, nome)
+    // Aplica restricoes de plano imediatamente (antes do fetch async)
+    if(id==='s-dash') aplicarRestricoesDePlano('starter');
+    // Carrega perfil real do Supabase (nicho, nome) e atualiza restricoes com plano real
     if(id==='s-dash' && currentUser) carregarPerfilDash();
     // Carrega análises salvas e popula o filtro do dashboard
     if(id==='s-dash') popularFiltroDash();
