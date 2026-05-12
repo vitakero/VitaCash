@@ -2074,7 +2074,7 @@ div[style*="position:absolute;top:0;left:0;right:0;height:3px"]{height:2px;}
 
     <!-- VALUATION BY EQUITY -->
     <div class="sl">Valuation — quanto vale sua empresa</div>
-    <div class="ab aok" style="margin-bottom:1.25rem;">
+    <div class="ab aok pro-only" style="margin-bottom:1.25rem;">
       <div style="flex-shrink:0;display:flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 1 7 7c0 2.62-1.45 4.92-3.6 6.17L15 17H9l-.4-1.83A7.004 7.004 0 0 1 5 9a7 7 0 0 1 7-7z"/></svg></div>
       <div class="at">Estimativa do valor de mercado da empresa com base em 4 métodos diferentes. Quanto mais métodos apontarem para o mesmo valor, mais confiável a estimativa.</div>
     </div>
@@ -2330,7 +2330,7 @@ div[style*="position:absolute;top:0;left:0;right:0;height:3px"]{height:2px;}
 
 
     <!-- ALERTA RENTABILIDADE -->
-    <div class="ab aok" style="margin-bottom:1.5rem;">
+    <div class="ab aok pro-only" style="margin-bottom:1.5rem;">
       <div style="font-size:14px;flex-shrink:0;">✓</div>
       <div class="at">O <strong>ROE de 25,3%</strong> está acima da Selic (13,75% em 2022), o que significa que a empresa está <strong>criando valor</strong> — o dinheiro investido pelos sócios rende mais do que a renda fixa. ROI de 17,4% é muito acima da média do setor.</div>
     </div>
@@ -2385,7 +2385,7 @@ div[style*="position:absolute;top:0;left:0;right:0;height:3px"]{height:2px;}
     </div>
 
     <!-- ALERTA ENDIVIDAMENTO -->
-    <div class="ab aok" style="margin-bottom:1.5rem;">
+    <div class="ab aok pro-only" style="margin-bottom:1.5rem;">
       <div style="font-size:14px;flex-shrink:0;">✓</div>
       <div class="at">Endividamento <strong>excelente (31,2%)</strong> — muito abaixo do limite de 60%. A empresa tem R$ 23,3 mi de espaço para novo crédito com segurança. Ótima posição para captar crédito a taxas melhores se precisar expandir.</div>
     </div>
@@ -4826,6 +4826,11 @@ function aplicarRestricoesDePlano(plan) {
         sec.style.overflow = '';
       }
     }
+  });
+
+  // Esconde/mostra elementos exclusivos de planos pagos
+  document.querySelectorAll('#tg .pro-only').forEach(function(el) {
+    el.style.display = nivel >= 2 ? '' : 'none';
   });
 
   // Banner geral de upgrade no tg para STARTER
