@@ -1598,6 +1598,25 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
   </div>
 </div>
 
+<script>
+// Permite enviar os formulários de auth (login, cadastro, reset) ao pressionar Enter
+document.addEventListener('keydown', function(e){
+  if(e.key !== 'Enter') return;
+  var login = document.getElementById('s-login');
+  if(!login || !login.classList.contains('active')) return;
+  if(!e.target || !e.target.classList || !e.target.classList.contains('lg-inp')) return;
+  e.preventDefault();
+  // Dispara o botão de submit que estiver visível e habilitado
+  var btnIds = ['lg-btn-login', 'lg-btn-cad', 'reset-btn'];
+  for(var i=0; i<btnIds.length; i++){
+    var btn = document.getElementById(btnIds[i]);
+    if(btn && !btn.disabled){
+      var rect = btn.getBoundingClientRect();
+      if(rect.width > 0 && rect.height > 0){ btn.click(); return; }
+    }
+  }
+});
+</script>
 
 <!-- ══ CADASTRO 4 ══ -->
 <div class="screen" id="s-c4">
