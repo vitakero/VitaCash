@@ -5290,11 +5290,11 @@ function go(id){
     if(id==='s-dash') aplicarRestricoesDePlano('starter');
     // Carrega perfil real do Supabase (nicho, nome) e atualiza restricoes com plano real
     if(id==='s-dash' && currentUser) carregarPerfilDash();
-    // Carrega perfil na tela de perfil
-    if(id==='s-perfil' && currentUser) setTimeout(carregarPerfil, 50);
     // Carrega análises salvas e popula o filtro do dashboard
     if(id==='s-dash') popularFiltroDash();
   }
+  // Carrega perfil na tela de perfil
+  if(id==='s-perfil' && currentUser) setTimeout(carregarPerfil, 50);
   // Limpa flag de novo cadastro ao sair da pagina de planos
   if(id !== 's-escolher-plano') sessionStorage.removeItem('vc_novo_cadastro');
   // Controla badge cadastro vs botão voltar na página de planos
