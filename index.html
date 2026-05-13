@@ -1790,8 +1790,8 @@ document.addEventListener('keydown', function(e){
         <span id="dash-plano-status" style="color:var(--text3);font-weight:500;"></span>
       </div>
 
-      <!-- Saudação + Avatar (abre tela de perfil) -->
-      <div class="user-menu-trigger" onclick="abrirPerfil()" title="Abrir meu perfil">
+      <!-- Saudação + Avatar -->
+      <div style="display:flex;align-items:center;gap:9px;cursor:pointer;" onclick="go('s-perfil')" title="Meu perfil">
         <div style="font-size:13px;color:var(--text2);">Olá, <strong style="color:var(--text);font-weight:600;" id="dn">Gilson</strong></div>
         <div class="av" id="dav">GJ</div>
       </div>
@@ -5290,6 +5290,8 @@ function go(id){
     if(id==='s-dash') aplicarRestricoesDePlano('starter');
     // Carrega perfil real do Supabase (nicho, nome) e atualiza restricoes com plano real
     if(id==='s-dash' && currentUser) carregarPerfilDash();
+    // Carrega perfil na tela de perfil
+    if(id==='s-perfil' && currentUser) setTimeout(carregarPerfil, 50);
     // Carrega análises salvas e popula o filtro do dashboard
     if(id==='s-dash') popularFiltroDash();
   }
@@ -6978,6 +6980,7 @@ document.addEventListener('click', function(e) {
   if (e.target.id === 'modal-suporte') fecharSuporte();
   if (e.target.id === 'modal-premium-upgrade') document.getElementById('modal-premium-upgrade').style.display='none';
 });
+
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
