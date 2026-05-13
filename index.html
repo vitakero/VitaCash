@@ -4235,37 +4235,71 @@ async function mudarSenhaPerfil(){
     </button>
   </div>
 
-  <!-- CARD: Zona de perigo — pausar + apagar conta -->
-  <div class="perfil-card perfil-card-danger">
-    <div class="perfil-card-title" style="color:#dc2626;">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      Zona de perigo
+  <!-- ════════════════════════════════════════════════
+       ZONA DE PERIGO — redesign premium
+       ════════════════════════════════════════════════ -->
+  <div class="dz-section">
+    <div class="dz-section-header">
+      <div class="dz-section-eyebrow">Zona de perigo</div>
+      <div class="dz-section-desc">Ações que afetam o estado da sua conta. Revise com atenção antes de prosseguir.</div>
     </div>
 
-    <!-- PAUSAR (opção menos agressiva) -->
-    <div class="perfil-danger-section perfil-danger-section-warn">
-      <div class="perfil-danger-section-title">⏸ Pausar minha conta</div>
-      <div class="perfil-danger-section-desc">
-        Cancela sua assinatura e bloqueia o acesso temporariamente, mas <strong>mantém todos os seus dados</strong>. Você pode reativar a qualquer momento fazendo login novamente.
+    <!-- Card 1: Pausar conta (reversível, neutro) -->
+    <div class="dz-card">
+      <div class="dz-card-body">
+        <div class="dz-card-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="10" y1="9" x2="10" y2="15"/><line x1="14" y1="9" x2="14" y2="15"/></svg>
+        </div>
+        <div class="dz-card-content">
+          <div class="dz-card-title-row">
+            <h3 class="dz-card-title">Pausar conta</h3>
+            <span class="dz-badge dz-badge-neutral">
+              <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><circle cx="4" cy="4" r="3" fill="currentColor"/></svg>
+              Reversível
+            </span>
+          </div>
+          <p class="dz-card-desc">
+            Cancela sua assinatura e bloqueia o acesso temporariamente. Seus dados, análises e configurações permanecem preservados. Reative a qualquer momento ao fazer login novamente.
+          </p>
+        </div>
       </div>
-      <button type="button" class="perfil-btn perfil-btn-warn" onclick="abrirModalPausarConta()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-        Pausar conta
-      </button>
+      <div class="dz-card-footer">
+        <button type="button" class="dz-btn dz-btn-secondary" id="dz-btn-pausar" onclick="abrirModalPausarConta()">
+          <span class="dz-btn-label">Pausar conta</span>
+          <span class="dz-btn-loading" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg>
+          </span>
+        </button>
+      </div>
     </div>
 
-    <div class="perfil-danger-divider"></div>
-
-    <!-- APAGAR (opção definitiva) -->
-    <div class="perfil-danger-section">
-      <div class="perfil-danger-section-title" style="color:#dc2626;">🗑 Apagar permanentemente</div>
-      <div class="perfil-danger-section-desc">
-        Apaga <strong>permanentemente</strong> seus dados, histórico de análises e cancela sua assinatura. Esta ação é <strong style="color:#dc2626;">irreversível</strong>.
+    <!-- Card 2: Excluir conta (irreversível, danger sutil) -->
+    <div class="dz-card dz-card-destructive">
+      <div class="dz-card-body">
+        <div class="dz-card-icon dz-card-icon-destructive">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+        </div>
+        <div class="dz-card-content">
+          <div class="dz-card-title-row">
+            <h3 class="dz-card-title">Excluir conta</h3>
+            <span class="dz-badge dz-badge-destructive">
+              <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><circle cx="4" cy="4" r="3" fill="currentColor"/></svg>
+              Irreversível
+            </span>
+          </div>
+          <p class="dz-card-desc">
+            Remove permanentemente sua conta, dados pessoais, histórico de análises e cancela sua assinatura ativa. Esta ação não pode ser desfeita e seu email não poderá ser recuperado.
+          </p>
+        </div>
       </div>
-      <button type="button" class="perfil-btn perfil-btn-danger" onclick="abrirModalApagarConta()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 01-2 2H9a2 2 0 01-2-2L5 6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-        Apagar minha conta
-      </button>
+      <div class="dz-card-footer">
+        <button type="button" class="dz-btn dz-btn-destructive" id="dz-btn-excluir" onclick="abrirModalApagarConta()">
+          <span class="dz-btn-label">Excluir conta</span>
+          <span class="dz-btn-loading" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg>
+          </span>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -4349,51 +4383,327 @@ async function mudarSenhaPerfil(){
 </div>
 </div>
 
-<!-- ══ MODAL: APAGAR CONTA ══ -->
+<!-- ══ MODAL: EXCLUIR CONTA (premium redesign) ══ -->
 <div class="del-modal" id="del-modal" aria-hidden="true">
   <div class="del-modal-backdrop" onclick="fecharModalApagarConta()"></div>
-  <div class="del-modal-content" role="dialog" aria-modal="true">
-    <div class="del-modal-icon">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-    </div>
-    <h2 class="del-modal-title">Apagar minha conta?</h2>
-    <p class="del-modal-sub">Você vai perder <strong>todos</strong> os seus dados e análises. Esta ação não pode ser desfeita.</p>
-
-    <div class="del-modal-list">
-      <div class="del-modal-list-item"><span class="del-modal-bullet">✕</span> Dados pessoais (nome, telefone, email)</div>
-      <div class="del-modal-list-item"><span class="del-modal-bullet">✕</span> Histórico de análises e DREs enviadas</div>
-      <div class="del-modal-list-item"><span class="del-modal-bullet">✕</span> Assinatura ativa (será cancelada no Stripe)</div>
-      <div class="del-modal-list-item"><span class="del-modal-bullet">✕</span> Acesso ao seu email/senha de login</div>
+  <div class="del-modal-content del-modal-premium" role="dialog" aria-modal="true" aria-labelledby="del-modal-title-id">
+    <!-- Header com badge -->
+    <div class="del-modal-header">
+      <span class="dz-badge dz-badge-destructive">
+        <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><circle cx="4" cy="4" r="3" fill="currentColor"/></svg>
+        Ação irreversível
+      </span>
+      <button type="button" class="del-modal-close" onclick="fecharModalApagarConta()" aria-label="Fechar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
 
+    <h2 id="del-modal-title-id" class="del-modal-title">Excluir conta permanentemente</h2>
+    <p class="del-modal-sub">Esta ação <strong>não pode ser desfeita</strong>. Confirme que entende as consequências antes de prosseguir.</p>
+
+    <!-- Lista de impactos -->
+    <div class="del-modal-impact-list">
+      <div class="del-modal-impact-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <span>Dados pessoais (nome, telefone, email)</span>
+      </div>
+      <div class="del-modal-impact-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <span>Histórico de análises e DREs enviadas</span>
+      </div>
+      <div class="del-modal-impact-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <span>Assinatura ativa (cancelada no Stripe)</span>
+      </div>
+      <div class="del-modal-impact-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <span>Acesso ao seu email e senha de login</span>
+      </div>
+    </div>
+
+    <!-- Campo de confirmação -->
     <div class="del-modal-field">
-      <label class="del-modal-label">Para confirmar, digite <strong>APAGAR</strong> abaixo:</label>
-      <input type="text" id="del-confirm-input" class="del-modal-input" placeholder="APAGAR" autocomplete="off" oninput="delChkConfirm()"/>
+      <label class="del-modal-label" for="del-confirm-input">
+        Para confirmar, digite <code class="del-modal-code">EXCLUIR</code> abaixo:
+      </label>
+      <input type="text" id="del-confirm-input" class="del-modal-input" placeholder="EXCLUIR" autocomplete="off" spellcheck="false" oninput="delChkConfirm()"/>
     </div>
 
     <div class="del-modal-msg" id="del-modal-msg"></div>
 
+    <!-- Ações -->
     <div class="del-modal-actions">
-      <button type="button" class="del-modal-btn-cancel" onclick="fecharModalApagarConta()">Cancelar</button>
-      <button type="button" class="del-modal-btn-confirm" id="del-modal-btn-confirm" disabled onclick="confirmarApagarConta()">Apagar para sempre</button>
+      <button type="button" class="dz-btn dz-btn-secondary del-modal-btn" onclick="fecharModalApagarConta()">
+        <span class="dz-btn-label">Cancelar</span>
+      </button>
+      <button type="button" class="dz-btn dz-btn-destructive dz-btn-filled del-modal-btn" id="del-modal-btn-confirm" disabled onclick="confirmarApagarConta()">
+        <span class="dz-btn-label">Excluir conta</span>
+        <span class="dz-btn-loading" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg>
+        </span>
+      </button>
     </div>
   </div>
 </div>
 
 <style>
-#s-perfil .perfil-card-danger { border-color:#fecaca; background:#fef9f9; }
-#s-perfil .perfil-card-danger .perfil-btn-danger,
-#s-perfil .perfil-card-danger .perfil-btn-warn { width:auto; }
+/* ══════════════════════════════════════════════════
+   ZONA DE PERIGO — design system premium
+   Inspirado em Stripe, Linear, Vercel, Notion, Framer
+   ══════════════════════════════════════════════════ */
+#s-perfil .dz-section { margin-top:.5rem; }
 
-/* Seções dentro da Zona de perigo */
-#s-perfil .perfil-danger-section { padding:.25rem 0 .5rem; }
-#s-perfil .perfil-danger-section-title { font-size:13px; font-weight:700; color:var(--text); margin-bottom:.5rem; }
-#s-perfil .perfil-danger-section-desc { font-size:12.5px; color:var(--text2); line-height:1.55; margin-bottom:.85rem; }
-#s-perfil .perfil-danger-divider { height:1px; background:#fecaca; margin:1rem -.25rem; opacity:.6; }
+/* Header da seção */
+#s-perfil .dz-section-header { margin-bottom:1rem; padding:0 .25rem; }
+#s-perfil .dz-section-eyebrow {
+  font-family:'Inter',-apple-system,sans-serif;
+  font-size:10.5px;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:#94a3b8;
+  margin-bottom:.4rem;
+}
+#s-perfil .dz-section-desc {
+  font-size:13px;
+  color:#64748b;
+  font-weight:400;
+  line-height:1.5;
+  letter-spacing:-.005em;
+}
 
-/* Botão de pausar (amarelo/aviso) — versão amigável */
-.perfil-btn-warn { background:#fff; color:#b45309; border:1.5px solid #fcd34d; box-shadow:none; }
-.perfil-btn-warn:hover:not(:disabled) { background:#fffbeb; border-color:#f59e0b; transform:none; box-shadow:none; }
+/* Card base */
+#s-perfil .dz-card {
+  background:#fff;
+  border:1px solid #e8edf2;
+  border-radius:14px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04), 0 1px 1px rgba(15,23,42,.02);
+  margin-bottom:.875rem;
+  overflow:hidden;
+  transition:border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+#s-perfil .dz-card:hover {
+  border-color:#d8dee5;
+  box-shadow:0 4px 12px rgba(15,23,42,.06), 0 1px 3px rgba(15,23,42,.04);
+}
+
+/* Variante destrutiva — tonalidade muito sutil de vermelho */
+#s-perfil .dz-card-destructive {
+  border-color:rgba(220,38,38,.14);
+}
+#s-perfil .dz-card-destructive:hover {
+  border-color:rgba(220,38,38,.28);
+  box-shadow:0 4px 14px rgba(220,38,38,.07), 0 1px 3px rgba(220,38,38,.04);
+}
+
+/* Corpo do card (ícone + conteúdo) */
+#s-perfil .dz-card-body {
+  display:flex;
+  gap:.95rem;
+  padding:1.25rem 1.4rem 1.1rem;
+  align-items:flex-start;
+}
+
+/* Ícone */
+#s-perfil .dz-card-icon {
+  flex-shrink:0;
+  width:38px;
+  height:38px;
+  border-radius:10px;
+  background:#f8fafc;
+  border:1px solid #e8edf2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#475569;
+  transition:background .2s ease, color .2s ease, border-color .2s ease;
+}
+#s-perfil .dz-card:hover .dz-card-icon {
+  background:#f1f5f9;
+  color:#0f172a;
+}
+#s-perfil .dz-card-icon-destructive {
+  background:rgba(220,38,38,.05);
+  border-color:rgba(220,38,38,.12);
+  color:#b91c1c;
+}
+#s-perfil .dz-card-destructive:hover .dz-card-icon-destructive {
+  background:rgba(220,38,38,.08);
+  color:#991b1b;
+}
+
+/* Conteúdo */
+#s-perfil .dz-card-content { flex:1; min-width:0; }
+
+/* Linha do título com badge */
+#s-perfil .dz-card-title-row {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:.4rem;
+}
+#s-perfil .dz-card-title {
+  font-family:'Sora','Inter',-apple-system,sans-serif;
+  font-size:15px;
+  font-weight:600;
+  color:#0f172a;
+  letter-spacing:-.012em;
+  margin:0;
+  line-height:1.2;
+}
+
+/* Badges */
+#s-perfil .dz-badge {
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:3px 9px 3px 7px;
+  border-radius:99px;
+  font-size:10.5px;
+  font-weight:600;
+  letter-spacing:.02em;
+  line-height:1;
+  border:1px solid transparent;
+}
+#s-perfil .dz-badge svg { flex-shrink:0; }
+#s-perfil .dz-badge-neutral {
+  background:#f0fdf4;
+  border-color:rgba(22,163,74,.18);
+  color:#15803d;
+}
+#s-perfil .dz-badge-destructive {
+  background:rgba(220,38,38,.06);
+  border-color:rgba(220,38,38,.18);
+  color:#b91c1c;
+}
+
+/* Descrição */
+#s-perfil .dz-card-desc {
+  font-size:13px;
+  color:#64748b;
+  line-height:1.55;
+  letter-spacing:-.003em;
+  margin:0;
+  max-width:62ch;
+}
+
+/* Rodapé (separador + botão alinhado à direita) */
+#s-perfil .dz-card-footer {
+  display:flex;
+  justify-content:flex-end;
+  padding:.85rem 1.4rem;
+  background:#fafbfc;
+  border-top:1px solid #f1f5f9;
+}
+#s-perfil .dz-card-destructive .dz-card-footer {
+  background:rgba(254,242,242,.4);
+  border-top-color:rgba(220,38,38,.10);
+}
+
+/* Botões premium */
+#s-perfil .dz-btn {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  padding:7px 14px;
+  border-radius:8px;
+  font-size:13px;
+  font-weight:600;
+  letter-spacing:-.005em;
+  font-family:inherit;
+  cursor:pointer;
+  transition:background .15s ease, border-color .15s ease, color .15s ease, transform .12s ease, box-shadow .15s ease;
+  position:relative;
+  min-width:120px;
+  height:34px;
+}
+#s-perfil .dz-btn:focus-visible {
+  outline:none;
+  box-shadow:0 0 0 3px rgba(15,23,42,.10);
+}
+
+/* Secundário (Pausar) — outline neutro elegante */
+#s-perfil .dz-btn-secondary {
+  background:#fff;
+  border:1px solid #d8dee5;
+  color:#334155;
+  box-shadow:0 1px 1px rgba(15,23,42,.04);
+}
+#s-perfil .dz-btn-secondary:hover:not(:disabled) {
+  background:#f8fafc;
+  border-color:#b8c0cc;
+  color:#0f172a;
+  transform:translateY(-1px);
+  box-shadow:0 2px 4px rgba(15,23,42,.06);
+}
+#s-perfil .dz-btn-secondary:active:not(:disabled) {
+  transform:translateY(0);
+  background:#f1f5f9;
+}
+
+/* Destrutivo (Excluir) — outline danger refinado */
+#s-perfil .dz-btn-destructive {
+  background:#fff;
+  border:1px solid rgba(220,38,38,.28);
+  color:#b91c1c;
+  box-shadow:0 1px 1px rgba(220,38,38,.04);
+}
+#s-perfil .dz-btn-destructive:hover:not(:disabled) {
+  background:#fef2f2;
+  border-color:rgba(220,38,38,.5);
+  color:#991b1b;
+  transform:translateY(-1px);
+  box-shadow:0 2px 6px rgba(220,38,38,.10);
+}
+#s-perfil .dz-btn-destructive:active:not(:disabled) {
+  transform:translateY(0);
+  background:#fee2e2;
+}
+
+#s-perfil .dz-btn:disabled { opacity:.55; cursor:not-allowed; transform:none; }
+
+/* Loading state */
+#s-perfil .dz-btn-loading {
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+#s-perfil .dz-btn-loading svg { animation:dzSpin .8s linear infinite; }
+#s-perfil .dz-btn.is-loading .dz-btn-label { display:none; }
+#s-perfil .dz-btn.is-loading .dz-btn-loading { display:inline-flex; }
+@keyframes dzSpin { from { transform:rotate(0); } to { transform:rotate(360deg); } }
+
+/* Responsividade */
+@media (max-width:560px) {
+  #s-perfil .dz-card-body { flex-direction:column; padding:1.1rem 1.1rem .9rem; }
+  #s-perfil .dz-card-icon { width:34px; height:34px; }
+  #s-perfil .dz-card-footer { padding:.75rem 1.1rem; }
+  #s-perfil .dz-btn { width:100%; }
+}
+
+/* Dark mode ready (ativa se o body tiver data-theme="dark") */
+[data-theme="dark"] #s-perfil .dz-card {
+  background:#0f172a;
+  border-color:#1e293b;
+  box-shadow:0 1px 2px rgba(0,0,0,.3);
+}
+[data-theme="dark"] #s-perfil .dz-card-destructive { border-color:rgba(248,113,113,.20); }
+[data-theme="dark"] #s-perfil .dz-card-title { color:#f1f5f9; }
+[data-theme="dark"] #s-perfil .dz-card-desc { color:#94a3b8; }
+[data-theme="dark"] #s-perfil .dz-section-desc { color:#94a3b8; }
+[data-theme="dark"] #s-perfil .dz-section-eyebrow { color:#64748b; }
+[data-theme="dark"] #s-perfil .dz-card-icon { background:#1e293b; border-color:#334155; color:#cbd5e1; }
+[data-theme="dark"] #s-perfil .dz-card-icon-destructive { background:rgba(248,113,113,.10); border-color:rgba(248,113,113,.25); color:#fca5a5; }
+[data-theme="dark"] #s-perfil .dz-card-footer { background:#0b1220; border-top-color:#1e293b; }
+[data-theme="dark"] #s-perfil .dz-card-destructive .dz-card-footer { background:rgba(127,29,29,.15); border-top-color:rgba(248,113,113,.12); }
+[data-theme="dark"] #s-perfil .dz-btn-secondary { background:#1e293b; border-color:#334155; color:#e2e8f0; }
+[data-theme="dark"] #s-perfil .dz-btn-secondary:hover:not(:disabled) { background:#283447; border-color:#475569; color:#f1f5f9; }
+[data-theme="dark"] #s-perfil .dz-btn-destructive { background:#1e293b; border-color:rgba(248,113,113,.30); color:#fca5a5; }
+[data-theme="dark"] #s-perfil .dz-btn-destructive:hover:not(:disabled) { background:rgba(127,29,29,.30); border-color:rgba(248,113,113,.55); color:#fecaca; }
+[data-theme="dark"] #s-perfil .dz-badge-neutral { background:rgba(22,163,74,.12); border-color:rgba(22,163,74,.25); color:#86efac; }
+[data-theme="dark"] #s-perfil .dz-badge-destructive { background:rgba(248,113,113,.10); border-color:rgba(248,113,113,.25); color:#fca5a5; }
 
 /* Modal de apagar conta */
 .del-modal { position:fixed; inset:0; z-index:9999; display:none; align-items:center; justify-content:center; padding:1rem; }
@@ -4420,6 +4730,126 @@ async function mudarSenhaPerfil(){
 .del-modal-btn-confirm { background:#dc2626; border:none; color:#fff; box-shadow:0 4px 12px rgba(220,38,38,.3); }
 .del-modal-btn-confirm:hover:not(:disabled) { background:#b91c1c; transform:translateY(-1px); box-shadow:0 6px 16px rgba(220,38,38,.4); }
 .del-modal-btn-confirm:disabled { background:#fca5a5; cursor:not-allowed; box-shadow:none; transform:none; }
+
+/* ══════ Modal premium (redesign) ══════ */
+.del-modal-premium { padding:1.5rem 1.5rem 1.25rem; max-width:480px; }
+.del-modal-premium .del-modal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem; }
+.del-modal-premium .del-modal-close { width:28px; height:28px; border:none; background:transparent; color:#94a3b8; border-radius:7px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .15s, color .15s; }
+.del-modal-premium .del-modal-close:hover { background:#f1f5f9; color:#0f172a; }
+.del-modal-premium .del-modal-title {
+  font-family:'Sora','Inter',sans-serif;
+  font-size:18px;
+  font-weight:600;
+  color:#0f172a;
+  letter-spacing:-.014em;
+  margin-bottom:.4rem;
+  text-align:left;
+}
+.del-modal-premium .del-modal-sub {
+  font-size:13px;
+  color:#64748b;
+  line-height:1.55;
+  margin-bottom:1.1rem;
+  text-align:left;
+}
+.del-modal-premium .del-modal-sub strong { color:#0f172a; font-weight:600; }
+/* Lista de impactos */
+.del-modal-premium .del-modal-impact-list {
+  background:#fafbfc;
+  border:1px solid #e8edf2;
+  border-radius:10px;
+  padding:.6rem .85rem;
+  margin-bottom:1.1rem;
+}
+.del-modal-premium .del-modal-impact-item {
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:5px 0;
+  font-size:12.5px;
+  color:#475569;
+  letter-spacing:-.003em;
+}
+.del-modal-premium .del-modal-impact-item svg { color:#dc2626; flex-shrink:0; opacity:.7; }
+.del-modal-premium .del-modal-impact-item + .del-modal-impact-item { border-top:1px solid #eef2f6; }
+/* Campo de confirmação */
+.del-modal-premium .del-modal-field { margin-bottom:.85rem; }
+.del-modal-premium .del-modal-label {
+  font-size:12.5px;
+  color:#475569;
+  margin-bottom:6px;
+  display:block;
+  letter-spacing:-.003em;
+}
+.del-modal-premium .del-modal-code {
+  font-family:'JetBrains Mono','SF Mono',Menlo,Consolas,monospace;
+  font-size:11.5px;
+  background:#f1f5f9;
+  padding:2px 6px;
+  border-radius:4px;
+  color:#0f172a;
+  font-weight:600;
+  border:1px solid #e2e8f0;
+}
+.del-modal-premium .del-modal-input {
+  width:100%;
+  padding:9px 12px;
+  border:1px solid #d8dee5;
+  border-radius:8px;
+  font-size:13.5px;
+  font-family:'JetBrains Mono','SF Mono',Menlo,Consolas,monospace;
+  letter-spacing:.05em;
+  outline:none;
+  transition:border-color .15s, box-shadow .15s;
+  background:#fff;
+}
+.del-modal-premium .del-modal-input:focus { border-color:#0f172a; box-shadow:0 0 0 3px rgba(15,23,42,.08); }
+.del-modal-premium .del-modal-input::placeholder { color:#cbd5e1; letter-spacing:.05em; }
+/* Ações */
+.del-modal-premium .del-modal-actions {
+  display:flex;
+  gap:8px;
+  justify-content:flex-end;
+  padding-top:.65rem;
+  border-top:1px solid #f1f5f9;
+}
+.del-modal-premium .del-modal-btn { min-width:110px; height:36px; padding:8px 16px; font-size:13px; }
+
+/* Variante "filled" (cheia) do botão destrutivo — usada no modal quando confirma */
+#s-perfil .dz-btn-destructive.dz-btn-filled,
+.del-modal-premium .dz-btn-destructive.dz-btn-filled {
+  background:#dc2626;
+  border-color:#dc2626;
+  color:#fff;
+  box-shadow:0 1px 2px rgba(220,38,38,.18), inset 0 1px 0 rgba(255,255,255,.10);
+}
+#s-perfil .dz-btn-destructive.dz-btn-filled:hover:not(:disabled),
+.del-modal-premium .dz-btn-destructive.dz-btn-filled:hover:not(:disabled) {
+  background:#b91c1c;
+  border-color:#b91c1c;
+  color:#fff;
+  box-shadow:0 4px 12px rgba(220,38,38,.30), inset 0 1px 0 rgba(255,255,255,.12);
+}
+#s-perfil .dz-btn-destructive.dz-btn-filled:disabled,
+.del-modal-premium .dz-btn-destructive.dz-btn-filled:disabled {
+  background:#fca5a5;
+  border-color:#fca5a5;
+  color:#fff;
+  box-shadow:none;
+  cursor:not-allowed;
+}
+
+/* Loading do botão dentro do modal */
+.del-modal-premium .dz-btn-loading { display:none; align-items:center; justify-content:center; }
+.del-modal-premium .dz-btn-loading svg { animation:dzSpin .8s linear infinite; }
+.del-modal-premium .dz-btn.is-loading .dz-btn-label { display:none; }
+.del-modal-premium .dz-btn.is-loading .dz-btn-loading { display:inline-flex; }
+
+/* Responsividade do modal */
+@media (max-width:560px) {
+  .del-modal-premium .del-modal-actions { flex-direction:column-reverse; }
+  .del-modal-premium .del-modal-btn { width:100%; }
+}
 </style>
 
 <script>
@@ -4427,19 +4857,24 @@ async function mudarSenhaPerfil(){
 // APAGAR CONTA (LGPD Art. 18 — direito de eliminação)
 // ════════════════════════════════════════════════════════════════════
 function abrirModalApagarConta(){
-  var m = document.getElementById('del-modal');
-  var inp = document.getElementById('del-confirm-input');
-  var msg = document.getElementById('del-modal-msg');
-  var btn = document.getElementById('del-modal-btn-confirm');
-  if(inp){ inp.value=''; }
-  if(msg){ msg.textContent=''; msg.className='del-modal-msg'; }
-  if(btn){ btn.disabled = true; btn.textContent = 'Apagar para sempre'; }
-  if(m){
-    m.classList.add('open');
-    m.setAttribute('aria-hidden','false');
-    document.body.style.overflow = 'hidden';
-  }
-  setTimeout(function(){ if(inp) inp.focus(); }, 200);
+  var trigger = document.getElementById('dz-btn-excluir');
+  if(trigger){ trigger.classList.add('is-loading'); trigger.disabled = true; }
+  setTimeout(function(){
+    if(trigger){ trigger.classList.remove('is-loading'); trigger.disabled = false; }
+    var m = document.getElementById('del-modal');
+    var inp = document.getElementById('del-confirm-input');
+    var msg = document.getElementById('del-modal-msg');
+    var btn = document.getElementById('del-modal-btn-confirm');
+    if(inp){ inp.value=''; }
+    if(msg){ msg.textContent=''; msg.className='del-modal-msg'; }
+    if(btn){ btn.disabled = true; btn.classList.remove('is-loading'); }
+    if(m){
+      m.classList.add('open');
+      m.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+    }
+    setTimeout(function(){ if(inp) inp.focus(); }, 200);
+  }, 220);
 }
 
 function fecharModalApagarConta(){
@@ -4455,7 +4890,7 @@ function delChkConfirm(){
   var inp = document.getElementById('del-confirm-input');
   var btn = document.getElementById('del-modal-btn-confirm');
   if(!inp || !btn) return;
-  btn.disabled = (inp.value.trim().toUpperCase() !== 'APAGAR');
+  btn.disabled = (inp.value.trim().toUpperCase() !== 'EXCLUIR');
 }
 
 async function confirmarApagarConta(){
@@ -4465,7 +4900,7 @@ async function confirmarApagarConta(){
     if(msg){ msg.textContent='Sessão expirou. Faça login novamente.'; msg.className='del-modal-msg err'; }
     return;
   }
-  if(btn){ btn.disabled = true; btn.textContent = 'Apagando...'; }
+  if(btn){ btn.disabled = true; btn.classList.add('is-loading'); }
   if(msg){ msg.textContent='Removendo seus dados...'; msg.className='del-modal-msg'; }
 
   try {
@@ -4503,10 +4938,10 @@ async function confirmarApagarConta(){
   } catch(err){
     console.error('apagar conta:', err);
     if(msg){
-      msg.textContent = (typeof traduzirErroSupabase === 'function' ? traduzirErroSupabase(err) : ('Erro ao apagar conta: ' + (err.message || 'tente novamente')));
+      msg.textContent = (typeof traduzirErroSupabase === 'function' ? traduzirErroSupabase(err) : ('Erro ao excluir conta: ' + (err.message || 'tente novamente')));
       msg.className='del-modal-msg err';
     }
-    if(btn){ btn.disabled = false; btn.textContent = 'Apagar para sempre'; }
+    if(btn){ btn.disabled = false; btn.classList.remove('is-loading'); }
   }
 }
 
@@ -4524,16 +4959,22 @@ document.addEventListener('keydown', function(e){
 // PAUSAR CONTA (retenção / win-back)
 // ════════════════════════════════════════════════════════════════════
 function abrirModalPausarConta(){
-  var m = document.getElementById('pause-modal');
-  var msg = document.getElementById('pause-modal-msg');
-  var btn = document.getElementById('pause-modal-btn-confirm');
-  if(msg){ msg.textContent=''; msg.className='del-modal-msg'; }
-  if(btn){ btn.disabled = false; btn.textContent = 'Pausar minha conta'; }
-  if(m){
-    m.classList.add('open');
-    m.setAttribute('aria-hidden','false');
-    document.body.style.overflow = 'hidden';
-  }
+  var trigger = document.getElementById('dz-btn-pausar');
+  if(trigger){ trigger.classList.add('is-loading'); trigger.disabled = true; }
+  // pequena animação de loading antes de abrir o modal (transição premium)
+  setTimeout(function(){
+    if(trigger){ trigger.classList.remove('is-loading'); trigger.disabled = false; }
+    var m = document.getElementById('pause-modal');
+    var msg = document.getElementById('pause-modal-msg');
+    var btn = document.getElementById('pause-modal-btn-confirm');
+    if(msg){ msg.textContent=''; msg.className='del-modal-msg'; }
+    if(btn){ btn.disabled = false; btn.textContent = 'Pausar minha conta'; }
+    if(m){
+      m.classList.add('open');
+      m.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+    }
+  }, 220);
 }
 
 function fecharModalPausarConta(){
