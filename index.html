@@ -1867,32 +1867,153 @@ async function carregarPerfil(){
   var $ = function(id){ return document.getElementById(id); };
   if($('p-email-display')) $('p-email-display').textContent = currentUser.email || '—';
   if($('p-email-input'))   $('p-email-input').value         = currentUser.email || '';
+
+  // ── Helper: formata data PT-BR curta (ex: 13 mai 2026) ──────────
+  function fmtDateShort(d){
+    try {
+      var dt = new Date(d);
+      var meses = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+      return dt.getDate() + ' ' + meses[dt.getMonth()] + ' ' + dt.getFullYear();
+    } catch(e){ return '—'; }
+  }
+  function diasAte(d){
+    try {
+      var diff = (new Date(d).getTime() - Date.now()) / 86400000;
+      return Math.max(0, Math.ceil(diff));
+    } catch(e){ return 0; }
+  }
+
   try {
     var resp = await sb.from('profiles')
-      .select('full_name, email, telefone, nicho, faturamento_faixa, current_plan, subscription_status, current_period_end')
+      .select('full_name, email, telefone, nicho, faturamento_faixa, current_plan, subscription_status, current_period_end, status, paused_at')
       .eq('id', currentUser.id).single();
     var d = resp.data || {};
     if($('p-nome'))  $('p-nome').value  = d.full_name || '';
     if($('p-tel'))   $('p-tel').value   = d.telefone  || '';
-    // Custom selects de nicho e faturamento
     if($('p-nicho')) $('p-nicho').value = d.nicho || '';
     if($('p-fat'))   $('p-fat').value   = d.faturamento_faixa || '';
     pfSetCs('pf-cs-nicho', d.nicho || '');
     pfSetCs('pf-cs-fat', d.faturamento_faixa || '');
+
     var nomeCompleto = d.full_name || (currentUser.email||'').split('@')[0] || 'Usuário';
     var iniciais = nomeCompleto.trim().split(/\s+/).map(function(x){return x[0]||''}).slice(0,2).join('').toUpperCase() || '?';
     if($('p-nome-big')) $('p-nome-big').textContent = nomeCompleto;
     if($('p-av-big'))   $('p-av-big').textContent   = iniciais;
-    // Plano
-    var planoTxt = d.current_plan ? (d.current_plan.charAt(0).toUpperCase()+d.current_plan.slice(1)) : '—';
-    if($('p-plano-label'))   $('p-plano-label').textContent   = planoTxt;
-    if($('p-plano-label-2')) $('p-plano-label-2').textContent = planoTxt + (d.subscription_status ? ' · ' + d.subscription_status : '');
-    if($('p-plano-status')) $('p-plano-status').textContent = d.subscription_status || '';
+
+    // ── PLANO ──────────────────────────────────────────────────────
+    var planoTxt = d.current_plan ? (d.current_plan.charAt(0).toUpperCase()+d.current_plan.slice(1)) : 'Free';
+    var status   = d.subscription_status || '';
+    var statusLabel = ({
+      'trialing': 'Trial',
+      'active':   'Ativo',
+      'past_due': 'Pagamento pendente',
+      'canceled': 'Cancelado',
+      'incomplete': 'Incompleto',
+      'unpaid':   'Não pago'
+    })[status] || (status ? status.charAt(0).toUpperCase()+status.slice(1) : 'Inativo');
+
+    // Hero pill
+    if($('p-plano-label'))  $('p-plano-label').textContent  = 'Plano ' + planoTxt;
+    if($('p-plano-status')) $('p-plano-status').textContent = status ? '· ' + statusLabel : '';
+
+    // Plan card
+    if($('p-plano-label-2')) $('p-plano-label-2').textContent = planoTxt;
+    var planStatusEl = $('p-plano-status-2');
+    if(planStatusEl){
+      planStatusEl.textContent = statusLabel;
+      planStatusEl.classList.toggle('active', status === 'active');
+    }
     if($('p-plano-fim')){
       if(d.current_period_end){
-        try { $('p-plano-fim').textContent = 'Próxima cobrança: ' + new Date(d.current_period_end).toLocaleDateString('pt-BR'); }
-        catch(e){ $('p-plano-fim').textContent = ''; }
-      } else { $('p-plano-fim').textContent = ''; }
+        var labelTxt = (status === 'trialing') ? 'Trial termina em ' : 'Próxima cobrança em ';
+        $('p-plano-fim').innerHTML = labelTxt + '<strong>' + fmtDateShort(d.current_period_end) + '</strong>';
+      } else {
+        $('p-plano-fim').textContent = 'Sem assinatura ativa';
+      }
+    }
+
+    // ── TRIAL COUNTDOWN ────────────────────────────────────────────
+    var trialSection = $('p-trial-section');
+    if(status === 'trialing' && d.current_period_end){
+      var diasRest = diasAte(d.current_period_end);
+      // Assume 14 dias de trial padrão (ajustável)
+      var trialTotal = 14;
+      var pct = Math.max(0, Math.min(100, (diasRest / trialTotal) * 100));
+      if(trialSection) trialSection.style.display = 'block';
+      if($('p-trial-num')) $('p-trial-num').textContent = diasRest;
+      if($('p-trial-num-suffix')) $('p-trial-num-suffix').textContent = (diasRest === 1 ? 'dia restante' : 'dias restantes');
+      var fill = $('p-trial-fill');
+      if(fill){
+        fill.style.width = '0%';
+        // Pequeno delay pra animar do 0 até o valor real
+        setTimeout(function(){ fill.style.width = pct + '%'; }, 200);
+      }
+      if($('p-trial-hint')){
+        if(diasRest <= 3 && diasRest > 0){
+          $('p-trial-hint').textContent = 'Seu trial está acabando. Garanta a continuidade do acesso.';
+        } else if(diasRest === 0){
+          $('p-trial-hint').textContent = 'Seu trial termina hoje.';
+        } else {
+          $('p-trial-hint').textContent = 'Você só será cobrado após o período de teste.';
+        }
+      }
+    } else {
+      if(trialSection) trialSection.style.display = 'none';
+    }
+
+    // ── STATS ROW ──────────────────────────────────────────────────
+    if($('p-stat-since')){
+      var createdAt = (currentUser && currentUser.created_at) ? currentUser.created_at : null;
+      $('p-stat-since').textContent = createdAt ? fmtDateShort(createdAt) : '—';
+    }
+    if($('p-stat-trial')){
+      if(status === 'trialing' && d.current_period_end){
+        var dr = diasAte(d.current_period_end);
+        $('p-stat-trial').innerHTML = dr + ' <span class="perfil-stat-sub">' + (dr === 1 ? 'dia' : 'dias') + '</span>';
+      } else if(status === 'active'){
+        $('p-stat-trial').innerHTML = '<span class="perfil-stat-sub">Trial encerrado</span>';
+      } else {
+        $('p-stat-trial').innerHTML = '—';
+      }
+    }
+    if($('p-stat-status')){
+      $('p-stat-status').textContent = statusLabel;
+    }
+
+    // Análises feitas — busca contagem se a tabela existir, caso contrário fica em 0
+    if($('p-stat-analyses')){
+      try {
+        var cnt = await sb.from('dre_uploads').select('id', { count:'exact', head:true }).eq('user_id', currentUser.id);
+        if(cnt && typeof cnt.count === 'number') $('p-stat-analyses').textContent = cnt.count;
+      } catch(e){ /* tabela pode não existir, mantém 0 */ }
+    }
+
+    // ── INSIGHT WIDGET (mensagem contextual inteligente) ───────────
+    var insightTitle = $('p-insight-title');
+    var insightDesc  = $('p-insight-desc');
+    if(insightTitle && insightDesc){
+      if(status === 'trialing'){
+        var dr2 = d.current_period_end ? diasAte(d.current_period_end) : 0;
+        if(dr2 <= 3 && dr2 > 0){
+          insightTitle.textContent = 'Seu trial está terminando';
+          insightDesc.textContent = 'Faltam ' + dr2 + ' ' + (dr2 === 1 ? 'dia' : 'dias') + '. Continue desbloqueando todo o potencial do seu negócio.';
+        } else {
+          insightTitle.textContent = 'Trial ativo — aproveite';
+          insightDesc.textContent = 'Você tem acesso completo aos recursos. Envie sua DRE pra descobrir oportunidades.';
+        }
+      } else if(status === 'active'){
+        insightTitle.textContent = 'Assinatura ativa ✨';
+        insightDesc.textContent = 'Obrigado por confiar no VitaCash. Continue explorando o seu diagnóstico financeiro.';
+      } else if(status === 'past_due' || status === 'unpaid'){
+        insightTitle.textContent = 'Atenção: pagamento pendente';
+        insightDesc.textContent = 'Atualize seus dados de cobrança para evitar a perda de acesso.';
+      } else if(status === 'canceled'){
+        insightTitle.textContent = 'Sua assinatura foi cancelada';
+        insightDesc.textContent = 'Reative quando quiser para voltar a ter acesso completo.';
+      } else {
+        insightTitle.textContent = 'Bem-vindo ao VitaCash';
+        insightDesc.textContent = 'Envie sua primeira DRE pra começar o diagnóstico financeiro.';
+      }
     }
   } catch(err){ console.error('perfil load:', err); }
 }
@@ -4074,49 +4195,432 @@ async function mudarSenhaPerfil(){
 <!-- ══ MEU PERFIL ══ -->
 <div class="screen" id="s-perfil">
 <style>
-/* ── TELA DE PERFIL ── */
-#s-perfil .perfil-wrap { max-width:720px; margin:0 auto; padding:0 0 2rem; }
-#s-perfil .perfil-back { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:8px; border:.5px solid var(--border2); background:var(--surface); color:var(--text2); font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s; margin-bottom:1.25rem; }
-#s-perfil .perfil-back:hover { background:var(--surface2); color:var(--text); }
-#s-perfil .perfil-hero { background:linear-gradient(160deg,#085041 0%,#0f6e56 60%,#1D9E75 100%); color:#fff; border-radius:16px; padding:1.75rem 1.5rem; display:flex; align-items:center; gap:1rem; margin-bottom:1.25rem; box-shadow:0 10px 30px rgba(15,110,86,.25); }
-#s-perfil .perfil-av { width:72px; height:72px; border-radius:50%; background:rgba(255,255,255,.18); border:2px solid rgba(255,255,255,.3); display:inline-flex; align-items:center; justify-content:center; font-family:'Sora',sans-serif; font-size:24px; font-weight:700; color:#fff; letter-spacing:-.5px; flex-shrink:0; }
+/* ════════════════════════════════════════════════════════════════
+   TELA DE PERFIL — Design System Premium
+   Inspirado em Stripe, Ramp, Mercury, Linear, Vercel, Notion
+   ════════════════════════════════════════════════════════════════ */
+#s-perfil .perfil-wrap { max-width:880px; margin:0 auto; padding:0 0 3rem; }
+
+/* Botão "Voltar" refinado */
+#s-perfil .perfil-back {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:7px 13px 7px 11px;
+  border-radius:8px;
+  border:1px solid #e8edf2;
+  background:#fff;
+  color:#475569;
+  font-size:12.5px; font-weight:500;
+  cursor:pointer; font-family:inherit;
+  transition:background .15s, border-color .15s, color .15s, transform .12s;
+  margin-bottom:1.5rem;
+  letter-spacing:-.005em;
+  box-shadow:0 1px 2px rgba(15,23,42,.04);
+}
+#s-perfil .perfil-back:hover { background:#f8fafc; border-color:#cbd5e1; color:#0f172a; transform:translateX(-2px); }
+#s-perfil .perfil-back svg { transition:transform .15s; }
+#s-perfil .perfil-back:hover svg { transform:translateX(-2px); }
+
+/* ══════ HERO PREMIUM (mesh gradient + glassmorphism) ══════ */
+#s-perfil .perfil-hero {
+  position:relative;
+  color:#fff;
+  border-radius:20px;
+  padding:1.9rem 1.75rem;
+  display:flex; align-items:center; gap:1.15rem;
+  margin-bottom:1rem;
+  overflow:hidden;
+  box-shadow:0 16px 40px -12px rgba(15,110,86,.28), 0 4px 8px rgba(15,110,86,.08);
+  background:
+    radial-gradient(900px circle at 0% 0%, rgba(110,231,183,.32), transparent 50%),
+    radial-gradient(700px circle at 100% 100%, rgba(8,80,65,.55), transparent 50%),
+    linear-gradient(135deg, #052e16 0%, #0a4a3a 35%, #0f6e56 70%, #1D9E75 100%);
+}
+/* Grain/noise overlay sutil */
+#s-perfil .perfil-hero::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.18'/%3E%3C/svg%3E");
+  mix-blend-mode:overlay; opacity:.35;
+}
+/* Glow orbe decorativo */
+#s-perfil .perfil-hero::after {
+  content:''; position:absolute; top:-40%; right:-15%;
+  width:340px; height:340px; border-radius:50%;
+  background:radial-gradient(circle, rgba(110,231,183,.20), transparent 65%);
+  pointer-events:none;
+}
+#s-perfil .perfil-hero > * { position:relative; z-index:2; }
+
+#s-perfil .perfil-av {
+  width:72px; height:72px; border-radius:50%;
+  background:linear-gradient(145deg, rgba(255,255,255,.25), rgba(255,255,255,.10));
+  border:1.5px solid rgba(255,255,255,.30);
+  display:inline-flex; align-items:center; justify-content:center;
+  font-family:'Sora',sans-serif; font-size:24px; font-weight:700;
+  color:#fff; letter-spacing:-.5px; flex-shrink:0;
+  box-shadow:0 8px 24px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.20);
+  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+}
 #s-perfil .perfil-hero-text { flex:1; min-width:0; }
-#s-perfil .perfil-nome { font-family:'Sora',sans-serif; font-size:20px; font-weight:700; letter-spacing:-.4px; margin-bottom:3px; overflow:hidden; text-overflow:ellipsis; }
-#s-perfil .perfil-email { font-size:13px; color:rgba(255,255,255,.78); margin-bottom:.6rem; }
-#s-perfil .perfil-plano-pill { display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border-radius:99px; background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.22); font-size:11px; font-weight:700; letter-spacing:.3px; }
-#s-perfil .perfil-plano-pill .dot { width:6px; height:6px; border-radius:50%; background:#6ee7b7; }
-#s-perfil .perfil-card { background:var(--surface); border:.5px solid var(--border); border-radius:14px; padding:1.25rem 1.25rem 1.1rem; margin-bottom:1rem; box-shadow:var(--shadow-sm); }
-#s-perfil .perfil-card-title { font-size:13.5px; font-weight:700; color:var(--text); margin-bottom:.875rem; display:flex; align-items:center; gap:8px; letter-spacing:-.2px; }
+#s-perfil .perfil-nome {
+  font-family:'Sora',sans-serif; font-size:22px; font-weight:700;
+  letter-spacing:-.018em; line-height:1.15;
+  margin-bottom:4px;
+  overflow:hidden; text-overflow:ellipsis;
+}
+#s-perfil .perfil-email {
+  font-size:13px; color:rgba(255,255,255,.72);
+  font-weight:400; letter-spacing:-.003em;
+  margin-bottom:.85rem;
+}
+#s-perfil .perfil-plano-pill {
+  display:inline-flex; align-items:center; gap:7px;
+  padding:5px 11px 5px 9px;
+  border-radius:99px;
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.22);
+  font-size:11px; font-weight:600;
+  letter-spacing:.04em; text-transform:uppercase;
+  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+}
+#s-perfil .perfil-plano-pill .dot {
+  width:7px; height:7px; border-radius:50%;
+  background:#6ee7b7;
+  box-shadow:0 0 0 3px rgba(110,231,183,.30);
+  animation:perfilPulse 2.4s ease-in-out infinite;
+}
+@keyframes perfilPulse {
+  0%,100% { box-shadow:0 0 0 3px rgba(110,231,183,.30); }
+  50%     { box-shadow:0 0 0 6px rgba(110,231,183,.10); }
+}
+
+/* ══════ STATS ROW (4 cards inteligentes) ══════ */
+#s-perfil .perfil-stats {
+  display:grid; grid-template-columns:repeat(4, 1fr);
+  gap:.75rem; margin-bottom:1.25rem;
+}
+#s-perfil .perfil-stat-card {
+  background:#fff;
+  border:1px solid #e8edf2;
+  border-radius:14px;
+  padding:1rem 1.1rem;
+  position:relative;
+  transition:border-color .2s, box-shadow .2s, transform .15s;
+  overflow:hidden;
+}
+#s-perfil .perfil-stat-card::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg, transparent 0%, rgba(29,158,117,.04) 100%);
+  opacity:0; transition:opacity .25s ease;
+  pointer-events:none;
+}
+#s-perfil .perfil-stat-card:hover {
+  border-color:#d8dee5;
+  transform:translateY(-2px);
+  box-shadow:0 12px 24px -10px rgba(15,23,42,.10), 0 2px 4px rgba(15,23,42,.04);
+}
+#s-perfil .perfil-stat-card:hover::before { opacity:1; }
+#s-perfil .perfil-stat-icon {
+  width:30px; height:30px; border-radius:8px;
+  background:#f0fdf8;
+  border:1px solid rgba(29,158,117,.15);
+  display:inline-flex; align-items:center; justify-content:center;
+  color:var(--green); margin-bottom:.7rem;
+  transition:background .2s, transform .15s;
+}
+#s-perfil .perfil-stat-card:hover .perfil-stat-icon {
+  background:#e1f5ee; transform:scale(1.06);
+}
+#s-perfil .perfil-stat-label {
+  font-size:10.5px; font-weight:600;
+  color:#94a3b8; letter-spacing:.06em;
+  text-transform:uppercase; margin-bottom:5px;
+}
+#s-perfil .perfil-stat-value {
+  font-family:'Sora',sans-serif;
+  font-size:17px; font-weight:700;
+  color:#0f172a; letter-spacing:-.015em;
+  line-height:1.15;
+}
+#s-perfil .perfil-stat-value .perfil-stat-sub {
+  font-size:11px; font-weight:500; color:#64748b; margin-left:4px; letter-spacing:0;
+}
+
+/* ══════ CARDS (refinados) ══════ */
+#s-perfil .perfil-card {
+  background:#fff;
+  border:1px solid #e8edf2;
+  border-radius:16px;
+  padding:1.4rem 1.5rem 1.25rem;
+  margin-bottom:.875rem;
+  box-shadow:0 1px 2px rgba(15,23,42,.04), 0 1px 1px rgba(15,23,42,.02);
+  transition:border-color .2s, box-shadow .2s;
+}
+#s-perfil .perfil-card:hover {
+  border-color:#dde3eb;
+  box-shadow:0 8px 24px -12px rgba(15,23,42,.10), 0 2px 4px rgba(15,23,42,.04);
+}
+#s-perfil .perfil-card-title {
+  font-family:'Sora',sans-serif;
+  font-size:14.5px; font-weight:600;
+  color:#0f172a;
+  margin-bottom:1.1rem;
+  display:flex; align-items:center; gap:9px;
+  letter-spacing:-.015em;
+}
 #s-perfil .perfil-card-title svg { color:var(--green); }
-#s-perfil .perfil-grid { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; }
-#s-perfil .perfil-field { display:flex; flex-direction:column; gap:5px; }
+#s-perfil .perfil-card-title-icon {
+  width:30px; height:30px; border-radius:8px;
+  background:linear-gradient(145deg, #f0fdf8, #e1f5ee);
+  border:1px solid rgba(29,158,117,.15);
+  display:inline-flex; align-items:center; justify-content:center;
+  color:var(--green-dark);
+}
+
+#s-perfil .perfil-grid { display:grid; grid-template-columns:1fr 1fr; gap:.9rem; }
+#s-perfil .perfil-field { display:flex; flex-direction:column; gap:6px; }
 #s-perfil .perfil-field.full { grid-column:1/-1; }
-#s-perfil .perfil-label { font-size:11.5px; font-weight:600; color:var(--text3); letter-spacing:.1px; }
-#s-perfil .perfil-input, #s-perfil .perfil-select { width:100%; padding:9px 12px; border:1.5px solid #e2e8f0; border-radius:9px; font-size:13px; color:#0f172a; font-family:inherit; outline:none; transition:border-color .18s, box-shadow .18s; background:#fafafa; }
-#s-perfil .perfil-input:focus, #s-perfil .perfil-select:focus { border-color:var(--green); box-shadow:0 0 0 3px rgba(29,158,117,.1); background:#fff; }
-#s-perfil .perfil-input[readonly] { background:#f1f5f9; color:#64748b; cursor:not-allowed; }
+#s-perfil .perfil-label {
+  font-size:11.5px; font-weight:600;
+  color:#64748b;
+  letter-spacing:.005em;
+}
+
+/* ══════ INPUTS PREMIUM ══════ */
+#s-perfil .perfil-input, #s-perfil .perfil-select {
+  width:100%; padding:10px 13px;
+  border:1px solid #e2e8f0;
+  border-radius:10px;
+  font-size:13.5px;
+  color:#0f172a;
+  font-family:inherit;
+  outline:none;
+  background:#fff;
+  letter-spacing:-.003em;
+  transition:border-color .18s, box-shadow .18s, background .18s;
+  box-shadow:0 1px 1px rgba(15,23,42,.03);
+}
+#s-perfil .perfil-input::placeholder { color:#cbd5e1; }
+#s-perfil .perfil-input:hover { border-color:#cbd5e1; }
+#s-perfil .perfil-input:focus, #s-perfil .perfil-select:focus {
+  border-color:var(--green);
+  box-shadow:0 0 0 3px rgba(29,158,117,.12), 0 1px 2px rgba(29,158,117,.06);
+  background:#fff;
+}
+#s-perfil .perfil-input[readonly] {
+  background:#f8fafc; color:#64748b; cursor:not-allowed;
+  border-color:#e8edf2;
+}
+
 /* Custom select bloqueado (visualização apenas) */
 #s-perfil .perfil-locked-hint { font-size:10.5px; font-weight:500; color:var(--text3); letter-spacing:0; margin-left:4px; font-style:italic; }
-#s-perfil .lg-cs-readonly .lg-cs-trigger { background:#f1f5f9 !important; cursor:not-allowed !important; pointer-events:none; }
-#s-perfil .lg-cs-readonly .lg-cs-trigger:hover { border-color:#e2e8f0 !important; box-shadow:none !important; background:#f1f5f9 !important; }
+#s-perfil .lg-cs-readonly .lg-cs-trigger {
+  background:#f8fafc !important;
+  cursor:not-allowed !important; pointer-events:none;
+  border-color:#e8edf2 !important;
+  padding:9px 14px 9px 36px !important;
+  border-radius:10px !important;
+}
+#s-perfil .lg-cs-readonly .lg-cs-trigger:hover { border-color:#e8edf2 !important; box-shadow:none !important; background:#f8fafc !important; }
 #s-perfil .lg-cs-readonly .lg-cs-val { color:#475569 !important; }
 #s-perfil .lg-cs-lock { margin-left:auto; flex-shrink:0; opacity:.55; }
-#s-perfil .perfil-btn { display:inline-flex; align-items:center; gap:7px; padding:10px 18px; border-radius:10px; border:none; background:var(--green); color:#fff; font-size:13.5px; font-weight:700; cursor:pointer; font-family:inherit; transition:all .18s; box-shadow:0 4px 14px rgba(29,158,117,.32); margin-top:.5rem; }
-#s-perfil .perfil-btn:hover:not(:disabled) { background:#15835f; transform:translateY(-1px); box-shadow:0 6px 18px rgba(29,158,117,.4); }
-#s-perfil .perfil-btn:disabled { opacity:.6; cursor:not-allowed; transform:none; }
-#s-perfil .perfil-btn-secondary { background:var(--surface); color:var(--text2); border:.5px solid var(--border2); box-shadow:none; }
-#s-perfil .perfil-btn-secondary:hover:not(:disabled) { background:var(--surface2); color:var(--text); transform:none; box-shadow:none; }
-#s-perfil .perfil-btn-danger { background:#fff; color:#dc2626; border:1.5px solid #fecaca; box-shadow:none; }
-#s-perfil .perfil-btn-danger:hover:not(:disabled) { background:#fef2f2; border-color:#fca5a5; transform:none; box-shadow:none; }
-#s-perfil .perfil-msg { font-size:12px; margin-top:.6rem; min-height:1.2em; transition:color .15s; }
-#s-perfil .perfil-plano-info { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.6rem .25rem .9rem; flex-wrap:wrap; }
-#s-perfil .perfil-plano-titulo { font-size:18px; font-weight:700; color:var(--text); font-family:'Sora',sans-serif; letter-spacing:-.3px; }
-#s-perfil .perfil-plano-sub { font-size:12px; color:var(--text3); margin-top:2px; }
-#s-perfil .perfil-actions-row { display:flex; gap:.6rem; flex-wrap:wrap; }
+
+/* ══════ BOTÕES ══════ */
+#s-perfil .perfil-btn {
+  display:inline-flex; align-items:center; gap:7px;
+  padding:9px 16px;
+  border-radius:10px;
+  border:none;
+  background:linear-gradient(135deg, var(--green) 0%, #16a36a 100%);
+  color:#fff;
+  font-size:13px; font-weight:600;
+  letter-spacing:-.005em;
+  cursor:pointer; font-family:inherit;
+  transition:transform .14s, box-shadow .18s, filter .18s;
+  box-shadow:0 4px 14px rgba(29,158,117,.30), inset 0 1px 0 rgba(255,255,255,.15);
+  margin-top:.5rem;
+}
+#s-perfil .perfil-btn:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 8px 22px rgba(29,158,117,.40), inset 0 1px 0 rgba(255,255,255,.15); filter:brightness(1.04); }
+#s-perfil .perfil-btn:active:not(:disabled) { transform:translateY(0); }
+#s-perfil .perfil-btn:disabled { opacity:.55; cursor:not-allowed; transform:none; }
+#s-perfil .perfil-btn-secondary {
+  background:#fff; color:#334155;
+  border:1px solid #d8dee5;
+  box-shadow:0 1px 2px rgba(15,23,42,.04);
+}
+#s-perfil .perfil-btn-secondary:hover:not(:disabled) {
+  background:#f8fafc; color:#0f172a; border-color:#b8c0cc;
+  box-shadow:0 2px 6px rgba(15,23,42,.08);
+}
+#s-perfil .perfil-btn-danger {
+  background:#fff; color:#b91c1c;
+  border:1px solid rgba(220,38,38,.28);
+  box-shadow:0 1px 2px rgba(220,38,38,.04);
+}
+#s-perfil .perfil-btn-danger:hover:not(:disabled) {
+  background:#fef2f2; color:#991b1b; border-color:rgba(220,38,38,.45);
+  box-shadow:0 2px 8px rgba(220,38,38,.12);
+}
+#s-perfil .perfil-msg { font-size:12.5px; margin-top:.75rem; min-height:1.2em; transition:color .15s; letter-spacing:-.003em; }
+
+/* ══════ PLAN CARD PREMIUM (com countdown + features) ══════ */
+#s-perfil .plan-card {
+  position:relative;
+  background:linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
+  border:1px solid #e8edf2;
+  border-radius:18px;
+  padding:0;
+  margin-bottom:.875rem;
+  overflow:hidden;
+  box-shadow:0 1px 2px rgba(15,23,42,.04), 0 1px 1px rgba(15,23,42,.02);
+  transition:border-color .2s, box-shadow .2s;
+}
+#s-perfil .plan-card:hover {
+  border-color:#dde3eb;
+  box-shadow:0 12px 32px -16px rgba(15,23,42,.12), 0 2px 4px rgba(15,23,42,.04);
+}
+#s-perfil .plan-card-top {
+  padding:1.4rem 1.5rem 1.1rem;
+  display:flex; align-items:flex-start; gap:1rem;
+  position:relative;
+}
+#s-perfil .plan-card-top::after {
+  content:''; position:absolute; left:1.5rem; right:1.5rem; bottom:0;
+  height:1px; background:#f1f5f9;
+}
+#s-perfil .plan-card-icon {
+  width:42px; height:42px; border-radius:11px;
+  background:linear-gradient(135deg, #0f6e56 0%, #1D9E75 100%);
+  display:flex; align-items:center; justify-content:center;
+  color:#fff; flex-shrink:0;
+  box-shadow:0 6px 16px rgba(29,158,117,.30), inset 0 1px 0 rgba(255,255,255,.20);
+}
+#s-perfil .plan-card-info { flex:1; min-width:0; }
+#s-perfil .plan-card-name-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:3px; }
+#s-perfil .plan-card-name {
+  font-family:'Sora',sans-serif;
+  font-size:18px; font-weight:700;
+  color:#0f172a; letter-spacing:-.018em;
+}
+#s-perfil .plan-card-status {
+  font-size:10.5px; font-weight:700;
+  letter-spacing:.06em; text-transform:uppercase;
+  padding:3px 8px; border-radius:99px;
+  background:rgba(245,158,11,.10);
+  border:1px solid rgba(245,158,11,.25);
+  color:#b45309;
+}
+#s-perfil .plan-card-status.active {
+  background:rgba(22,163,74,.08);
+  border-color:rgba(22,163,74,.22);
+  color:#15803d;
+}
+#s-perfil .plan-card-price {
+  font-size:12.5px; color:#64748b;
+  letter-spacing:-.003em;
+}
+#s-perfil .plan-card-price strong { color:#0f172a; font-weight:600; }
+
+/* Trial countdown */
+#s-perfil .plan-card-trial {
+  padding:1.1rem 1.5rem;
+  background:linear-gradient(180deg, #fafbfc 0%, #f8fafc 100%);
+}
+#s-perfil .plan-card-trial-head {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:8px; gap:1rem;
+}
+#s-perfil .plan-card-trial-label {
+  font-size:11px; font-weight:600;
+  color:#64748b; letter-spacing:.06em;
+  text-transform:uppercase;
+}
+#s-perfil .plan-card-trial-days {
+  font-family:'Sora',sans-serif;
+  font-size:13.5px; font-weight:700;
+  color:#0f172a; letter-spacing:-.005em;
+}
+#s-perfil .plan-card-trial-days .num { color:var(--green); font-size:15px; }
+#s-perfil .plan-card-trial-bar {
+  width:100%; height:6px; border-radius:99px;
+  background:#e2e8f0; overflow:hidden; position:relative;
+}
+#s-perfil .plan-card-trial-fill {
+  height:100%; border-radius:99px;
+  background:linear-gradient(90deg, #1D9E75 0%, #16a36a 50%, #6ee7b7 100%);
+  box-shadow:0 0 8px rgba(29,158,117,.40);
+  transition:width 1.2s cubic-bezier(.16,1,.3,1);
+  width:0%;
+}
+#s-perfil .plan-card-trial-hint {
+  font-size:11.5px; color:#94a3b8;
+  margin-top:8px; letter-spacing:-.003em;
+}
+
+/* Features list */
+#s-perfil .plan-card-features {
+  padding:1.1rem 1.5rem 1.3rem;
+}
+#s-perfil .plan-card-features-title {
+  font-size:11px; font-weight:600;
+  color:#94a3b8; letter-spacing:.06em;
+  text-transform:uppercase; margin-bottom:.65rem;
+}
+#s-perfil .plan-card-features-grid {
+  display:grid; grid-template-columns:repeat(2, 1fr); gap:7px 14px;
+  margin-bottom:1rem;
+}
+#s-perfil .plan-card-feature {
+  display:flex; align-items:center; gap:7px;
+  font-size:12.5px; color:#475569; letter-spacing:-.003em;
+}
+#s-perfil .plan-card-feature-icon {
+  width:16px; height:16px; border-radius:50%;
+  background:#f0fdf8; border:1px solid rgba(29,158,117,.20);
+  color:var(--green);
+  display:inline-flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+#s-perfil .plan-card-actions {
+  display:flex; gap:.6rem;
+  padding:0 1.5rem 1.3rem;
+  flex-wrap:wrap;
+}
+
+/* Insight/AI widget (decorativo, fortalece percepção premium) */
+#s-perfil .perfil-insight {
+  display:flex; align-items:center; gap:11px;
+  background:linear-gradient(135deg, #f0fdf8 0%, #e1f5ee 100%);
+  border:1px solid rgba(29,158,117,.18);
+  border-radius:14px;
+  padding:.85rem 1rem;
+  margin-bottom:1rem;
+}
+#s-perfil .perfil-insight-icon {
+  width:32px; height:32px; border-radius:9px;
+  background:#fff;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--green); flex-shrink:0;
+  box-shadow:0 2px 6px rgba(29,158,117,.15);
+}
+#s-perfil .perfil-insight-content { flex:1; min-width:0; }
+#s-perfil .perfil-insight-title {
+  font-size:12.5px; font-weight:600;
+  color:#0d2b1e; letter-spacing:-.005em;
+  margin-bottom:1px;
+}
+#s-perfil .perfil-insight-desc {
+  font-size:11.5px; color:#0d6e4c; letter-spacing:-.003em;
+}
+
+/* Responsividade */
+@media(max-width:760px){
+  #s-perfil .perfil-stats { grid-template-columns:repeat(2, 1fr); }
+}
 @media(max-width:560px){
   #s-perfil .perfil-grid { grid-template-columns:1fr; }
-  #s-perfil .perfil-hero { flex-direction:column; text-align:center; }
+  #s-perfil .perfil-hero { flex-direction:column; text-align:center; padding:1.6rem 1.25rem; }
   #s-perfil .perfil-hero-text { width:100%; }
+  #s-perfil .plan-card-features-grid { grid-template-columns:1fr; }
 }
 </style>
 
@@ -4126,13 +4630,63 @@ async function mudarSenhaPerfil(){
     Voltar ao dashboard
   </button>
 
-  <!-- HERO: avatar + nome + email + plano -->
+  <!-- ══ HERO PREMIUM (mesh gradient + glassmorphism) ══ -->
   <div class="perfil-hero">
     <div class="perfil-av" id="p-av-big">VI</div>
     <div class="perfil-hero-text">
       <div class="perfil-nome" id="p-nome-big">Usuário</div>
       <div class="perfil-email" id="p-email-display">—</div>
-      <div class="perfil-plano-pill"><span class="dot"></span><span id="p-plano-label">—</span><span id="p-plano-status" style="opacity:.85;font-weight:500;"></span></div>
+      <div class="perfil-plano-pill">
+        <span class="dot"></span>
+        <span id="p-plano-label">—</span>
+        <span id="p-plano-status" style="opacity:.85;font-weight:500;"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ STATS ROW (cards inteligentes) ══ -->
+  <div class="perfil-stats">
+    <div class="perfil-stat-card">
+      <div class="perfil-stat-icon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </div>
+      <div class="perfil-stat-label">Cliente desde</div>
+      <div class="perfil-stat-value" id="p-stat-since">—</div>
+    </div>
+
+    <div class="perfil-stat-card">
+      <div class="perfil-stat-icon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      </div>
+      <div class="perfil-stat-label">Análises feitas</div>
+      <div class="perfil-stat-value" id="p-stat-analyses">0</div>
+    </div>
+
+    <div class="perfil-stat-card">
+      <div class="perfil-stat-icon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <div class="perfil-stat-label">Trial restante</div>
+      <div class="perfil-stat-value" id="p-stat-trial">— <span class="perfil-stat-sub">dias</span></div>
+    </div>
+
+    <div class="perfil-stat-card">
+      <div class="perfil-stat-icon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
+      </div>
+      <div class="perfil-stat-label">Status</div>
+      <div class="perfil-stat-value" id="p-stat-status">Ativo</div>
+    </div>
+  </div>
+
+  <!-- ══ INSIGHT WIDGET (toque de IA / inteligência) ══ -->
+  <div class="perfil-insight" id="p-insight">
+    <div class="perfil-insight-icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 008.5 14.063l-6.135-1.582a.5.5 0 010-.962L8.5 9.936A2 2 0 009.937 8.5l1.582-6.135a.5.5 0 01.962 0L14.063 8.5A2 2 0 0015.5 9.937l6.135 1.582a.5.5 0 010 .962L15.5 14.063a2 2 0 00-1.437 1.437l-1.582 6.135a.5.5 0 01-.962 0z"/></svg>
+    </div>
+    <div class="perfil-insight-content">
+      <div class="perfil-insight-title" id="p-insight-title">Bem-vindo ao VitaCash</div>
+      <div class="perfil-insight-desc" id="p-insight-desc">Envie sua primeira DRE pra começar o diagnóstico financeiro.</div>
     </div>
   </div>
 
@@ -4208,20 +4762,81 @@ async function mudarSenhaPerfil(){
     <div class="perfil-msg" id="p-msg-senha"></div>
   </div>
 
-  <!-- CARD: Assinatura -->
-  <div class="perfil-card">
-    <div class="perfil-card-title">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-      Assinatura
-    </div>
-    <div class="perfil-plano-info">
-      <div>
-        <div class="perfil-plano-titulo"><span id="p-plano-label-2">—</span></div>
-        <div class="perfil-plano-sub" id="p-plano-fim"></div>
+  <!-- ══ PLAN CARD PREMIUM (assinatura + trial + features) ══ -->
+  <div class="plan-card" id="p-plan-card">
+    <div class="plan-card-top">
+      <div class="plan-card-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
       </div>
+      <div class="plan-card-info">
+        <div class="plan-card-name-row">
+          <span class="plan-card-name" id="p-plano-label-2">—</span>
+          <span class="plan-card-status" id="p-plano-status-2">Trial</span>
+        </div>
+        <div class="plan-card-price" id="p-plano-fim">Sem assinatura ativa</div>
+      </div>
+    </div>
+
+    <!-- Trial countdown (aparece apenas se em trial) -->
+    <div class="plan-card-trial" id="p-trial-section" style="display:none;">
+      <div class="plan-card-trial-head">
+        <span class="plan-card-trial-label">Período de teste</span>
+        <span class="plan-card-trial-days"><span class="num" id="p-trial-num">—</span> <span id="p-trial-num-suffix">dias restantes</span></span>
+      </div>
+      <div class="plan-card-trial-bar">
+        <div class="plan-card-trial-fill" id="p-trial-fill"></div>
+      </div>
+      <div class="plan-card-trial-hint" id="p-trial-hint">Você só será cobrado após o período de teste.</div>
+    </div>
+
+    <!-- Recursos liberados -->
+    <div class="plan-card-features">
+      <div class="plan-card-features-title">Recursos liberados</div>
+      <div class="plan-card-features-grid" id="p-features-grid">
+        <div class="plan-card-feature">
+          <span class="plan-card-feature-icon">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+          Análises ilimitadas de DRE
+        </div>
+        <div class="plan-card-feature">
+          <span class="plan-card-feature-icon">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+          Exportação completa em PDF
+        </div>
+        <div class="plan-card-feature">
+          <span class="plan-card-feature-icon">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+          Histórico completo de DREs
+        </div>
+        <div class="plan-card-feature">
+          <span class="plan-card-feature-icon">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+          Plano de ação personalizado
+        </div>
+        <div class="plan-card-feature">
+          <span class="plan-card-feature-icon">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+          Suporte prioritário
+        </div>
+        <div class="plan-card-feature">
+          <span class="plan-card-feature-icon">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+          Atualizações automáticas
+        </div>
+      </div>
+    </div>
+
+    <!-- Ações -->
+    <div class="plan-card-actions">
       <button type="button" class="perfil-btn perfil-btn-secondary" onclick="abrirPortal()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        Gerenciar
+        Gerenciar assinatura
       </button>
     </div>
   </div>
