@@ -1783,12 +1783,12 @@ document.addEventListener('keydown', function(e){
         Nova análise
       </button>
 
-      <!-- BOTÃO MINHA ASSINATURA + PLANO -->
-      <button onclick="abrirPortal()" title="Gerenciar assinatura" id="dash-plano-badge" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;border:.5px solid var(--border2);background:var(--surface);color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;" onmouseover="this.style.background='var(--surface2)';this.style.color='var(--text)'" onmouseout="this.style.background='var(--surface)';this.style.color='var(--text2)'">
+      <!-- BADGE DO PLANO (apenas informativo — gerenciar assinatura está no dropdown do perfil) -->
+      <div id="dash-plano-badge" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;border:.5px solid var(--border2);background:var(--surface);color:var(--text2);font-size:12px;font-weight:600;font-family:inherit;white-space:nowrap;user-select:none;">
         <span id="dash-plano-dot" style="width:7px;height:7px;border-radius:50%;background:var(--border2);display:inline-block;flex-shrink:0;"></span>
         <span id="dash-plano-label">Minha assinatura</span>
         <span id="dash-plano-status" style="color:var(--text3);font-weight:500;"></span>
-      </button>
+      </div>
 
       <!-- Saudação + Avatar (com dropdown de perfil) -->
       <div class="user-menu" id="user-menu">
