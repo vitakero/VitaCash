@@ -7217,14 +7217,73 @@ function lgMaskTel(input) {
         <div style="font-size:12px;color:var(--text2);margin-top:3px;">14 dias grátis · Cancele quando quiser</div>
       </div>
 
-      <button onclick="go('s-nova-dre')" style="width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#1D9E75,#0f8f65);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 8px 24px rgba(29,158,117,.35);">
+      <button id="btn-ok-comecar" onclick="okComecarAgora()" style="width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#1D9E75,#0f8f65);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 8px 24px rgba(29,158,117,.35);">
         Começar minha análise agora →
       </button>
-      <div style="margin-top:.75rem;font-size:12px;color:var(--text3);">Você receberá um e-mail de confirmação em breve</div>
+      <div id="ok-countdown-row" style="margin-top:.75rem;font-size:12px;color:var(--text3);display:flex;align-items:center;justify-content:center;gap:6px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:.7;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span>Entrando automaticamente em <strong id="ok-countdown-num" style="color:var(--green);font-family:'Sora',sans-serif;">5</strong>s</span>
+      </div>
+      <div style="margin-top:.5rem;font-size:12px;color:var(--text3);">Você receberá um e-mail de confirmação em breve</div>
 
     </div>
   </div>
 </div>
+
+<script>
+// ── Auto-redirect com countdown na tela "Assinatura ativada" ────────
+var _okRedirectTimer = null;
+var _okRedirectActive = false;
+
+function okIniciarCountdown(){
+  var num = document.getElementById('ok-countdown-num');
+  var row = document.getElementById('ok-countdown-row');
+  if(!num || _okRedirectActive) return;
+  _okRedirectActive = true;
+  var seconds = 5;
+  num.textContent = seconds;
+  if(_okRedirectTimer) clearInterval(_okRedirectTimer);
+  _okRedirectTimer = setInterval(function(){
+    seconds--;
+    if(seconds <= 0){
+      clearInterval(_okRedirectTimer);
+      _okRedirectTimer = null;
+      _okRedirectActive = false;
+      if(typeof go === 'function') go('s-nova-dre');
+    } else if(num){
+      num.textContent = seconds;
+    }
+  }, 1000);
+}
+
+function okComecarAgora(){
+  // Usuário clicou no botão antes do countdown terminar — cancela e vai direto
+  if(_okRedirectTimer){ clearInterval(_okRedirectTimer); _okRedirectTimer = null; }
+  _okRedirectActive = false;
+  if(typeof go === 'function') go('s-nova-dre');
+}
+
+// Observa quando a tela #s-pagamento-ok fica ativa e inicia o countdown
+(function(){
+  var screen = document.getElementById('s-pagamento-ok');
+  if(!screen) return;
+  var observer = new MutationObserver(function(mutations){
+    for(var i=0; i<mutations.length; i++){
+      var m = mutations[i];
+      if(m.attributeName === 'class'){
+        if(screen.classList.contains('active')){
+          // Pequeno delay pra animação da tela aparecer primeiro
+          setTimeout(okIniciarCountdown, 400);
+        } else {
+          // Saiu da tela: cancela o timer
+          if(_okRedirectTimer){ clearInterval(_okRedirectTimer); _okRedirectTimer = null; _okRedirectActive = false; }
+        }
+      }
+    }
+  });
+  observer.observe(screen, { attributes: true });
+})();
+</script>
 
 <!-- ══ ESCOLHER PLANO (após cadastro sem plano pré-selecionado) ══ -->
 <style>
