@@ -1988,32 +1988,50 @@ async function carregarPerfil(){
       } catch(e){ /* tabela pode não existir, mantém 0 */ }
     }
 
-    // ── INSIGHT WIDGET (mensagem contextual inteligente) ───────────
-    var insightTitle = $('p-insight-title');
-    var insightDesc  = $('p-insight-desc');
-    if(insightTitle && insightDesc){
-      if(status === 'trialing'){
-        var dr2 = d.current_period_end ? diasAte(d.current_period_end) : 0;
-        if(dr2 <= 3 && dr2 > 0){
-          insightTitle.textContent = 'Seu trial está terminando';
-          insightDesc.textContent = 'Faltam ' + dr2 + ' ' + (dr2 === 1 ? 'dia' : 'dias') + '. Continue desbloqueando todo o potencial do seu negócio.';
-        } else {
-          insightTitle.textContent = 'Trial ativo — aproveite';
-          insightDesc.textContent = 'Você tem acesso completo aos recursos. Envie sua DRE pra descobrir oportunidades.';
-        }
-      } else if(status === 'active'){
-        insightTitle.textContent = 'Assinatura ativa ✨';
-        insightDesc.textContent = 'Obrigado por confiar no VitaCash. Continue explorando o seu diagnóstico financeiro.';
-      } else if(status === 'past_due' || status === 'unpaid'){
-        insightTitle.textContent = 'Atenção: pagamento pendente';
-        insightDesc.textContent = 'Atualize seus dados de cobrança para evitar a perda de acesso.';
-      } else if(status === 'canceled'){
-        insightTitle.textContent = 'Sua assinatura foi cancelada';
-        insightDesc.textContent = 'Reative quando quiser para voltar a ter acesso completo.';
-      } else {
-        insightTitle.textContent = 'Bem-vindo ao VitaCash';
-        insightDesc.textContent = 'Envie sua primeira DRE pra começar o diagnóstico financeiro.';
+    // ── ATIVIDADE RECENTE (timeline simples e factual) ─────────────
+    // Constrói uma lista a partir dos eventos reais que temos
+    var actList = $('p-activity-list');
+    var actMeta = $('p-activity-meta');
+    if(actList){
+      function fmtDateTimeShort(dt){
+        try {
+          var d2 = new Date(dt);
+          var dia = String(d2.getDate()).padStart(2,'0');
+          var meses = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+          var hora = String(d2.getHours()).padStart(2,'0') + ':' + String(d2.getMinutes()).padStart(2,'0');
+          return dia + ' ' + meses[d2.getMonth()] + ' ' + d2.getFullYear() + ', ' + hora;
+        } catch(e){ return ''; }
       }
+      var events = [];
+      // Eventos coletados a partir do que sabemos
+      if(currentUser && currentUser.created_at){
+        events.push({ time:currentUser.created_at, text:'Conta criada', tag:'Cadastro' });
+      }
+      if(d.updated_at){
+        events.push({ time:d.updated_at, text:'Perfil atualizado', tag:'Perfil' });
+      }
+      if(status === 'trialing' && d.current_period_end){
+        events.push({ time:currentUser.created_at || new Date().toISOString(), text:'Trial iniciado · plano ' + planoTxt, tag:'Assinatura' });
+      } else if(status === 'active'){
+        events.push({ time:d.updated_at || new Date().toISOString(), text:'Assinatura ativada · plano ' + planoTxt, tag:'Assinatura' });
+      } else if(status === 'canceled'){
+        events.push({ time:d.updated_at || new Date().toISOString(), text:'Assinatura cancelada', tag:'Assinatura' });
+      }
+      // Ordena por data desc
+      events.sort(function(a,b){ return new Date(b.time) - new Date(a.time); });
+      // Renderiza
+      if(events.length === 0){
+        actList.innerHTML = '<div class="perfil-activity-item" style="grid-template-columns:1fr;color:#94a3b8;font-size:12.5px;">Sem atividade registrada ainda.</div>';
+      } else {
+        actList.innerHTML = events.slice(0, 6).map(function(ev){
+          return '<div class="perfil-activity-item">' +
+                 '<div class="perfil-activity-time">' + fmtDateTimeShort(ev.time) + '</div>' +
+                 '<div class="perfil-activity-text">' + ev.text + '</div>' +
+                 '<div class="perfil-activity-tag">' + ev.tag + '</div>' +
+                 '</div>';
+        }).join('');
+      }
+      if(actMeta) actMeta.textContent = events.length + (events.length === 1 ? ' evento' : ' eventos');
     }
   } catch(err){ console.error('perfil load:', err); }
 }
@@ -4220,161 +4238,154 @@ async function mudarSenhaPerfil(){
 #s-perfil .perfil-back svg { transition:transform .15s; }
 #s-perfil .perfil-back:hover svg { transform:translateX(-2px); }
 
-/* ══════ HERO PREMIUM (mesh gradient + glassmorphism) ══════ */
-#s-perfil .perfil-hero {
-  position:relative;
-  color:#fff;
-  border-radius:20px;
-  padding:1.9rem 1.75rem;
-  display:flex; align-items:center; gap:1.15rem;
-  margin-bottom:1rem;
-  overflow:hidden;
-  box-shadow:0 16px 40px -12px rgba(15,110,86,.28), 0 4px 8px rgba(15,110,86,.08);
-  background:
-    radial-gradient(900px circle at 0% 0%, rgba(110,231,183,.32), transparent 50%),
-    radial-gradient(700px circle at 100% 100%, rgba(8,80,65,.55), transparent 50%),
-    linear-gradient(135deg, #052e16 0%, #0a4a3a 35%, #0f6e56 70%, #1D9E75 100%);
-}
-/* Grain/noise overlay sutil */
-#s-perfil .perfil-hero::before {
-  content:''; position:absolute; inset:0; pointer-events:none;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.18'/%3E%3C/svg%3E");
-  mix-blend-mode:overlay; opacity:.35;
-}
-/* Glow orbe decorativo */
-#s-perfil .perfil-hero::after {
-  content:''; position:absolute; top:-40%; right:-15%;
-  width:340px; height:340px; border-radius:50%;
-  background:radial-gradient(circle, rgba(110,231,183,.20), transparent 65%);
-  pointer-events:none;
-}
-#s-perfil .perfil-hero > * { position:relative; z-index:2; }
+/* ══════ ACCOUNT SUMMARY (refinado, editorial) ══════
+   Inspirado em Stripe, Mercury, Ramp, Brex — calmo,
+   denso, neutro, sem decoração desnecessária. */
 
-#s-perfil .perfil-av {
-  width:72px; height:72px; border-radius:50%;
-  background:linear-gradient(145deg, rgba(255,255,255,.25), rgba(255,255,255,.10));
-  border:1.5px solid rgba(255,255,255,.30);
-  display:inline-flex; align-items:center; justify-content:center;
-  font-family:'Sora',sans-serif; font-size:24px; font-weight:700;
-  color:#fff; letter-spacing:-.5px; flex-shrink:0;
-  box-shadow:0 8px 24px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.20);
-  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+/* Eyebrow da seção (label discreto acima do título) */
+#s-perfil .perfil-eyebrow {
+  font-size:10.5px; font-weight:600;
+  color:#94a3b8;
+  text-transform:uppercase;
+  letter-spacing:.10em;
+  margin-bottom:6px;
 }
-#s-perfil .perfil-hero-text { flex:1; min-width:0; }
-#s-perfil .perfil-nome {
-  font-family:'Sora',sans-serif; font-size:22px; font-weight:700;
-  letter-spacing:-.018em; line-height:1.15;
+#s-perfil .perfil-page-title {
+  font-family:'Sora',sans-serif;
+  font-size:22px; font-weight:600;
+  color:#0f172a;
+  letter-spacing:-.018em;
+  line-height:1.15;
   margin-bottom:4px;
-  overflow:hidden; text-overflow:ellipsis;
 }
-#s-perfil .perfil-email {
-  font-size:13px; color:rgba(255,255,255,.72);
-  font-weight:400; letter-spacing:-.003em;
-  margin-bottom:.85rem;
-}
-#s-perfil .perfil-plano-pill {
-  display:inline-flex; align-items:center; gap:7px;
-  padding:5px 11px 5px 9px;
-  border-radius:99px;
-  background:rgba(255,255,255,.12);
-  border:1px solid rgba(255,255,255,.22);
-  font-size:11px; font-weight:600;
-  letter-spacing:.04em; text-transform:uppercase;
-  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
-}
-#s-perfil .perfil-plano-pill .dot {
-  width:7px; height:7px; border-radius:50%;
-  background:#6ee7b7;
-  box-shadow:0 0 0 3px rgba(110,231,183,.30);
-  animation:perfilPulse 2.4s ease-in-out infinite;
-}
-@keyframes perfilPulse {
-  0%,100% { box-shadow:0 0 0 3px rgba(110,231,183,.30); }
-  50%     { box-shadow:0 0 0 6px rgba(110,231,183,.10); }
+#s-perfil .perfil-page-desc {
+  font-size:13.5px; color:#64748b;
+  letter-spacing:-.003em;
+  line-height:1.5;
+  margin-bottom:1.5rem;
 }
 
-/* ══════ STATS ROW (4 cards inteligentes) ══════ */
-#s-perfil .perfil-stats {
-  display:grid; grid-template-columns:repeat(4, 1fr);
-  gap:.75rem; margin-bottom:1.25rem;
-}
-#s-perfil .perfil-stat-card {
+/* Card com cabeçalho do usuário + métricas inline */
+#s-perfil .perfil-hero {
   background:#fff;
   border:1px solid #e8edf2;
   border-radius:14px;
-  padding:1rem 1.1rem;
-  position:relative;
-  transition:border-color .2s, box-shadow .2s, transform .15s;
+  padding:0;
+  margin-bottom:1rem;
+  display:block;
   overflow:hidden;
+  box-shadow:0 1px 2px rgba(15,23,42,.03);
 }
-#s-perfil .perfil-stat-card::before {
-  content:''; position:absolute; inset:0;
-  background:linear-gradient(135deg, transparent 0%, rgba(29,158,117,.04) 100%);
-  opacity:0; transition:opacity .25s ease;
-  pointer-events:none;
+/* Linha superior: avatar + identidade + status */
+#s-perfil .perfil-hero-top {
+  padding:1.25rem 1.4rem 1.15rem;
+  display:flex; align-items:center; gap:14px;
 }
-#s-perfil .perfil-stat-card:hover {
-  border-color:#d8dee5;
-  transform:translateY(-2px);
-  box-shadow:0 12px 24px -10px rgba(15,23,42,.10), 0 2px 4px rgba(15,23,42,.04);
-}
-#s-perfil .perfil-stat-card:hover::before { opacity:1; }
-#s-perfil .perfil-stat-icon {
-  width:30px; height:30px; border-radius:8px;
-  background:#f0fdf8;
-  border:1px solid rgba(29,158,117,.15);
+#s-perfil .perfil-av {
+  width:48px; height:48px; border-radius:50%;
+  background:#f1f5f9;
+  border:1px solid #e2e8f0;
   display:inline-flex; align-items:center; justify-content:center;
-  color:var(--green); margin-bottom:.7rem;
-  transition:background .2s, transform .15s;
+  font-family:'Sora',sans-serif; font-size:16px; font-weight:600;
+  color:#334155; letter-spacing:-.01em; flex-shrink:0;
 }
-#s-perfil .perfil-stat-card:hover .perfil-stat-icon {
-  background:#e1f5ee; transform:scale(1.06);
+#s-perfil .perfil-hero-text { flex:1; min-width:0; }
+#s-perfil .perfil-nome {
+  font-family:'Sora',sans-serif; font-size:16.5px; font-weight:600;
+  color:#0f172a;
+  letter-spacing:-.015em; line-height:1.2;
+  margin-bottom:2px;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
-#s-perfil .perfil-stat-label {
+#s-perfil .perfil-email {
+  font-size:13px; color:#64748b;
+  font-weight:400; letter-spacing:-.003em;
+  font-family:'Inter',-apple-system,sans-serif;
+}
+#s-perfil .perfil-plano-pill {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:3px 9px 3px 8px;
+  border-radius:99px;
+  background:#fff;
+  border:1px solid #e8edf2;
   font-size:10.5px; font-weight:600;
-  color:#94a3b8; letter-spacing:.06em;
-  text-transform:uppercase; margin-bottom:5px;
+  color:#475569;
+  letter-spacing:.04em; text-transform:uppercase;
+  flex-shrink:0;
+}
+#s-perfil .perfil-plano-pill .dot {
+  width:5px; height:5px; border-radius:50%;
+  background:#16a36a;
+}
+#s-perfil .perfil-plano-pill #p-plano-status { color:#94a3b8; font-weight:500; }
+
+/* Métricas inline (strip dentro do card de conta) */
+#s-perfil .perfil-stats {
+  display:grid; grid-template-columns:repeat(4, 1fr);
+  gap:0;
+  border-top:1px solid #f1f5f9;
+  background:#fafbfc;
+}
+#s-perfil .perfil-stat-card {
+  background:transparent;
+  border:none;
+  border-right:1px solid #f1f5f9;
+  border-radius:0;
+  padding:.85rem 1.1rem .9rem;
+  position:relative;
+  overflow:hidden;
+  transition:none;
+}
+#s-perfil .perfil-stat-card:last-child { border-right:none; }
+#s-perfil .perfil-stat-card::before { display:none; }
+#s-perfil .perfil-stat-card:hover {
+  background:#f6f8fa;
+  transform:none;
+  box-shadow:none;
+  border-color:#f1f5f9;
+}
+/* Métrica: label fininho em caps + valor em peso editorial */
+#s-perfil .perfil-stat-icon { display:none; } /* ícones removidos, deixa só texto */
+#s-perfil .perfil-stat-label {
+  font-size:10.5px; font-weight:500;
+  color:#94a3b8; letter-spacing:.04em;
+  text-transform:uppercase; margin-bottom:4px;
+  font-family:'Inter',sans-serif;
 }
 #s-perfil .perfil-stat-value {
-  font-family:'Sora',sans-serif;
-  font-size:17px; font-weight:700;
-  color:#0f172a; letter-spacing:-.015em;
-  line-height:1.15;
+  font-family:'Inter','Sora',sans-serif;
+  font-size:14px; font-weight:500;
+  color:#0f172a; letter-spacing:-.005em;
+  line-height:1.25;
+  font-variant-numeric:tabular-nums;
 }
 #s-perfil .perfil-stat-value .perfil-stat-sub {
-  font-size:11px; font-weight:500; color:#64748b; margin-left:4px; letter-spacing:0;
+  font-size:12px; font-weight:400; color:#94a3b8; margin-left:3px; letter-spacing:0;
 }
 
-/* ══════ CARDS (refinados) ══════ */
+/* ══════ CARDS (calmos, editorial, sem hover dramático) ══════ */
 #s-perfil .perfil-card {
   background:#fff;
   border:1px solid #e8edf2;
-  border-radius:16px;
-  padding:1.4rem 1.5rem 1.25rem;
+  border-radius:14px;
+  padding:1.25rem 1.4rem 1.1rem;
   margin-bottom:.875rem;
-  box-shadow:0 1px 2px rgba(15,23,42,.04), 0 1px 1px rgba(15,23,42,.02);
-  transition:border-color .2s, box-shadow .2s;
+  box-shadow:0 1px 2px rgba(15,23,42,.03);
+  transition:border-color .15s;
 }
-#s-perfil .perfil-card:hover {
-  border-color:#dde3eb;
-  box-shadow:0 8px 24px -12px rgba(15,23,42,.10), 0 2px 4px rgba(15,23,42,.04);
-}
+#s-perfil .perfil-card:hover { border-color:#dde3eb; }
 #s-perfil .perfil-card-title {
   font-family:'Sora',sans-serif;
-  font-size:14.5px; font-weight:600;
+  font-size:13.5px; font-weight:600;
   color:#0f172a;
-  margin-bottom:1.1rem;
-  display:flex; align-items:center; gap:9px;
-  letter-spacing:-.015em;
+  margin-bottom:1rem;
+  display:flex; align-items:center; gap:8px;
+  letter-spacing:-.012em;
+  padding-bottom:.85rem;
+  border-bottom:1px solid #f1f5f9;
 }
-#s-perfil .perfil-card-title svg { color:var(--green); }
-#s-perfil .perfil-card-title-icon {
-  width:30px; height:30px; border-radius:8px;
-  background:linear-gradient(145deg, #f0fdf8, #e1f5ee);
-  border:1px solid rgba(29,158,117,.15);
-  display:inline-flex; align-items:center; justify-content:center;
-  color:var(--green-dark);
-}
+/* Ícone neutro — não verde brilhante */
+#s-perfil .perfil-card-title svg { color:#94a3b8; flex-shrink:0; }
 
 #s-perfil .perfil-grid { display:grid; grid-template-columns:1fr 1fr; gap:.9rem; }
 #s-perfil .perfil-field { display:flex; flex-direction:column; gap:6px; }
@@ -4401,9 +4412,10 @@ async function mudarSenhaPerfil(){
 }
 #s-perfil .perfil-input::placeholder { color:#cbd5e1; }
 #s-perfil .perfil-input:hover { border-color:#cbd5e1; }
+/* Focus editorial (cinza-escuro), não verde — estilo Stripe */
 #s-perfil .perfil-input:focus, #s-perfil .perfil-select:focus {
-  border-color:var(--green);
-  box-shadow:0 0 0 3px rgba(29,158,117,.12), 0 1px 2px rgba(29,158,117,.06);
+  border-color:#0f172a;
+  box-shadow:0 0 0 3px rgba(15,23,42,.08);
   background:#fff;
 }
 #s-perfil .perfil-input[readonly] {
@@ -4424,24 +4436,24 @@ async function mudarSenhaPerfil(){
 #s-perfil .lg-cs-readonly .lg-cs-val { color:#475569 !important; }
 #s-perfil .lg-cs-lock { margin-left:auto; flex-shrink:0; opacity:.55; }
 
-/* ══════ BOTÕES ══════ */
+/* ══════ BOTÕES (sólidos, sem glow exagerado) ══════ */
 #s-perfil .perfil-btn {
   display:inline-flex; align-items:center; gap:7px;
-  padding:9px 16px;
-  border-radius:10px;
-  border:none;
-  background:linear-gradient(135deg, var(--green) 0%, #16a36a 100%);
+  padding:8px 14px;
+  border-radius:8px;
+  border:1px solid #15835f;
+  background:#16a36a;
   color:#fff;
-  font-size:13px; font-weight:600;
+  font-size:13px; font-weight:500;
   letter-spacing:-.005em;
   cursor:pointer; font-family:inherit;
-  transition:transform .14s, box-shadow .18s, filter .18s;
-  box-shadow:0 4px 14px rgba(29,158,117,.30), inset 0 1px 0 rgba(255,255,255,.15);
+  transition:background .14s, border-color .14s, transform .12s;
+  box-shadow:0 1px 2px rgba(15,23,42,.04);
   margin-top:.5rem;
 }
-#s-perfil .perfil-btn:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 8px 22px rgba(29,158,117,.40), inset 0 1px 0 rgba(255,255,255,.15); filter:brightness(1.04); }
-#s-perfil .perfil-btn:active:not(:disabled) { transform:translateY(0); }
-#s-perfil .perfil-btn:disabled { opacity:.55; cursor:not-allowed; transform:none; }
+#s-perfil .perfil-btn:hover:not(:disabled) { background:#15835f; border-color:#0f6e50; }
+#s-perfil .perfil-btn:active:not(:disabled) { transform:translateY(.5px); }
+#s-perfil .perfil-btn:disabled { opacity:.55; cursor:not-allowed; }
 #s-perfil .perfil-btn-secondary {
   background:#fff; color:#334155;
   border:1px solid #d8dee5;
@@ -4462,93 +4474,91 @@ async function mudarSenhaPerfil(){
 }
 #s-perfil .perfil-msg { font-size:12.5px; margin-top:.75rem; min-height:1.2em; transition:color .15s; letter-spacing:-.003em; }
 
-/* ══════ PLAN CARD PREMIUM (com countdown + features) ══════ */
+/* ══════ PLAN CARD (refinado, sem gradients chamativos) ══════ */
 #s-perfil .plan-card {
   position:relative;
-  background:linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
+  background:#fff;
   border:1px solid #e8edf2;
-  border-radius:18px;
+  border-radius:14px;
   padding:0;
   margin-bottom:.875rem;
   overflow:hidden;
-  box-shadow:0 1px 2px rgba(15,23,42,.04), 0 1px 1px rgba(15,23,42,.02);
+  box-shadow:0 1px 2px rgba(15,23,42,.03);
   transition:border-color .2s, box-shadow .2s;
 }
 #s-perfil .plan-card:hover {
   border-color:#dde3eb;
-  box-shadow:0 12px 32px -16px rgba(15,23,42,.12), 0 2px 4px rgba(15,23,42,.04);
+  box-shadow:0 4px 12px -6px rgba(15,23,42,.08);
 }
 #s-perfil .plan-card-top {
-  padding:1.4rem 1.5rem 1.1rem;
-  display:flex; align-items:flex-start; gap:1rem;
+  padding:1.25rem 1.4rem 1.1rem;
+  display:flex; align-items:center; gap:14px;
   position:relative;
+  border-bottom:1px solid #f1f5f9;
 }
-#s-perfil .plan-card-top::after {
-  content:''; position:absolute; left:1.5rem; right:1.5rem; bottom:0;
-  height:1px; background:#f1f5f9;
-}
+/* Ícone monoline neutro — sem gradient verde brilhante */
 #s-perfil .plan-card-icon {
-  width:42px; height:42px; border-radius:11px;
-  background:linear-gradient(135deg, #0f6e56 0%, #1D9E75 100%);
+  width:36px; height:36px; border-radius:9px;
+  background:#f8fafc;
+  border:1px solid #e2e8f0;
   display:flex; align-items:center; justify-content:center;
-  color:#fff; flex-shrink:0;
-  box-shadow:0 6px 16px rgba(29,158,117,.30), inset 0 1px 0 rgba(255,255,255,.20);
+  color:#475569; flex-shrink:0;
 }
 #s-perfil .plan-card-info { flex:1; min-width:0; }
-#s-perfil .plan-card-name-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:3px; }
+#s-perfil .plan-card-name-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:2px; }
 #s-perfil .plan-card-name {
   font-family:'Sora',sans-serif;
-  font-size:18px; font-weight:700;
-  color:#0f172a; letter-spacing:-.018em;
+  font-size:15.5px; font-weight:600;
+  color:#0f172a; letter-spacing:-.015em;
 }
 #s-perfil .plan-card-status {
-  font-size:10.5px; font-weight:700;
-  letter-spacing:.06em; text-transform:uppercase;
-  padding:3px 8px; border-radius:99px;
-  background:rgba(245,158,11,.10);
-  border:1px solid rgba(245,158,11,.25);
-  color:#b45309;
+  font-size:10px; font-weight:600;
+  letter-spacing:.05em; text-transform:uppercase;
+  padding:2px 7px; border-radius:99px;
+  background:#fff;
+  border:1px solid #e8edf2;
+  color:#64748b;
 }
 #s-perfil .plan-card-status.active {
-  background:rgba(22,163,74,.08);
-  border-color:rgba(22,163,74,.22);
+  border-color:rgba(22,163,74,.25);
   color:#15803d;
 }
 #s-perfil .plan-card-price {
   font-size:12.5px; color:#64748b;
   letter-spacing:-.003em;
+  font-variant-numeric:tabular-nums;
 }
-#s-perfil .plan-card-price strong { color:#0f172a; font-weight:600; }
+#s-perfil .plan-card-price strong { color:#0f172a; font-weight:500; }
 
-/* Trial countdown */
+/* Trial countdown (linha simples, sem glow) */
 #s-perfil .plan-card-trial {
-  padding:1.1rem 1.5rem;
-  background:linear-gradient(180deg, #fafbfc 0%, #f8fafc 100%);
+  padding:1rem 1.4rem 1.1rem;
+  background:#fafbfc;
+  border-bottom:1px solid #f1f5f9;
 }
 #s-perfil .plan-card-trial-head {
   display:flex; align-items:center; justify-content:space-between;
-  margin-bottom:8px; gap:1rem;
+  margin-bottom:9px; gap:1rem;
 }
 #s-perfil .plan-card-trial-label {
-  font-size:11px; font-weight:600;
-  color:#64748b; letter-spacing:.06em;
+  font-size:10.5px; font-weight:500;
+  color:#94a3b8; letter-spacing:.05em;
   text-transform:uppercase;
 }
 #s-perfil .plan-card-trial-days {
-  font-family:'Sora',sans-serif;
-  font-size:13.5px; font-weight:700;
-  color:#0f172a; letter-spacing:-.005em;
+  font-size:12.5px; font-weight:500;
+  color:#475569; letter-spacing:-.003em;
+  font-variant-numeric:tabular-nums;
 }
-#s-perfil .plan-card-trial-days .num { color:var(--green); font-size:15px; }
+#s-perfil .plan-card-trial-days .num { color:#0f172a; font-weight:600; }
 #s-perfil .plan-card-trial-bar {
-  width:100%; height:6px; border-radius:99px;
-  background:#e2e8f0; overflow:hidden; position:relative;
+  width:100%; height:4px; border-radius:99px;
+  background:#eef2f6; overflow:hidden;
 }
 #s-perfil .plan-card-trial-fill {
   height:100%; border-radius:99px;
-  background:linear-gradient(90deg, #1D9E75 0%, #16a36a 50%, #6ee7b7 100%);
-  box-shadow:0 0 8px rgba(29,158,117,.40);
-  transition:width 1.2s cubic-bezier(.16,1,.3,1);
+  background:#0f172a;
+  transition:width .9s cubic-bezier(.16,1,.3,1);
   width:0%;
 }
 #s-perfil .plan-card-trial-hint {
@@ -4558,58 +4568,89 @@ async function mudarSenhaPerfil(){
 
 /* Features list */
 #s-perfil .plan-card-features {
-  padding:1.1rem 1.5rem 1.3rem;
+  padding:1rem 1.4rem 1.1rem;
 }
 #s-perfil .plan-card-features-title {
-  font-size:11px; font-weight:600;
-  color:#94a3b8; letter-spacing:.06em;
+  font-size:10.5px; font-weight:500;
+  color:#94a3b8; letter-spacing:.05em;
   text-transform:uppercase; margin-bottom:.65rem;
 }
 #s-perfil .plan-card-features-grid {
-  display:grid; grid-template-columns:repeat(2, 1fr); gap:7px 14px;
-  margin-bottom:1rem;
+  display:grid; grid-template-columns:repeat(2, 1fr); gap:6px 18px;
+  margin-bottom:0;
 }
 #s-perfil .plan-card-feature {
-  display:flex; align-items:center; gap:7px;
+  display:flex; align-items:center; gap:8px;
   font-size:12.5px; color:#475569; letter-spacing:-.003em;
 }
+/* Check sem círculo, sem verde florescente — apenas glifo neutro */
 #s-perfil .plan-card-feature-icon {
-  width:16px; height:16px; border-radius:50%;
-  background:#f0fdf8; border:1px solid rgba(29,158,117,.20);
-  color:var(--green);
+  width:13px; height:13px;
+  background:none; border:none;
+  color:#16a36a;
   display:inline-flex; align-items:center; justify-content:center;
   flex-shrink:0;
 }
 #s-perfil .plan-card-actions {
   display:flex; gap:.6rem;
-  padding:0 1.5rem 1.3rem;
+  padding:.95rem 1.4rem 1.1rem;
+  border-top:1px solid #f1f5f9;
   flex-wrap:wrap;
+  background:#fafbfc;
 }
 
-/* Insight/AI widget (decorativo, fortalece percepção premium) */
-#s-perfil .perfil-insight {
-  display:flex; align-items:center; gap:11px;
-  background:linear-gradient(135deg, #f0fdf8 0%, #e1f5ee 100%);
-  border:1px solid rgba(29,158,117,.18);
-  border-radius:14px;
-  padding:.85rem 1rem;
-  margin-bottom:1rem;
-}
-#s-perfil .perfil-insight-icon {
-  width:32px; height:32px; border-radius:9px;
+/* ══════ ATIVIDADE RECENTE (substitui o widget de IA) ══════ */
+#s-perfil .perfil-activity {
   background:#fff;
-  display:flex; align-items:center; justify-content:center;
-  color:var(--green); flex-shrink:0;
-  box-shadow:0 2px 6px rgba(29,158,117,.15);
+  border:1px solid #e8edf2;
+  border-radius:14px;
+  padding:1.25rem 0 .25rem;
+  margin-bottom:.875rem;
+  box-shadow:0 1px 2px rgba(15,23,42,.03);
 }
-#s-perfil .perfil-insight-content { flex:1; min-width:0; }
-#s-perfil .perfil-insight-title {
-  font-size:12.5px; font-weight:600;
-  color:#0d2b1e; letter-spacing:-.005em;
-  margin-bottom:1px;
+#s-perfil .perfil-activity-head {
+  display:flex; align-items:baseline; justify-content:space-between;
+  padding:0 1.4rem .9rem;
+  border-bottom:1px solid #f1f5f9;
 }
-#s-perfil .perfil-insight-desc {
-  font-size:11.5px; color:#0d6e4c; letter-spacing:-.003em;
+#s-perfil .perfil-activity-title {
+  font-family:'Sora',sans-serif;
+  font-size:13.5px; font-weight:600;
+  color:#0f172a; letter-spacing:-.012em;
+}
+#s-perfil .perfil-activity-meta {
+  font-size:11px; color:#94a3b8;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:.005em;
+}
+#s-perfil .perfil-activity-list { padding:0; }
+#s-perfil .perfil-activity-item {
+  display:grid;
+  grid-template-columns:140px 1fr auto;
+  gap:1rem; align-items:center;
+  padding:.7rem 1.4rem;
+  border-bottom:1px solid #f6f8fa;
+  font-size:12.5px;
+}
+#s-perfil .perfil-activity-item:last-child { border-bottom:none; }
+#s-perfil .perfil-activity-time {
+  color:#94a3b8;
+  font-variant-numeric:tabular-nums;
+  font-family:'Inter',sans-serif;
+  font-size:12px;
+  letter-spacing:.002em;
+}
+#s-perfil .perfil-activity-text {
+  color:#0f172a;
+  letter-spacing:-.003em;
+  line-height:1.45;
+}
+#s-perfil .perfil-activity-tag {
+  font-size:10px; font-weight:500;
+  color:#64748b;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  font-variant-numeric:tabular-nums;
 }
 
 /* Responsividade */
@@ -4630,63 +4671,44 @@ async function mudarSenhaPerfil(){
     Voltar ao dashboard
   </button>
 
-  <!-- ══ HERO PREMIUM (mesh gradient + glassmorphism) ══ -->
+  <!-- ══ PAGE HEADER (eyebrow + título) ══ -->
+  <div class="perfil-eyebrow">Configurações da conta</div>
+  <h1 class="perfil-page-title">Sua conta</h1>
+  <p class="perfil-page-desc">Gerencie seus dados, plano, segurança e preferências.</p>
+
+  <!-- ══ ACCOUNT CARD (avatar + identidade + métricas inline) ══ -->
   <div class="perfil-hero">
-    <div class="perfil-av" id="p-av-big">VI</div>
-    <div class="perfil-hero-text">
-      <div class="perfil-nome" id="p-nome-big">Usuário</div>
-      <div class="perfil-email" id="p-email-display">—</div>
+    <div class="perfil-hero-top">
+      <div class="perfil-av" id="p-av-big">VI</div>
+      <div class="perfil-hero-text">
+        <div class="perfil-nome" id="p-nome-big">Usuário</div>
+        <div class="perfil-email" id="p-email-display">—</div>
+      </div>
       <div class="perfil-plano-pill">
         <span class="dot"></span>
         <span id="p-plano-label">—</span>
-        <span id="p-plano-status" style="opacity:.85;font-weight:500;"></span>
+        <span id="p-plano-status"></span>
       </div>
     </div>
-  </div>
 
-  <!-- ══ STATS ROW (cards inteligentes) ══ -->
-  <div class="perfil-stats">
-    <div class="perfil-stat-card">
-      <div class="perfil-stat-icon">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <!-- Strip de métricas dentro do mesmo card -->
+    <div class="perfil-stats">
+      <div class="perfil-stat-card">
+        <div class="perfil-stat-label">Cliente desde</div>
+        <div class="perfil-stat-value" id="p-stat-since">—</div>
       </div>
-      <div class="perfil-stat-label">Cliente desde</div>
-      <div class="perfil-stat-value" id="p-stat-since">—</div>
-    </div>
-
-    <div class="perfil-stat-card">
-      <div class="perfil-stat-icon">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <div class="perfil-stat-card">
+        <div class="perfil-stat-label">Análises</div>
+        <div class="perfil-stat-value" id="p-stat-analyses">0</div>
       </div>
-      <div class="perfil-stat-label">Análises feitas</div>
-      <div class="perfil-stat-value" id="p-stat-analyses">0</div>
-    </div>
-
-    <div class="perfil-stat-card">
-      <div class="perfil-stat-icon">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <div class="perfil-stat-card">
+        <div class="perfil-stat-label">Trial restante</div>
+        <div class="perfil-stat-value" id="p-stat-trial">— <span class="perfil-stat-sub">dias</span></div>
       </div>
-      <div class="perfil-stat-label">Trial restante</div>
-      <div class="perfil-stat-value" id="p-stat-trial">— <span class="perfil-stat-sub">dias</span></div>
-    </div>
-
-    <div class="perfil-stat-card">
-      <div class="perfil-stat-icon">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
+      <div class="perfil-stat-card">
+        <div class="perfil-stat-label">Status</div>
+        <div class="perfil-stat-value" id="p-stat-status">Ativo</div>
       </div>
-      <div class="perfil-stat-label">Status</div>
-      <div class="perfil-stat-value" id="p-stat-status">Ativo</div>
-    </div>
-  </div>
-
-  <!-- ══ INSIGHT WIDGET (toque de IA / inteligência) ══ -->
-  <div class="perfil-insight" id="p-insight">
-    <div class="perfil-insight-icon">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 008.5 14.063l-6.135-1.582a.5.5 0 010-.962L8.5 9.936A2 2 0 009.937 8.5l1.582-6.135a.5.5 0 01.962 0L14.063 8.5A2 2 0 0015.5 9.937l6.135 1.582a.5.5 0 010 .962L15.5 14.063a2 2 0 00-1.437 1.437l-1.582 6.135a.5.5 0 01-.962 0z"/></svg>
-    </div>
-    <div class="perfil-insight-content">
-      <div class="perfil-insight-title" id="p-insight-title">Bem-vindo ao VitaCash</div>
-      <div class="perfil-insight-desc" id="p-insight-desc">Envie sua primeira DRE pra começar o diagnóstico financeiro.</div>
     </div>
   </div>
 
@@ -4838,6 +4860,17 @@ async function mudarSenhaPerfil(){
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         Gerenciar assinatura
       </button>
+    </div>
+  </div>
+
+  <!-- ══ ATIVIDADE RECENTE (substitui o widget de IA) ══ -->
+  <div class="perfil-activity">
+    <div class="perfil-activity-head">
+      <div class="perfil-activity-title">Atividade recente</div>
+      <div class="perfil-activity-meta" id="p-activity-meta">—</div>
+    </div>
+    <div class="perfil-activity-list" id="p-activity-list">
+      <div class="perfil-activity-item" style="grid-template-columns:1fr;color:#94a3b8;font-size:12.5px;">Carregando…</div>
     </div>
   </div>
 
