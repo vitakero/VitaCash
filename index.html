@@ -1388,9 +1388,10 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
       <div style="display:none;font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:#0f172a;letter-spacing:-.5px;margin-bottom:1.5rem;" id="lg-logo-mobile">Vita<span style="color:#1D9E75;">Cash</span></div>
 
       <!-- TABS -->
-      <div class="lg-tab">
+      <div class="lg-tab" id="lg-tab-bar">
         <button class="lg-tab-btn" id="lg-tab-login" onclick="lgSwitch('login')">Entrar</button>
         <button class="lg-tab-btn active" id="lg-tab-cad" onclick="lgSwitch('cadastro')">Criar conta grátis ✦</button>
+        <button class="lg-tab-btn" id="lg-tab-otp" onclick="lgSwitch('otp')" style="display:none;">Confirmar código</button>
       </div>
 
       <!-- ── PAINEL ENTRAR ── -->
@@ -1594,9 +1595,53 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
         </div>
       </div>
 
+      <!-- ══ PAINEL CONFIRMAR CÓDIGO (OTP — opção 2: aba no login) ══ -->
+      <div id="lg-panel-otp" style="display:none;">
+        <div style="text-align:center;margin-bottom:1rem;">
+          <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(160deg,#1D9E75 0%,#0f6e56 100%);display:inline-flex;align-items:center;justify-content:center;margin-bottom:.85rem;box-shadow:0 8px 20px rgba(29,158,117,.28);">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <h3 style="font-family:'Sora',sans-serif;font-size:20px;font-weight:800;color:#0f172a;letter-spacing:-.5px;margin-bottom:.4rem;">Confirme seu e-mail</h3>
+          <p style="font-size:13px;color:#475569;line-height:1.55;margin-bottom:.15rem;">Enviamos um código de 6 dígitos para</p>
+          <p style="font-size:13.5px;color:#0f172a;font-weight:700;word-break:break-all;">
+            <span id="lgotp-email">seu@email.com</span>
+          </p>
+        </div>
+
+        <div style="display:flex;justify-content:center;gap:.45rem;margin:1.25rem 0 1rem;" id="lgotp-inputs">
+          <input class="lgotp-inp" maxlength="1" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code"/>
+          <input class="lgotp-inp" maxlength="1" inputmode="numeric" pattern="[0-9]*"/>
+          <input class="lgotp-inp" maxlength="1" inputmode="numeric" pattern="[0-9]*"/>
+          <input class="lgotp-inp" maxlength="1" inputmode="numeric" pattern="[0-9]*"/>
+          <input class="lgotp-inp" maxlength="1" inputmode="numeric" pattern="[0-9]*"/>
+          <input class="lgotp-inp" maxlength="1" inputmode="numeric" pattern="[0-9]*"/>
+        </div>
+
+        <button type="button" class="lg-btn" id="lgotp-btn" onclick="lgOtpConfirmar()" disabled>
+          Confirmar acesso →
+        </button>
+        <div class="lgotp-msg" id="lgotp-msg" style="font-size:12.5px;min-height:1.4em;margin-top:.75rem;text-align:center;font-weight:500;"></div>
+
+        <div style="font-size:12.5px;color:#64748b;text-align:center;margin-top:1rem;">
+          Não recebeu? <button type="button" id="lgotp-resend-btn" onclick="lgOtpReenviar()" style="background:none;border:none;color:#1D9E75;font-weight:700;cursor:pointer;font-family:inherit;font-size:12.5px;padding:0 4px;text-decoration:underline;text-underline-offset:3px;">Reenviar código</button>
+        </div>
+        <div style="text-align:center;margin-top:.75rem;">
+          <button type="button" onclick="lgOtpTrocarEmail()" style="background:none;border:none;color:#94a3b8;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;padding:6px 10px;text-decoration:underline;text-underline-offset:3px;">← Trocar email</button>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
+
+<style>
+/* Inputs OTP do painel de login (opção 2) */
+.lgotp-inp{width:42px;height:50px;border:1.5px solid #e2e8f0;border-radius:10px;background:#fafafa;font-size:20px;font-weight:700;color:#0f172a;text-align:center;font-family:'Sora',sans-serif;outline:none;transition:border-color .15s,box-shadow .15s,background .15s;-webkit-appearance:none;}
+.lgotp-inp:focus{border-color:#1D9E75;box-shadow:0 0 0 3px rgba(29,158,117,.12);background:#fff;}
+.lgotp-inp.filled{border-color:#1D9E75;background:#fff;}
+.lgotp-msg.ok{color:#16a36a;}
+.lgotp-msg.err{color:#dc2626;}
+</style>
 
 <script>
 // Permite enviar os formulários de auth (login, cadastro, reset) ao pressionar Enter
@@ -4376,23 +4421,24 @@ async function mudarSenhaPerfil(){
 // ────────────────────────────────────────────────────────────────────
 // CONFIRMAÇÃO DE EMAIL POR CÓDIGO OTP (6 dígitos)
 // ────────────────────────────────────────────────────────────────────
+// VERSÃO 2 (ATIVA): Aba "Confirmar código" dentro do login
 function irParaConfirmacaoEmail(email){
   var $ = function(id){ return document.getElementById(id); };
-  if($('cmail-email')) $('cmail-email').textContent = email;
+  if($('lgotp-email')) $('lgotp-email').textContent = email;
   // Limpa os inputs do código
-  document.querySelectorAll('#cmail-inputs .cmail-inp').forEach(function(inp){
+  document.querySelectorAll('#lgotp-inputs .lgotp-inp').forEach(function(inp){
     inp.value = ''; inp.classList.remove('filled');
   });
-  if($('cmail-msg')){ $('cmail-msg').textContent=''; $('cmail-msg').className='cmail-msg'; }
-  if($('cmail-btn')) $('cmail-btn').disabled = true;
-  if(typeof go === 'function') go('s-confirmar-email');
-  // Foca o primeiro input após a transição
+  if($('lgotp-msg')){ $('lgotp-msg').textContent=''; $('lgotp-msg').className='lgotp-msg'; }
+  if($('lgotp-btn')) $('lgotp-btn').disabled = true;
+  // Vai pra tela de login e troca pra aba OTP
+  if(typeof go === 'function') go('s-login');
   setTimeout(function(){
-    var first = document.querySelector('#cmail-inputs .cmail-inp');
+    if(typeof lgSwitch === 'function') lgSwitch('otp');
+    var first = document.querySelector('#lgotp-inputs .lgotp-inp');
     if(first) first.focus();
-  }, 350);
-  // Inicia cooldown para reenvio
-  iniciarCooldownReenvio(60);
+  }, 200);
+  lgOtpIniciarCooldown(60);
 }
 
 // Lógica dos 6 inputs: auto-avanço, paste, backspace, validação
@@ -4555,6 +4601,169 @@ function trocarEmailCadastro(){
   try { localStorage.removeItem('vitacash_pending_email'); } catch(e){}
   try { localStorage.removeItem('vitacash_pending_profile'); } catch(e){}
   if(typeof go === 'function') go('s-login');
+}
+
+// ════════════════════════════════════════════════════════════════════
+// OTP — Aba dentro do login (opção 2)
+// ════════════════════════════════════════════════════════════════════
+(function(){
+  function lerCodigo(){
+    var s = '';
+    document.querySelectorAll('#lgotp-inputs .lgotp-inp').forEach(function(inp){ s += (inp.value||''); });
+    return s;
+  }
+  function atualizarBotao(){
+    var inputs = document.querySelectorAll('#lgotp-inputs .lgotp-inp');
+    var btn = document.getElementById('lgotp-btn');
+    if(!inputs.length || !btn) return;
+    var full = Array.prototype.every.call(inputs, function(i){ return i.value && /\d/.test(i.value); });
+    btn.disabled = !full;
+  }
+  function setup(){
+    var inputs = document.querySelectorAll('#lgotp-inputs .lgotp-inp');
+    if(!inputs.length) return;
+    inputs.forEach(function(inp, idx){
+      inp.addEventListener('input', function(){
+        var v = inp.value.replace(/\D/g,'');
+        inp.value = v.slice(0,1);
+        if(inp.value) inp.classList.add('filled'); else inp.classList.remove('filled');
+        if(inp.value && idx < inputs.length - 1) inputs[idx+1].focus();
+        atualizarBotao();
+      });
+      inp.addEventListener('keydown', function(e){
+        if(e.key === 'Backspace' && !inp.value && idx > 0){ inputs[idx-1].focus(); inputs[idx-1].value=''; inputs[idx-1].classList.remove('filled'); atualizarBotao(); }
+        if(e.key === 'ArrowLeft' && idx > 0) inputs[idx-1].focus();
+        if(e.key === 'ArrowRight' && idx < inputs.length - 1) inputs[idx+1].focus();
+        if(e.key === 'Enter'){ var b = document.getElementById('lgotp-btn'); if(b && !b.disabled) b.click(); }
+      });
+      inp.addEventListener('paste', function(e){
+        e.preventDefault();
+        var text = (e.clipboardData || window.clipboardData).getData('text');
+        var digits = (text||'').replace(/\D/g,'').slice(0,6);
+        if(!digits) return;
+        for(var i=0; i<inputs.length; i++){
+          inputs[i].value = digits[i] || '';
+          if(inputs[i].value) inputs[i].classList.add('filled'); else inputs[i].classList.remove('filled');
+        }
+        var last = Math.min(digits.length, inputs.length) - 1;
+        if(last >= 0) inputs[last].focus();
+        atualizarBotao();
+      });
+    });
+  }
+  window._lgOtpLerCodigo = lerCodigo;
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', setup); } else { setup(); }
+})();
+
+async function lgOtpConfirmar(){
+  var $ = function(id){ return document.getElementById(id); };
+  var btn = $('lgotp-btn'), msg = $('lgotp-msg');
+  var email = localStorage.getItem('vitacash_pending_email') || ($('lgotp-email')||{}).textContent;
+  var token = window._lgOtpLerCodigo ? window._lgOtpLerCodigo() : '';
+  if(!token || token.length !== 6){
+    if(msg){ msg.textContent='Digite os 6 dígitos do código.'; msg.className='lgotp-msg err'; }
+    return;
+  }
+  if(!email){
+    if(msg){ msg.textContent='Sessão expirou. Faça o cadastro novamente.'; msg.className='lgotp-msg err'; }
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'Confirmando...';
+  if(msg){ msg.textContent=''; msg.className='lgotp-msg'; }
+  try {
+    var resp = await sb.auth.verifyOtp({ email: email, token: token, type: 'email' });
+    if(resp.error) throw resp.error;
+    var user = (resp.data && resp.data.user) || null;
+    if(!user) throw new Error('Confirmação falhou. Tente novamente.');
+    currentUser = user;
+    if(msg){ msg.textContent='✓ Email confirmado!'; msg.className='lgotp-msg ok'; }
+    // Salva o perfil pendente
+    var pending = localStorage.getItem('vitacash_pending_profile');
+    if(pending){
+      try {
+        var prof = JSON.parse(pending);
+        await sb.from('profiles').upsert({
+          id: currentUser.id,
+          full_name: prof.n,
+          email: prof.e,
+          telefone: prof.tel || null,
+          nicho: prof.nicho || null,
+          faturamento_faixa: prof.fat || null,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'id' });
+      } catch(e){ console.warn('upsert pending profile:', e); }
+      localStorage.removeItem('vitacash_pending_profile');
+    }
+    localStorage.removeItem('vitacash_pending_email');
+    // Retoma fluxo (checkout ou escolher plano)
+    var planName = localStorage.getItem('vc_pending_plan');
+    var priceId  = localStorage.getItem('vc_pending_price');
+    setTimeout(function(){
+      if(planName && priceId && typeof abrirTelaCheckout === 'function'){
+        localStorage.removeItem('vc_pending_plan');
+        localStorage.removeItem('vc_pending_price');
+        abrirTelaCheckout(planName, priceId);
+      } else if(typeof go === 'function'){
+        go('s-escolher-plano');
+      }
+    }, 600);
+  } catch(err){
+    console.error('verifyOtp:', err);
+    var m = (err && err.message) || '';
+    var txt = 'Código inválido ou expirado. Tente reenviar.';
+    if(/expired/i.test(m)) txt = 'Código expirado. Clique em "Reenviar código".';
+    else if(/invalid/i.test(m)) txt = 'Código incorreto. Confira e tente de novo.';
+    if(msg){ msg.textContent = txt; msg.className='lgotp-msg err'; }
+    btn.disabled = false;
+    btn.textContent = 'Confirmar acesso →';
+  }
+}
+
+var _lgOtpCooldownInt = null;
+function lgOtpIniciarCooldown(seconds){
+  var btn = document.getElementById('lgotp-resend-btn');
+  if(!btn) return;
+  var remaining = seconds || 60;
+  if(_lgOtpCooldownInt) clearInterval(_lgOtpCooldownInt);
+  btn.disabled = true;
+  btn.style.color = '#94a3b8';
+  btn.style.textDecoration = 'none';
+  btn.style.cursor = 'not-allowed';
+  btn.textContent = 'Aguarde ' + remaining + 's';
+  _lgOtpCooldownInt = setInterval(function(){
+    remaining--;
+    if(remaining <= 0){
+      clearInterval(_lgOtpCooldownInt); _lgOtpCooldownInt = null;
+      btn.disabled = false; btn.style.color=''; btn.style.textDecoration='underline'; btn.style.cursor='pointer';
+      btn.textContent = 'Reenviar código';
+    } else {
+      btn.textContent = 'Aguarde ' + remaining + 's';
+    }
+  }, 1000);
+}
+
+async function lgOtpReenviar(){
+  var $ = function(id){ return document.getElementById(id); };
+  var msg = $('lgotp-msg');
+  var email = localStorage.getItem('vitacash_pending_email') || ($('lgotp-email')||{}).textContent;
+  if(!email){ if(msg){ msg.textContent='Sessão expirou. Faça o cadastro novamente.'; msg.className='lgotp-msg err'; } return; }
+  if(msg){ msg.textContent='Enviando novo código...'; msg.className='lgotp-msg'; }
+  try {
+    var resp = await sb.auth.resend({ type: 'signup', email: email });
+    if(resp.error) throw resp.error;
+    if(msg){ msg.textContent='✓ Código reenviado. Verifique seu email.'; msg.className='lgotp-msg ok'; }
+    lgOtpIniciarCooldown(60);
+  } catch(err){
+    console.error('resend:', err);
+    if(msg){ msg.textContent='Não foi possível reenviar. Tente em alguns segundos.'; msg.className='lgotp-msg err'; }
+  }
+}
+
+function lgOtpTrocarEmail(){
+  try { localStorage.removeItem('vitacash_pending_email'); } catch(e){}
+  try { localStorage.removeItem('vitacash_pending_profile'); } catch(e){}
+  if(typeof lgSwitch === 'function') lgSwitch('cadastro');
 }
 </script>
 
@@ -6120,23 +6329,41 @@ function goLogin(tab) {
 
 // ── LOGIN PREMIUM: tab switcher ────────────────────────────────────
 function lgSwitch(tab) {
-  var panelLogin  = document.getElementById('lg-panel-login');
-  var panelCad    = document.getElementById('lg-panel-cad');
-  var panelReset  = document.getElementById('lg-panel-reset');
-  var tabLogin    = document.getElementById('lg-tab-login');
-  var tabCad      = document.getElementById('lg-tab-cad');
+  var panelLogin = document.getElementById('lg-panel-login');
+  var panelCad   = document.getElementById('lg-panel-cad');
+  var panelReset = document.getElementById('lg-panel-reset');
+  var panelOtp   = document.getElementById('lg-panel-otp');
+  var tabLogin   = document.getElementById('lg-tab-login');
+  var tabCad     = document.getElementById('lg-tab-cad');
+  var tabOtp     = document.getElementById('lg-tab-otp');
   if (!panelLogin) return;
+  // Esconde todos
   if (panelReset) panelReset.style.display = 'none';
+  if (panelOtp)   panelOtp.style.display   = 'none';
+  panelLogin.style.display = 'none';
+  panelCad.style.display   = 'none';
+  if (tabLogin) tabLogin.classList.remove('active');
+  if (tabCad)   tabCad.classList.remove('active');
+  if (tabOtp)   tabOtp.classList.remove('active');
+
   if (tab === 'login') {
     panelLogin.style.display = 'block';
-    panelCad.style.display   = 'none';
-    tabLogin.classList.add('active');
-    tabCad.classList.remove('active');
+    if (tabLogin) tabLogin.classList.add('active');
+    if (tabOtp)   tabOtp.style.display = 'none';
+  } else if (tab === 'otp') {
+    if (panelOtp) panelOtp.style.display = 'block';
+    if (tabOtp){ tabOtp.style.display = ''; tabOtp.classList.add('active'); }
+    // Esconde as outras abas enquanto está em modo "confirmar código"
+    if (tabLogin) tabLogin.style.display = 'none';
+    if (tabCad)   tabCad.style.display   = 'none';
   } else {
-    panelLogin.style.display = 'none';
-    panelCad.style.display   = 'block';
-    tabLogin.classList.remove('active');
-    tabCad.classList.add('active');
+    // cadastro (default)
+    panelCad.style.display = 'block';
+    if (tabCad) tabCad.classList.add('active');
+    if (tabOtp) tabOtp.style.display = 'none';
+    // Restaura abas normais
+    if (tabLogin) tabLogin.style.display = '';
+    if (tabCad)   tabCad.style.display   = '';
   }
 }
 
