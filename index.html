@@ -1790,8 +1790,8 @@ document.addEventListener('keydown', function(e){
         <span id="dash-plano-status" style="color:var(--text3);font-weight:500;"></span>
       </div>
 
-      <!-- Saudação + Avatar (abre modal de perfil) -->
-      <div class="user-menu-trigger" onclick="openProfileModal()" title="Abrir perfil">
+      <!-- Saudação + Avatar (abre tela de perfil) -->
+      <div class="user-menu-trigger" onclick="abrirPerfil()" title="Abrir meu perfil">
         <div style="font-size:13px;color:var(--text2);">Olá, <strong style="color:var(--text);font-weight:600;" id="dn">Gilson</strong></div>
         <div class="av" id="dav">GJ</div>
       </div>
@@ -1799,124 +1799,113 @@ document.addEventListener('keydown', function(e){
     </div>
   </div>
 
-<!-- ══ MODAL DE PERFIL (sobreposto ao dashboard) ══ -->
-<div class="profile-modal" id="profile-modal" aria-hidden="true">
-  <div class="profile-modal-backdrop" onclick="closeProfileModal()"></div>
-  <div class="profile-modal-content" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
-    <button type="button" class="profile-modal-close" onclick="closeProfileModal()" title="Fechar" aria-label="Fechar">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-
-    <div class="profile-modal-header">
-      <div class="profile-modal-avatar" id="profile-modal-avatar">GJ</div>
-      <div id="profile-modal-title" class="profile-modal-name" id-display="profile-modal-name">Gilson</div>
-      <div class="profile-modal-email" id="profile-modal-email"></div>
-      <div class="profile-modal-plan" id="profile-modal-plan"></div>
-    </div>
-
-    <div class="profile-modal-actions">
-      <button type="button" class="profile-modal-action" onclick="closeProfileModal();abrirPortal()">
-        <div class="profile-modal-action-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-        </div>
-        <div class="profile-modal-action-text">
-          <div class="profile-modal-action-title">Minha assinatura</div>
-          <div class="profile-modal-action-sub">Gerenciar plano, dados de cobrança ou cancelar</div>
-        </div>
-        <svg class="profile-modal-action-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
-
-      <button type="button" class="profile-modal-action profile-modal-action-danger" onclick="closeProfileModal();sair()">
-        <div class="profile-modal-action-icon profile-modal-action-icon-danger">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        </div>
-        <div class="profile-modal-action-text">
-          <div class="profile-modal-action-title">Sair</div>
-          <div class="profile-modal-action-sub">Encerrar sessão neste navegador</div>
-        </div>
-        <svg class="profile-modal-action-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
-    </div>
-  </div>
-</div>
-
 <style>
-/* ── HEADER: gatilho do perfil (abre modal) ── */
+/* ── HEADER: gatilho do perfil ── */
 .user-menu-trigger { display:inline-flex; align-items:center; gap:9px; cursor:pointer; padding:5px 10px 5px 11px; border-radius:10px; border:1px solid transparent; transition:background .15s, border-color .15s; user-select:none; }
 .user-menu-trigger:hover { background:var(--surface2); border-color:var(--border); }
-
-/* ── MODAL DE PERFIL ── */
-.profile-modal { position:fixed; inset:0; z-index:9999; display:none; align-items:center; justify-content:center; padding:1rem; }
-.profile-modal.open { display:flex; }
-.profile-modal-backdrop { position:absolute; inset:0; background:rgba(15,23,42,.55); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); animation:profile-fade .18s ease-out; }
-.profile-modal-content { position:relative; width:100%; max-width:420px; background:#fff; border-radius:18px; box-shadow:0 30px 80px rgba(0,0,0,.25), 0 8px 24px rgba(0,0,0,.12); overflow:hidden; animation:profile-pop .22s cubic-bezier(.16,1,.3,1); }
-@keyframes profile-fade { from{opacity:0} to{opacity:1} }
-@keyframes profile-pop  { from{opacity:0;transform:translateY(12px) scale(.96)} to{opacity:1;transform:translateY(0) scale(1)} }
-
-.profile-modal-close { position:absolute; top:12px; right:12px; width:32px; height:32px; border:none; background:rgba(0,0,0,.04); color:#64748b; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .15s, color .15s; z-index:2; }
-.profile-modal-close:hover { background:rgba(0,0,0,.08); color:#0f172a; }
-
-.profile-modal-header { background:linear-gradient(160deg,#085041 0%,#0f6e56 60%,#1D9E75 100%); color:#fff; padding:2rem 1.5rem 1.5rem; text-align:center; }
-.profile-modal-avatar { width:64px; height:64px; border-radius:50%; background:rgba(255,255,255,.18); border:2px solid rgba(255,255,255,.3); display:inline-flex; align-items:center; justify-content:center; font-family:'Sora',sans-serif; font-size:22px; font-weight:700; color:#fff; margin-bottom:.75rem; letter-spacing:-.5px; }
-.profile-modal-name { font-family:'Sora',sans-serif; font-size:19px; font-weight:700; color:#fff; letter-spacing:-.4px; margin-bottom:2px; }
-.profile-modal-email { font-size:12.5px; color:rgba(255,255,255,.75); }
-.profile-modal-plan { display:none; margin-top:.85rem; padding:5px 11px; border-radius:99px; background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.2); font-size:11px; font-weight:700; color:#fff; letter-spacing:.3px; }
-.profile-modal-plan.show { display:inline-block; }
-
-.profile-modal-actions { padding:.875rem; display:flex; flex-direction:column; gap:6px; }
-.profile-modal-action { width:100%; display:flex; align-items:center; gap:13px; padding:12px 14px; border:1px solid transparent; background:transparent; border-radius:11px; cursor:pointer; font-family:inherit; text-align:left; transition:background .14s, border-color .14s; }
-.profile-modal-action:hover { background:var(--surface2); border-color:var(--border); }
-.profile-modal-action-icon { width:36px; height:36px; border-radius:9px; background:var(--green-light); color:var(--green-dark); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.profile-modal-action-icon-danger { background:#fef2f2; color:#dc2626; }
-.profile-modal-action-text { flex:1; min-width:0; }
-.profile-modal-action-title { font-size:14px; font-weight:600; color:var(--text); margin-bottom:1px; }
-.profile-modal-action-sub { font-size:11.5px; color:var(--text3); font-weight:400; line-height:1.35; }
-.profile-modal-action-chev { color:#cbd5e1; flex-shrink:0; transition:color .14s, transform .14s; }
-.profile-modal-action:hover .profile-modal-action-chev { color:var(--text2); transform:translateX(2px); }
-.profile-modal-action-danger .profile-modal-action-title { color:#dc2626; }
-.profile-modal-action-danger:hover { background:#fef2f2; border-color:#fecaca; }
 </style>
 
 <script>
-function openProfileModal(){
-  // Sincroniza dados do header pro modal antes de abrir
-  try {
-    var nameEl = document.getElementById('dn');
-    var avEl   = document.getElementById('dav');
-    var pNome  = document.getElementById('profile-modal-name');
-    var pAv    = document.getElementById('profile-modal-avatar');
-    var pEmail = document.getElementById('profile-modal-email');
-    var pPlan  = document.getElementById('profile-modal-plan');
-    if(nameEl && pNome) pNome.textContent = nameEl.textContent || 'Usuário';
-    if(avEl && pAv) pAv.textContent = avEl.textContent || '–';
-    if(pEmail) pEmail.textContent = (typeof currentUser !== 'undefined' && currentUser && currentUser.email) ? currentUser.email : '';
-    // Plano: pega do badge informativo se existir
-    var planoLabel = document.getElementById('dash-plano-label');
-    var planoStatus = document.getElementById('dash-plano-status');
-    if(pPlan){
-      var txt = '';
-      if(planoLabel && planoLabel.textContent && planoLabel.textContent.trim() !== 'Minha assinatura') txt = planoLabel.textContent.trim();
-      if(planoStatus && planoStatus.textContent) txt = (txt ? txt + ' · ' : '') + planoStatus.textContent.trim();
-      if(txt){ pPlan.textContent = txt; pPlan.classList.add('show'); }
-      else { pPlan.classList.remove('show'); }
-    }
-  } catch(err) { console.error(err); }
-  var m = document.getElementById('profile-modal');
-  if(m){ m.classList.add('open'); m.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
-}
-function closeProfileModal(){
-  var m = document.getElementById('profile-modal');
-  if(m){ m.classList.remove('open'); m.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
-}
-// Fecha o modal com ESC
-document.addEventListener('keydown', function(e){
-  if(e.key === 'Escape') closeProfileModal();
-});
 async function sair(){
   try { if(typeof sb !== 'undefined' && sb && sb.auth) await sb.auth.signOut(); } catch(err) { console.error('Erro ao sair:', err); }
   try { currentUser = null; } catch(err) {}
   if(typeof go === 'function') go('s-land');
   else window.location.reload();
+}
+function abrirPerfil(){
+  if(typeof go === 'function') go('s-perfil');
+  // O carregamento dos dados acontece em seguida (não bloqueia a transição)
+  setTimeout(carregarPerfil, 50);
+}
+async function carregarPerfil(){
+  if(typeof currentUser === 'undefined' || !currentUser){ if(typeof go === 'function') go('s-land'); return; }
+  var $ = function(id){ return document.getElementById(id); };
+  if($('p-email-display')) $('p-email-display').textContent = currentUser.email || '—';
+  if($('p-email-input'))   $('p-email-input').value         = currentUser.email || '';
+  try {
+    var resp = await sb.from('profiles')
+      .select('full_name, email, telefone, nicho, faturamento_faixa, current_plan, subscription_status, current_period_end')
+      .eq('id', currentUser.id).single();
+    var d = resp.data || {};
+    if($('p-nome'))  $('p-nome').value  = d.full_name || '';
+    if($('p-tel'))   $('p-tel').value   = d.telefone  || '';
+    if($('p-nicho')) $('p-nicho').value = d.nicho     || '';
+    if($('p-fat'))   $('p-fat').value   = d.faturamento_faixa || '';
+    var nomeCompleto = d.full_name || (currentUser.email||'').split('@')[0] || 'Usuário';
+    var iniciais = nomeCompleto.trim().split(/\s+/).map(function(x){return x[0]||''}).slice(0,2).join('').toUpperCase() || '?';
+    if($('p-nome-big')) $('p-nome-big').textContent = nomeCompleto;
+    if($('p-av-big'))   $('p-av-big').textContent   = iniciais;
+    // Plano
+    var planoTxt = d.current_plan ? (d.current_plan.charAt(0).toUpperCase()+d.current_plan.slice(1)) : '—';
+    if($('p-plano-label'))   $('p-plano-label').textContent   = planoTxt;
+    if($('p-plano-label-2')) $('p-plano-label-2').textContent = planoTxt + (d.subscription_status ? ' · ' + d.subscription_status : '');
+    if($('p-plano-status')) $('p-plano-status').textContent = d.subscription_status || '';
+    if($('p-plano-fim')){
+      if(d.current_period_end){
+        try { $('p-plano-fim').textContent = 'Próxima cobrança: ' + new Date(d.current_period_end).toLocaleDateString('pt-BR'); }
+        catch(e){ $('p-plano-fim').textContent = ''; }
+      } else { $('p-plano-fim').textContent = ''; }
+    }
+  } catch(err){ console.error('perfil load:', err); }
+}
+async function salvarPerfil(){
+  if(typeof currentUser === 'undefined' || !currentUser) return;
+  var $ = function(id){ return document.getElementById(id); };
+  var btn = $('p-btn-salvar'), msg = $('p-msg-salvar');
+  var nome = ($('p-nome')||{}).value || '';
+  var tel  = ($('p-tel') ||{}).value || '';
+  var nicho= ($('p-nicho')||{}).value || '';
+  var fat  = ($('p-fat') ||{}).value || '';
+  if(!nome.trim()){ if(msg){ msg.textContent='Informe seu nome completo.'; msg.style.color='#dc2626'; } return; }
+  if(btn){ btn.disabled = true; btn.textContent = 'Salvando...'; }
+  if(msg){ msg.textContent=''; msg.style.color=''; }
+  try {
+    var resp = await sb.from('profiles').upsert({
+      id: currentUser.id,
+      full_name: nome.trim(),
+      email: currentUser.email,
+      telefone: tel.trim() || null,
+      nicho: nicho || null,
+      faturamento_faixa: fat || null,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'id' });
+    if(resp.error) throw resp.error;
+    if(msg){ msg.textContent='✓ Dados atualizados com sucesso'; msg.style.color='#16a36a'; }
+    // Atualiza saudação no header do dashboard
+    var dn = document.getElementById('dn');
+    if(dn && nome.trim()) dn.textContent = nome.trim().split(' ')[0];
+    var nomeBig = document.getElementById('p-nome-big');
+    if(nomeBig) nomeBig.textContent = nome.trim();
+  } catch(err){
+    console.error('salvar perfil:', err);
+    if(msg){ msg.textContent='Erro ao salvar: '+(err.message||'tente novamente'); msg.style.color='#dc2626'; }
+  } finally {
+    if(btn){ btn.disabled = false; btn.textContent = 'Salvar alterações'; }
+    setTimeout(function(){ if(msg) msg.textContent=''; }, 5000);
+  }
+}
+async function mudarSenhaPerfil(){
+  if(typeof currentUser === 'undefined' || !currentUser) return;
+  var $ = function(id){ return document.getElementById(id); };
+  var btn = $('p-btn-senha'), msg = $('p-msg-senha');
+  var nova = ($('p-senha-nova')||{}).value || '';
+  var conf = ($('p-senha-conf')||{}).value || '';
+  if(msg){ msg.textContent=''; msg.style.color=''; }
+  if(nova.length < 8){ if(msg){ msg.textContent='A nova senha precisa ter pelo menos 8 caracteres.'; msg.style.color='#dc2626'; } return; }
+  if(nova !== conf){ if(msg){ msg.textContent='As senhas não conferem.'; msg.style.color='#dc2626'; } return; }
+  if(btn){ btn.disabled = true; btn.textContent='Atualizando...'; }
+  try {
+    var resp = await sb.auth.updateUser({ password: nova });
+    if(resp.error) throw resp.error;
+    if(msg){ msg.textContent='✓ Senha atualizada'; msg.style.color='#16a36a'; }
+    if($('p-senha-nova')) $('p-senha-nova').value='';
+    if($('p-senha-conf')) $('p-senha-conf').value='';
+  } catch(err){
+    console.error('senha:', err);
+    if(msg){ msg.textContent='Erro: '+(err.message||'não foi possível atualizar'); msg.style.color='#dc2626'; }
+  } finally {
+    if(btn){ btn.disabled=false; btn.textContent='Atualizar senha'; }
+  }
 }
 </script>
 
@@ -4033,6 +4022,175 @@ async function sair(){
     </div> <!-- /conteúdo principal -->
   </div> <!-- /grid sidebar+conteudo -->
 </div> <!-- /screen s-dash -->
+
+<!-- ══ MEU PERFIL ══ -->
+<div class="screen" id="s-perfil">
+<style>
+/* ── TELA DE PERFIL ── */
+#s-perfil .perfil-wrap { max-width:720px; margin:0 auto; padding:0 0 2rem; }
+#s-perfil .perfil-back { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:8px; border:.5px solid var(--border2); background:var(--surface); color:var(--text2); font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s; margin-bottom:1.25rem; }
+#s-perfil .perfil-back:hover { background:var(--surface2); color:var(--text); }
+#s-perfil .perfil-hero { background:linear-gradient(160deg,#085041 0%,#0f6e56 60%,#1D9E75 100%); color:#fff; border-radius:16px; padding:1.75rem 1.5rem; display:flex; align-items:center; gap:1rem; margin-bottom:1.25rem; box-shadow:0 10px 30px rgba(15,110,86,.25); }
+#s-perfil .perfil-av { width:72px; height:72px; border-radius:50%; background:rgba(255,255,255,.18); border:2px solid rgba(255,255,255,.3); display:inline-flex; align-items:center; justify-content:center; font-family:'Sora',sans-serif; font-size:24px; font-weight:700; color:#fff; letter-spacing:-.5px; flex-shrink:0; }
+#s-perfil .perfil-hero-text { flex:1; min-width:0; }
+#s-perfil .perfil-nome { font-family:'Sora',sans-serif; font-size:20px; font-weight:700; letter-spacing:-.4px; margin-bottom:3px; overflow:hidden; text-overflow:ellipsis; }
+#s-perfil .perfil-email { font-size:13px; color:rgba(255,255,255,.78); margin-bottom:.6rem; }
+#s-perfil .perfil-plano-pill { display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border-radius:99px; background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.22); font-size:11px; font-weight:700; letter-spacing:.3px; }
+#s-perfil .perfil-plano-pill .dot { width:6px; height:6px; border-radius:50%; background:#6ee7b7; }
+#s-perfil .perfil-card { background:var(--surface); border:.5px solid var(--border); border-radius:14px; padding:1.25rem 1.25rem 1.1rem; margin-bottom:1rem; box-shadow:var(--shadow-sm); }
+#s-perfil .perfil-card-title { font-size:13.5px; font-weight:700; color:var(--text); margin-bottom:.875rem; display:flex; align-items:center; gap:8px; letter-spacing:-.2px; }
+#s-perfil .perfil-card-title svg { color:var(--green); }
+#s-perfil .perfil-grid { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; }
+#s-perfil .perfil-field { display:flex; flex-direction:column; gap:5px; }
+#s-perfil .perfil-field.full { grid-column:1/-1; }
+#s-perfil .perfil-label { font-size:11.5px; font-weight:600; color:var(--text3); letter-spacing:.1px; }
+#s-perfil .perfil-input, #s-perfil .perfil-select { width:100%; padding:9px 12px; border:1.5px solid #e2e8f0; border-radius:9px; font-size:13px; color:#0f172a; font-family:inherit; outline:none; transition:border-color .18s, box-shadow .18s; background:#fafafa; }
+#s-perfil .perfil-input:focus, #s-perfil .perfil-select:focus { border-color:var(--green); box-shadow:0 0 0 3px rgba(29,158,117,.1); background:#fff; }
+#s-perfil .perfil-input[readonly] { background:#f1f5f9; color:#64748b; cursor:not-allowed; }
+#s-perfil .perfil-btn { display:inline-flex; align-items:center; gap:7px; padding:10px 18px; border-radius:10px; border:none; background:var(--green); color:#fff; font-size:13.5px; font-weight:700; cursor:pointer; font-family:inherit; transition:all .18s; box-shadow:0 4px 14px rgba(29,158,117,.32); margin-top:.5rem; }
+#s-perfil .perfil-btn:hover:not(:disabled) { background:#15835f; transform:translateY(-1px); box-shadow:0 6px 18px rgba(29,158,117,.4); }
+#s-perfil .perfil-btn:disabled { opacity:.6; cursor:not-allowed; transform:none; }
+#s-perfil .perfil-btn-secondary { background:var(--surface); color:var(--text2); border:.5px solid var(--border2); box-shadow:none; }
+#s-perfil .perfil-btn-secondary:hover:not(:disabled) { background:var(--surface2); color:var(--text); transform:none; box-shadow:none; }
+#s-perfil .perfil-btn-danger { background:#fff; color:#dc2626; border:1.5px solid #fecaca; box-shadow:none; }
+#s-perfil .perfil-btn-danger:hover:not(:disabled) { background:#fef2f2; border-color:#fca5a5; transform:none; box-shadow:none; }
+#s-perfil .perfil-msg { font-size:12px; margin-top:.6rem; min-height:1.2em; transition:color .15s; }
+#s-perfil .perfil-plano-info { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.6rem .25rem .9rem; flex-wrap:wrap; }
+#s-perfil .perfil-plano-titulo { font-size:18px; font-weight:700; color:var(--text); font-family:'Sora',sans-serif; letter-spacing:-.3px; }
+#s-perfil .perfil-plano-sub { font-size:12px; color:var(--text3); margin-top:2px; }
+#s-perfil .perfil-actions-row { display:flex; gap:.6rem; flex-wrap:wrap; }
+@media(max-width:560px){
+  #s-perfil .perfil-grid { grid-template-columns:1fr; }
+  #s-perfil .perfil-hero { flex-direction:column; text-align:center; }
+  #s-perfil .perfil-hero-text { width:100%; }
+}
+</style>
+
+<div class="perfil-wrap">
+  <button type="button" class="perfil-back" onclick="go('s-dash')">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Voltar ao dashboard
+  </button>
+
+  <!-- HERO: avatar + nome + email + plano -->
+  <div class="perfil-hero">
+    <div class="perfil-av" id="p-av-big">VI</div>
+    <div class="perfil-hero-text">
+      <div class="perfil-nome" id="p-nome-big">Usuário</div>
+      <div class="perfil-email" id="p-email-display">—</div>
+      <div class="perfil-plano-pill"><span class="dot"></span><span id="p-plano-label">—</span><span id="p-plano-status" style="opacity:.85;font-weight:500;"></span></div>
+    </div>
+  </div>
+
+  <!-- CARD: Dados pessoais -->
+  <div class="perfil-card">
+    <div class="perfil-card-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Dados pessoais
+    </div>
+    <div class="perfil-grid">
+      <div class="perfil-field full">
+        <label class="perfil-label" for="p-nome">Nome completo</label>
+        <input type="text" id="p-nome" class="perfil-input" placeholder="Seu nome completo">
+      </div>
+      <div class="perfil-field">
+        <label class="perfil-label" for="p-tel">WhatsApp / Telefone</label>
+        <input type="tel" id="p-tel" class="perfil-input" placeholder="(11) 99999-9999">
+      </div>
+      <div class="perfil-field">
+        <label class="perfil-label" for="p-nicho">Segmento da empresa</label>
+        <select id="p-nicho" class="perfil-select">
+          <option value="">Selecione…</option>
+          <option>Atacado/Distribuição</option>
+          <option>Varejo</option>
+          <option>Indústria</option>
+          <option>Serviços</option>
+          <option>Tecnologia/Software</option>
+          <option>Construção Civil</option>
+          <option>Agronegócio</option>
+          <option>Alimentação/Restaurante</option>
+          <option>Saúde</option>
+          <option>Educação</option>
+          <option>Logística/Transporte</option>
+          <option>Outro</option>
+        </select>
+      </div>
+      <div class="perfil-field full">
+        <label class="perfil-label" for="p-fat">Faixa de faturamento anual</label>
+        <select id="p-fat" class="perfil-select">
+          <option value="">Selecione…</option>
+          <option>Até R$ 360 mil</option>
+          <option>R$ 360 mil a R$ 1 milhão</option>
+          <option>R$ 1 milhão a R$ 5 milhões</option>
+          <option>R$ 5 milhões a R$ 20 milhões</option>
+          <option>R$ 20 milhões a R$ 100 milhões</option>
+          <option>Acima de R$ 100 milhões</option>
+        </select>
+      </div>
+    </div>
+    <button type="button" class="perfil-btn" id="p-btn-salvar" onclick="salvarPerfil()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      Salvar alterações
+    </button>
+    <div class="perfil-msg" id="p-msg-salvar"></div>
+  </div>
+
+  <!-- CARD: Conta e segurança -->
+  <div class="perfil-card">
+    <div class="perfil-card-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+      Conta e segurança
+    </div>
+    <div class="perfil-grid">
+      <div class="perfil-field full">
+        <label class="perfil-label" for="p-email-input">Email (login)</label>
+        <input type="email" id="p-email-input" class="perfil-input" readonly>
+      </div>
+      <div class="perfil-field">
+        <label class="perfil-label" for="p-senha-nova">Nova senha</label>
+        <input type="password" id="p-senha-nova" class="perfil-input" placeholder="Mín. 8 caracteres" autocomplete="new-password">
+      </div>
+      <div class="perfil-field">
+        <label class="perfil-label" for="p-senha-conf">Confirmar nova senha</label>
+        <input type="password" id="p-senha-conf" class="perfil-input" placeholder="Repita a nova senha" autocomplete="new-password">
+      </div>
+    </div>
+    <button type="button" class="perfil-btn perfil-btn-secondary" id="p-btn-senha" onclick="mudarSenhaPerfil()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+      Atualizar senha
+    </button>
+    <div class="perfil-msg" id="p-msg-senha"></div>
+  </div>
+
+  <!-- CARD: Assinatura -->
+  <div class="perfil-card">
+    <div class="perfil-card-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      Assinatura
+    </div>
+    <div class="perfil-plano-info">
+      <div>
+        <div class="perfil-plano-titulo"><span id="p-plano-label-2">—</span></div>
+        <div class="perfil-plano-sub" id="p-plano-fim"></div>
+      </div>
+      <button type="button" class="perfil-btn perfil-btn-secondary" onclick="abrirPortal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Gerenciar
+      </button>
+    </div>
+  </div>
+
+  <!-- CARD: Sair -->
+  <div class="perfil-card" style="text-align:center;">
+    <div style="font-size:13px;color:var(--text2);margin-bottom:.75rem;">Quer encerrar a sessão neste navegador?</div>
+    <button type="button" class="perfil-btn perfil-btn-danger" onclick="sair()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sair da conta
+    </button>
+  </div>
+
+</div>
+</div> <!-- /screen s-perfil -->
 
 <!-- ══ CONFIRMAÇÃO DE CADASTRO ══ -->
 <div class="screen" id="s-confirmacao">
