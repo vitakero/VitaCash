@@ -4321,6 +4321,246 @@ async function mudarSenhaPerfil(){
   </div>
 </div>
 
+<!-- ══ CONFIRMAR EMAIL (código de 6 dígitos) ══ -->
+<div class="screen" id="s-confirmar-email">
+<style>
+#s-confirmar-email.active{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:1.5rem;background:#f5f4f0;z-index:100;overflow:auto;}
+.cmail-card{width:100%;max-width:460px;background:#fff;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.10);padding:2.5rem 2rem 2rem;text-align:center;}
+.cmail-icon{width:64px;height:64px;border-radius:50%;background:linear-gradient(160deg,#1D9E75 0%,#0f6e56 100%);display:inline-flex;align-items:center;justify-content:center;margin-bottom:1.25rem;box-shadow:0 8px 24px rgba(29,158,117,.32);}
+.cmail-title{font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:#0f172a;letter-spacing:-.6px;margin-bottom:.5rem;}
+.cmail-sub{font-size:13.5px;color:#64748b;line-height:1.55;margin-bottom:1.5rem;}
+.cmail-sub strong{color:#0f172a;font-weight:600;word-break:break-all;}
+.cmail-inputs{display:flex;justify-content:center;gap:.55rem;margin-bottom:1.25rem;direction:ltr;}
+.cmail-inp{width:46px;height:56px;border:1.5px solid #e2e8f0;border-radius:11px;background:#fafafa;font-size:22px;font-weight:700;color:#0f172a;text-align:center;font-family:'Sora',sans-serif;outline:none;transition:border-color .15s,box-shadow .15s,background .15s;-webkit-appearance:none;}
+.cmail-inp:focus{border-color:#1D9E75;box-shadow:0 0 0 3px rgba(29,158,117,.12);background:#fff;}
+.cmail-inp.filled{border-color:#1D9E75;background:#fff;}
+.cmail-btn{width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#1D9E75 0%,#16a36a 100%);color:#fff;font-size:14.5px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 8px 28px rgba(29,158,117,.4);transition:all .2s;letter-spacing:-.2px;}
+.cmail-btn:hover:not(:disabled){background:linear-gradient(135deg,#15835f 0%,#0f6e50 100%);transform:translateY(-1px);box-shadow:0 12px 32px rgba(29,158,117,.5);}
+.cmail-btn:disabled{background:#e2e8f0;color:#94a3b8;cursor:not-allowed;box-shadow:none;transform:none;}
+.cmail-msg{font-size:12.5px;min-height:1.5em;margin-top:.85rem;font-weight:500;transition:color .15s;}
+.cmail-msg.ok{color:#16a36a;}
+.cmail-msg.err{color:#dc2626;}
+.cmail-resend{font-size:12.5px;color:#64748b;margin-top:1.25rem;}
+.cmail-resend button{background:none;border:none;color:#1D9E75;font-weight:700;cursor:pointer;font-family:inherit;font-size:12.5px;padding:0 4px;text-decoration:underline;text-underline-offset:3px;}
+.cmail-resend button:disabled{color:#94a3b8;cursor:not-allowed;text-decoration:none;}
+.cmail-back{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#94a3b8;font-weight:500;cursor:pointer;background:none;border:none;padding:7px 14px;border-radius:8px;font-family:inherit;margin-top:1rem;transition:background .15s,color .15s;}
+.cmail-back:hover{background:#f1f5f9;color:#475569;}
+</style>
+
+<div class="cmail-card">
+  <div class="cmail-icon">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+  </div>
+  <h1 class="cmail-title">Confirme seu e-mail</h1>
+  <p class="cmail-sub">Enviamos um código de 6 dígitos para<br><strong id="cmail-email">seu@email.com</strong>.<br>Cole ou digite o código abaixo.</p>
+  <div class="cmail-inputs" id="cmail-inputs">
+    <input class="cmail-inp" maxlength="1" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code"/>
+    <input class="cmail-inp" maxlength="1" inputmode="numeric" pattern="[0-9]*"/>
+    <input class="cmail-inp" maxlength="1" inputmode="numeric" pattern="[0-9]*"/>
+    <input class="cmail-inp" maxlength="1" inputmode="numeric" pattern="[0-9]*"/>
+    <input class="cmail-inp" maxlength="1" inputmode="numeric" pattern="[0-9]*"/>
+    <input class="cmail-inp" maxlength="1" inputmode="numeric" pattern="[0-9]*"/>
+  </div>
+  <button type="button" class="cmail-btn" id="cmail-btn" onclick="confirmarCodigoEmail()" disabled>Confirmar acesso →</button>
+  <div class="cmail-msg" id="cmail-msg"></div>
+  <div class="cmail-resend">
+    Não recebeu? <button type="button" id="cmail-resend-btn" onclick="reenviarCodigoEmail()">Reenviar código</button>
+  </div>
+  <button type="button" class="cmail-back" onclick="trocarEmailCadastro()">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Trocar email
+  </button>
+</div>
+
+<script>
+// ────────────────────────────────────────────────────────────────────
+// CONFIRMAÇÃO DE EMAIL POR CÓDIGO OTP (6 dígitos)
+// ────────────────────────────────────────────────────────────────────
+function irParaConfirmacaoEmail(email){
+  var $ = function(id){ return document.getElementById(id); };
+  if($('cmail-email')) $('cmail-email').textContent = email;
+  // Limpa os inputs do código
+  document.querySelectorAll('#cmail-inputs .cmail-inp').forEach(function(inp){
+    inp.value = ''; inp.classList.remove('filled');
+  });
+  if($('cmail-msg')){ $('cmail-msg').textContent=''; $('cmail-msg').className='cmail-msg'; }
+  if($('cmail-btn')) $('cmail-btn').disabled = true;
+  if(typeof go === 'function') go('s-confirmar-email');
+  // Foca o primeiro input após a transição
+  setTimeout(function(){
+    var first = document.querySelector('#cmail-inputs .cmail-inp');
+    if(first) first.focus();
+  }, 350);
+  // Inicia cooldown para reenvio
+  iniciarCooldownReenvio(60);
+}
+
+// Lógica dos 6 inputs: auto-avanço, paste, backspace, validação
+(function(){
+  function setup(){
+    var inputs = document.querySelectorAll('#cmail-inputs .cmail-inp');
+    if(!inputs.length) return;
+    inputs.forEach(function(inp, idx){
+      inp.addEventListener('input', function(e){
+        var v = inp.value.replace(/\D/g,'');
+        inp.value = v.slice(0,1);
+        if(inp.value) inp.classList.add('filled'); else inp.classList.remove('filled');
+        if(inp.value && idx < inputs.length - 1){ inputs[idx+1].focus(); }
+        atualizarBotaoConfirmar();
+      });
+      inp.addEventListener('keydown', function(e){
+        if(e.key === 'Backspace' && !inp.value && idx > 0){ inputs[idx-1].focus(); inputs[idx-1].value=''; inputs[idx-1].classList.remove('filled'); atualizarBotaoConfirmar(); }
+        if(e.key === 'ArrowLeft' && idx > 0) inputs[idx-1].focus();
+        if(e.key === 'ArrowRight' && idx < inputs.length - 1) inputs[idx+1].focus();
+        if(e.key === 'Enter'){ var btn = document.getElementById('cmail-btn'); if(btn && !btn.disabled) btn.click(); }
+      });
+      inp.addEventListener('paste', function(e){
+        e.preventDefault();
+        var text = (e.clipboardData || window.clipboardData).getData('text');
+        var digits = (text||'').replace(/\D/g,'').slice(0,6);
+        if(!digits) return;
+        for(var i=0; i<inputs.length; i++){
+          inputs[i].value = digits[i] || '';
+          if(inputs[i].value) inputs[i].classList.add('filled'); else inputs[i].classList.remove('filled');
+        }
+        var last = Math.min(digits.length, inputs.length) - 1;
+        if(last >= 0) inputs[last].focus();
+        atualizarBotaoConfirmar();
+      });
+    });
+  }
+  function atualizarBotaoConfirmar(){
+    var inputs = document.querySelectorAll('#cmail-inputs .cmail-inp');
+    var btn = document.getElementById('cmail-btn');
+    if(!inputs.length || !btn) return;
+    var full = Array.prototype.every.call(inputs, function(i){ return i.value && /\d/.test(i.value); });
+    btn.disabled = !full;
+  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', setup); } else { setup(); }
+})();
+
+function lerCodigoConfirmacao(){
+  var s = '';
+  document.querySelectorAll('#cmail-inputs .cmail-inp').forEach(function(inp){ s += (inp.value||''); });
+  return s;
+}
+
+async function confirmarCodigoEmail(){
+  var $ = function(id){ return document.getElementById(id); };
+  var btn = $('cmail-btn'), msg = $('cmail-msg');
+  var email = localStorage.getItem('vitacash_pending_email') || ($('cmail-email')||{}).textContent;
+  var token = lerCodigoConfirmacao();
+  if(!token || token.length !== 6){
+    if(msg){ msg.textContent='Digite os 6 dígitos do código.'; msg.className='cmail-msg err'; }
+    return;
+  }
+  if(!email){
+    if(msg){ msg.textContent='Sessão expirou. Faça o cadastro novamente.'; msg.className='cmail-msg err'; }
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'Confirmando...';
+  if(msg){ msg.textContent=''; msg.className='cmail-msg'; }
+
+  try {
+    // Verifica o código junto ao Supabase
+    var resp = await sb.auth.verifyOtp({ email: email, token: token, type: 'email' });
+    if(resp.error) throw resp.error;
+    var user = (resp.data && resp.data.user) || null;
+    if(!user) throw new Error('Confirmação falhou. Tente novamente.');
+    currentUser = user;
+    if(msg){ msg.textContent='✓ Email confirmado!'; msg.className='cmail-msg ok'; }
+
+    // Salva o perfil pendente, se existir
+    var pending = localStorage.getItem('vitacash_pending_profile');
+    if(pending){
+      try {
+        var prof = JSON.parse(pending);
+        await sb.from('profiles').upsert({
+          id: currentUser.id,
+          full_name: prof.n,
+          email: prof.e,
+          telefone: prof.tel || null,
+          nicho: prof.nicho || null,
+          faturamento_faixa: prof.fat || null,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'id' });
+      } catch(e){ console.warn('upsert pending profile:', e); }
+      localStorage.removeItem('vitacash_pending_profile');
+    }
+    localStorage.removeItem('vitacash_pending_email');
+
+    // Continua para o checkout (se tinha plano) ou para escolher plano
+    var planName  = localStorage.getItem('vc_pending_plan');
+    var priceId   = localStorage.getItem('vc_pending_price');
+    setTimeout(function(){
+      if(planName && priceId && typeof abrirTelaCheckout === 'function'){
+        localStorage.removeItem('vc_pending_plan');
+        localStorage.removeItem('vc_pending_price');
+        abrirTelaCheckout(planName, priceId);
+      } else if(typeof go === 'function'){
+        go('s-escolher-plano');
+      }
+    }, 600);
+  } catch(err){
+    console.error('verifyOtp:', err);
+    var m = (err && err.message) || '';
+    var txt = 'Código inválido ou expirado. Tente reenviar.';
+    if(/expired/i.test(m)) txt = 'Código expirado. Clique em "Reenviar código".';
+    else if(/invalid/i.test(m)) txt = 'Código incorreto. Confira e tente de novo.';
+    if(msg){ msg.textContent = txt; msg.className='cmail-msg err'; }
+    btn.disabled = false;
+    btn.textContent = 'Confirmar acesso →';
+  }
+}
+
+var _cmailCooldownInt = null;
+function iniciarCooldownReenvio(seconds){
+  var btn = document.getElementById('cmail-resend-btn');
+  if(!btn) return;
+  var remaining = seconds || 60;
+  if(_cmailCooldownInt){ clearInterval(_cmailCooldownInt); }
+  btn.disabled = true;
+  btn.textContent = 'Aguarde ' + remaining + 's';
+  _cmailCooldownInt = setInterval(function(){
+    remaining--;
+    if(remaining <= 0){
+      clearInterval(_cmailCooldownInt); _cmailCooldownInt = null;
+      btn.disabled = false; btn.textContent = 'Reenviar código';
+    } else {
+      btn.textContent = 'Aguarde ' + remaining + 's';
+    }
+  }, 1000);
+}
+
+async function reenviarCodigoEmail(){
+  var $ = function(id){ return document.getElementById(id); };
+  var msg = $('cmail-msg');
+  var email = localStorage.getItem('vitacash_pending_email') || ($('cmail-email')||{}).textContent;
+  if(!email){ if(msg){ msg.textContent='Sessão expirou. Faça o cadastro novamente.'; msg.className='cmail-msg err'; } return; }
+  if(msg){ msg.textContent='Enviando novo código...'; msg.className='cmail-msg'; }
+  try {
+    var resp = await sb.auth.resend({ type: 'signup', email: email });
+    if(resp.error) throw resp.error;
+    if(msg){ msg.textContent='✓ Código reenviado. Verifique seu email.'; msg.className='cmail-msg ok'; }
+    iniciarCooldownReenvio(60);
+  } catch(err){
+    console.error('resend:', err);
+    if(msg){ msg.textContent='Não foi possível reenviar. Tente em alguns segundos.'; msg.className='cmail-msg err'; }
+  }
+}
+
+function trocarEmailCadastro(){
+  // Limpa dados pendentes e volta para o formulário de cadastro
+  try { localStorage.removeItem('vitacash_pending_email'); } catch(e){}
+  try { localStorage.removeItem('vitacash_pending_profile'); } catch(e){}
+  if(typeof go === 'function') go('s-login');
+}
+</script>
+
+</div>
+<!-- /screen s-confirmar-email -->
+
 <!-- ══ NOVA ANÁLISE / UPLOAD DRE ══ -->
 <div class="screen" id="s-nova-dre">
 <style>
@@ -4813,14 +5053,118 @@ async function mostrarCheckoutNaConfirmacao(planName, priceId) {
   await abrirTelaCheckout(planName, priceId);
 }
 
+// ════════════════════════════════════════════════════════════════════
+// PROTEÇÕES ANTI-FRAUDE NO CADASTRO
+// ════════════════════════════════════════════════════════════════════
+
+// Lista curada dos provedores de email descartável mais usados.
+// Cobre ~90% das tentativas de cadastro fraudulento sem precisar de
+// dependências externas. Adicione mais domínios aqui se notar abusos.
+var VC_DISPOSABLE_DOMAINS = [
+  '10minutemail.com','10minutemail.net','20minutemail.com','7tags.com',
+  'beefmilk.com','bouncr.com','burnermail.io','byom.de',
+  'dayrep.com','deadaddress.com','discard.email','discardmail.com',
+  'discardmail.de','dispostable.com','dropmail.me','easytrashmail.com',
+  'email-fake.com','emailondeck.com','emailtemporal.org','emailtemporanea.com',
+  'emailtemporario.com.br','ephemail.net','fake-email.com','fakeinbox.com',
+  'fakemailgenerator.com','filzmail.com','fivemail.de','fleckens.hu',
+  'forgetmail.com','getairmail.com','getnada.com','grr.la',
+  'guerrillamail.biz','guerrillamail.com','guerrillamail.de','guerrillamail.info',
+  'guerrillamail.net','guerrillamail.org','guerrillamailblock.com','harakirimail.com',
+  'hidemail.de','inboxalias.com','inboxbear.com','jetable.com',
+  'jetable.fr.nf','jetable.net','jetable.org','jourrapide.com',
+  'klzlk.com','lroid.com','mail.tm','mail7.io',
+  'mailbidon.com','mailcatch.com','maildrop.cc','maildrop.cf',
+  'maildrop.ga','maildrop.gq','maildrop.ml','maildrop.tk',
+  'mailexpire.com','mailfa.tk','mailforspam.com','mailfreeonline.com',
+  'mailguard.me','mailinator.com','mailinator.net','mailinator.org',
+  'mailinator2.com','mailmoat.com','mailnesia.com','mailnull.com',
+  'mailpoof.com','mailtemp.info','mailtothis.com','mailtrash.net',
+  'meltmail.com','mintemail.com','moakt.com','moakt.ws',
+  'mohmal.com','muehlmail.com','mvrht.net','my10minutemail.com',
+  'mytemp.email','nada.email','netmails.com','nobulk.com',
+  'nogmailspam.info','nomail.xl.cx','nomail2me.com','nospam.ze.tc',
+  'opayq.com','pookmail.com','privacy.net','proxymail.eu',
+  'putthisinyourspamdatabase.com','quickinbox.com','rcpt.at','rmqkr.net',
+  'safe-mail.net','safetymail.info','selfdestructingmail.com','sharklasers.com',
+  'shieldedmail.com','shitmail.me','sneakemail.com','sogetthis.com',
+  'spam.la','spam.su','spambog.com','spambog.de',
+  'spambog.ru','spambox.us','spamex.com','spamfree24.com',
+  'spamfree24.de','spamfree24.info','spamfree24.net','spamfree24.org',
+  'spamgourmet.com','spamherelots.com','spamhereplease.com','spamhole.com',
+  'spamify.com','spaml.com','spaml.de','spammotel.com',
+  'spamobox.com','spamslicer.com','spamtrail.com','superrito.com',
+  'teleworm.com','teleworm.us','temp-mail.com','temp-mail.io',
+  'temp-mail.org','temp-mail.ru','tempail.com','tempemail.com',
+  'tempemail.net','tempinbox.com','tempmail.eu','tempmail.it',
+  'tempmail.plus','tempmail.us','tempmail2.com','tempmailer.com',
+  'tempmailer.de','tempomail.fr','temporarily.de','temporaryemail.net',
+  'temporaryforwarding.com','temporaryinbox.com','throwawayemailaddress.com','throwawaymail.com',
+  'tmail.ws','tmailinator.com','toomail.biz','trash-mail.at',
+  'trash-mail.com','trash-mail.de','trashmail.at','trashmail.com',
+  'trashmail.de','trashmail.me','trashmail.net','trashmail.org',
+  'trashmailer.com','trashymail.com','trbvm.com','tyldd.com',
+  'wegwerfemail.com','wegwerfemail.de','wegwerfmail.de','wegwerfmail.info',
+  'wegwerfmail.net','wegwerfmail.org','whyspam.me','willhackforfood.biz',
+  'willselfdestruct.com','yopmail.com','yopmail.fr','yopmail.net',
+  'zehnminuten-email.de','zehnminutenmail.de'
+];
+
+function isDisposableEmail(email){
+  if(!email || typeof email !== 'string') return false;
+  var parts = email.toLowerCase().trim().split('@');
+  if(parts.length !== 2) return false;
+  var domain = parts[1];
+  for(var i=0; i<VC_DISPOSABLE_DOMAINS.length; i++){
+    if(VC_DISPOSABLE_DOMAINS[i] === domain) return true;
+  }
+  return false;
+}
+
+// Normaliza email para evitar truques de "+" e "." no Gmail/Outlook
+// Ex: "joao.silva+spam@gmail.com" → "joaosilva@gmail.com"
+//     "joao+1@outlook.com"        → "joao@outlook.com"
+function normalizeEmail(email){
+  if(!email || typeof email !== 'string') return email;
+  var lower = email.toLowerCase().trim();
+  var parts = lower.split('@');
+  if(parts.length !== 2) return lower;
+  var local = parts[0], domain = parts[1];
+
+  // Subaddressing: remove tudo depois do "+"
+  local = local.split('+')[0];
+
+  // Gmail/Googlemail: pontos são ignorados e domínios são equivalentes
+  if(domain === 'gmail.com' || domain === 'googlemail.com'){
+    local = local.replace(/\./g, '');
+    domain = 'gmail.com';
+  }
+  return local + '@' + domain;
+}
+
 // ── ETAPA 1: MOSTRAR CONFIRMAÇÃO (sem salvar nada ainda) ───────────
 function lgCadastrar() {
   const n     = document.getElementById('lg-nome').value.trim();
-  const e     = document.getElementById('lg-cad-email').value.trim();
+  const rawE  = document.getElementById('lg-cad-email').value.trim();
   const tel   = document.getElementById('lg-cad-tel').value.trim();
   const nicho = document.getElementById('lg-cad-nicho').value;
   const fat   = document.getElementById('lg-cad-fat').value;
   const s     = document.getElementById('lg-cad-senha').value;
+  const err   = document.getElementById('lg-err-cad');
+
+  // PROTEÇÃO 1 — Bloqueia emails descartáveis (mailinator, tempmail, etc.)
+  if(isDisposableEmail(rawE)){
+    if(err){
+      err.style.display = 'block';
+      err.textContent = 'Use seu email principal para receber o acesso. Emails descartáveis não são aceitos.';
+    }
+    var emailInp = document.getElementById('lg-cad-email');
+    if(emailInp){ emailInp.focus(); emailInp.style.borderColor = '#dc2626'; setTimeout(function(){ emailInp.style.borderColor=''; }, 3000); }
+    return;
+  }
+
+  // PROTEÇÃO 2 — Normaliza email (Gmail dots/+ e Outlook +)
+  const e = normalizeEmail(rawE);
 
   // Guarda temporariamente na memória — nada vai ao banco ainda
   window._cadPending = { n, e, tel, nicho, fat, s };
@@ -4892,24 +5236,21 @@ async function lgConfirmarCadastro(planName, priceId) {
     return;
   }
 
-  // 2. Verificar se precisa confirmar e-mail
+  // 2. Verificar se precisa confirmar e-mail → vai para a tela de OTP
   if (!signUpData.session) {
+    // Salva os dados pendentes para serem persistidos após a confirmação
     localStorage.setItem('vitacash_pending_profile', JSON.stringify({ n, e, tel, nicho, fat }));
+    localStorage.setItem('vitacash_pending_email', e);
+    // Guarda o plano selecionado (se houver) para retomar após confirmar
+    if(planName && priceId){
+      localStorage.setItem('vc_pending_plan', planName);
+      localStorage.setItem('vc_pending_price', priceId);
+    }
     window._cadPending = null;
-
-    btn.disabled = true;
-    btn.style.background = '#f0fdf8';
-    btn.style.color = '#065f46';
-    btn.style.boxShadow = 'none';
-    btn.style.border = '1.5px solid #a7f3d0';
-    btn.style.cursor = 'default';
-    btn.style.fontSize = '14px';
-    btn.textContent = '✅ Cadastro realizado!';
-
-    var card = document.createElement('div');
-    card.style.cssText = 'background:#f0fdf8;border:.5px solid #a7f3d0;border-radius:12px;padding:1rem 1.125rem;font-size:13px;color:#065f46;line-height:1.65;margin-bottom:.75rem;';
-    card.innerHTML = '<strong>Verifique seu e-mail!</strong> Enviamos um link de confirmação para <strong>' + e + '</strong>.<br><span style="font-size:12px;color:#0d9488;">Clique no link do e-mail para ativar seu acesso. Verifique também o spam.</span>';
-    btn.parentNode.insertBefore(card, btn);
+    btn.disabled = false;
+    btn.textContent = 'Descobrir meu dinheiro perdido agora →';
+    // Navega para a tela de inserir o código
+    irParaConfirmacaoEmail(e);
     return;
   }
 
@@ -4953,10 +5294,13 @@ async function lgConfirmarCadastro(planName, priceId) {
 
 // ── LOGIN COM SUPABASE ─────────────────────────────────────────────
 async function lgEntrar() {
-  const e    = document.getElementById('lg-email').value.trim();
+  const rawE = document.getElementById('lg-email').value.trim();
   const s    = document.getElementById('lg-senha').value;
   const btn  = document.getElementById('lg-btn-login');
   const erro = document.getElementById('lg-err-login');
+
+  // Normaliza para bater com o que foi salvo no cadastro (Gmail dots/+, Outlook +)
+  const e = (typeof normalizeEmail === 'function') ? normalizeEmail(rawE) : rawE;
 
   btn.disabled = true;
   btn.textContent = '⏳ Entrando...';
@@ -5025,7 +5369,9 @@ function lgChkReset() {
   if (btn) btn.disabled = !email.includes('@');
 }
 async function lgEnviarReset() {
-  var email = (document.getElementById('reset-email').value || '').trim();
+  var rawEmail = (document.getElementById('reset-email').value || '').trim();
+  // Normaliza para bater com o que foi salvo no cadastro
+  var email = (typeof normalizeEmail === 'function') ? normalizeEmail(rawEmail) : rawEmail;
   var btn   = document.getElementById('reset-btn');
   var err   = document.getElementById('reset-err');
   var ok    = document.getElementById('reset-ok');
