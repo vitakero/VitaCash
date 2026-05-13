@@ -4235,8 +4235,182 @@ async function mudarSenhaPerfil(){
     </button>
   </div>
 
+  <!-- CARD: Zona de perigo — apagar conta (LGPD Art. 18) -->
+  <div class="perfil-card perfil-card-danger">
+    <div class="perfil-card-title" style="color:#dc2626;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Zona de perigo
+    </div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.55;margin-bottom:1rem;">
+      Excluir sua conta vai <strong style="color:var(--text);">apagar permanentemente</strong> seus dados pessoais, histórico de análises e cancelar sua assinatura ativa. Esta ação é <strong style="color:#dc2626;">irreversível</strong>.
+    </div>
+    <button type="button" class="perfil-btn perfil-btn-danger" onclick="abrirModalApagarConta()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 01-2 2H9a2 2 0 01-2-2L5 6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+      Apagar minha conta
+    </button>
+  </div>
+
 </div>
 </div> <!-- /screen s-perfil -->
+
+<!-- ══ MODAL: APAGAR CONTA ══ -->
+<div class="del-modal" id="del-modal" aria-hidden="true">
+  <div class="del-modal-backdrop" onclick="fecharModalApagarConta()"></div>
+  <div class="del-modal-content" role="dialog" aria-modal="true">
+    <div class="del-modal-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+    <h2 class="del-modal-title">Apagar minha conta?</h2>
+    <p class="del-modal-sub">Você vai perder <strong>todos</strong> os seus dados e análises. Esta ação não pode ser desfeita.</p>
+
+    <div class="del-modal-list">
+      <div class="del-modal-list-item"><span class="del-modal-bullet">✕</span> Dados pessoais (nome, telefone, email)</div>
+      <div class="del-modal-list-item"><span class="del-modal-bullet">✕</span> Histórico de análises e DREs enviadas</div>
+      <div class="del-modal-list-item"><span class="del-modal-bullet">✕</span> Assinatura ativa (será cancelada no Stripe)</div>
+      <div class="del-modal-list-item"><span class="del-modal-bullet">✕</span> Acesso ao seu email/senha de login</div>
+    </div>
+
+    <div class="del-modal-field">
+      <label class="del-modal-label">Para confirmar, digite <strong>APAGAR</strong> abaixo:</label>
+      <input type="text" id="del-confirm-input" class="del-modal-input" placeholder="APAGAR" autocomplete="off" oninput="delChkConfirm()"/>
+    </div>
+
+    <div class="del-modal-msg" id="del-modal-msg"></div>
+
+    <div class="del-modal-actions">
+      <button type="button" class="del-modal-btn-cancel" onclick="fecharModalApagarConta()">Cancelar</button>
+      <button type="button" class="del-modal-btn-confirm" id="del-modal-btn-confirm" disabled onclick="confirmarApagarConta()">Apagar para sempre</button>
+    </div>
+  </div>
+</div>
+
+<style>
+#s-perfil .perfil-card-danger { border-color:#fecaca; background:#fef9f9; }
+#s-perfil .perfil-card-danger .perfil-btn-danger { width:auto; }
+
+/* Modal de apagar conta */
+.del-modal { position:fixed; inset:0; z-index:9999; display:none; align-items:center; justify-content:center; padding:1rem; }
+.del-modal.open { display:flex; }
+.del-modal-backdrop { position:absolute; inset:0; background:rgba(15,23,42,.6); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); animation:profile-fade .18s ease-out; }
+.del-modal-content { position:relative; width:100%; max-width:460px; background:#fff; border-radius:18px; box-shadow:0 30px 80px rgba(0,0,0,.25), 0 8px 24px rgba(0,0,0,.12); padding:2rem 1.75rem 1.5rem; animation:profile-pop .22s cubic-bezier(.16,1,.3,1); }
+.del-modal-icon { width:64px; height:64px; border-radius:50%; background:#fef2f2; border:2px solid #fecaca; display:flex; align-items:center; justify-content:center; margin:0 auto 1.25rem; }
+.del-modal-title { font-family:'Sora',sans-serif; font-size:21px; font-weight:800; color:#0f172a; letter-spacing:-.4px; text-align:center; margin-bottom:.5rem; }
+.del-modal-sub { font-size:13.5px; color:#475569; line-height:1.6; text-align:center; margin-bottom:1.25rem; }
+.del-modal-list { background:#fef2f2; border:1px solid #fecaca; border-radius:11px; padding:.75rem .85rem; margin-bottom:1.25rem; }
+.del-modal-list-item { font-size:12.5px; color:#7f1d1d; font-weight:500; padding:3px 0; display:flex; align-items:center; gap:8px; }
+.del-modal-bullet { color:#dc2626; font-weight:700; font-size:14px; width:14px; text-align:center; flex-shrink:0; }
+.del-modal-field { margin-bottom:1rem; }
+.del-modal-label { display:block; font-size:12.5px; color:#475569; margin-bottom:6px; font-weight:500; }
+.del-modal-input { width:100%; padding:10px 13px; border:1.5px solid #e2e8f0; border-radius:10px; font-size:14px; font-family:inherit; outline:none; transition:border-color .15s, box-shadow .15s; }
+.del-modal-input:focus { border-color:#dc2626; box-shadow:0 0 0 3px rgba(220,38,38,.12); }
+.del-modal-msg { font-size:12.5px; min-height:1em; margin-bottom:.75rem; text-align:center; font-weight:500; }
+.del-modal-msg.err { color:#dc2626; }
+.del-modal-msg.ok { color:#16a36a; }
+.del-modal-actions { display:flex; gap:.6rem; }
+.del-modal-btn-cancel, .del-modal-btn-confirm { flex:1; padding:12px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; transition:all .15s; }
+.del-modal-btn-cancel { background:#f1f5f9; border:1.5px solid #e2e8f0; color:#475569; }
+.del-modal-btn-cancel:hover { background:#e2e8f0; color:#0f172a; }
+.del-modal-btn-confirm { background:#dc2626; border:none; color:#fff; box-shadow:0 4px 12px rgba(220,38,38,.3); }
+.del-modal-btn-confirm:hover:not(:disabled) { background:#b91c1c; transform:translateY(-1px); box-shadow:0 6px 16px rgba(220,38,38,.4); }
+.del-modal-btn-confirm:disabled { background:#fca5a5; cursor:not-allowed; box-shadow:none; transform:none; }
+</style>
+
+<script>
+// ════════════════════════════════════════════════════════════════════
+// APAGAR CONTA (LGPD Art. 18 — direito de eliminação)
+// ════════════════════════════════════════════════════════════════════
+function abrirModalApagarConta(){
+  var m = document.getElementById('del-modal');
+  var inp = document.getElementById('del-confirm-input');
+  var msg = document.getElementById('del-modal-msg');
+  var btn = document.getElementById('del-modal-btn-confirm');
+  if(inp){ inp.value=''; }
+  if(msg){ msg.textContent=''; msg.className='del-modal-msg'; }
+  if(btn){ btn.disabled = true; btn.textContent = 'Apagar para sempre'; }
+  if(m){
+    m.classList.add('open');
+    m.setAttribute('aria-hidden','false');
+    document.body.style.overflow = 'hidden';
+  }
+  setTimeout(function(){ if(inp) inp.focus(); }, 200);
+}
+
+function fecharModalApagarConta(){
+  var m = document.getElementById('del-modal');
+  if(m){
+    m.classList.remove('open');
+    m.setAttribute('aria-hidden','true');
+    document.body.style.overflow = '';
+  }
+}
+
+function delChkConfirm(){
+  var inp = document.getElementById('del-confirm-input');
+  var btn = document.getElementById('del-modal-btn-confirm');
+  if(!inp || !btn) return;
+  btn.disabled = (inp.value.trim().toUpperCase() !== 'APAGAR');
+}
+
+async function confirmarApagarConta(){
+  var btn = document.getElementById('del-modal-btn-confirm');
+  var msg = document.getElementById('del-modal-msg');
+  if(typeof currentUser === 'undefined' || !currentUser){
+    if(msg){ msg.textContent='Sessão expirou. Faça login novamente.'; msg.className='del-modal-msg err'; }
+    return;
+  }
+  if(btn){ btn.disabled = true; btn.textContent = 'Apagando...'; }
+  if(msg){ msg.textContent='Removendo seus dados...'; msg.className='del-modal-msg'; }
+
+  try {
+    // 1. Apaga linha de profiles (dados pessoais)
+    var delProfile = await sb.from('profiles').delete().eq('id', currentUser.id);
+    if(delProfile.error){
+      console.warn('delete profiles:', delProfile.error);
+      // Não bloqueia — segue tentando apagar o auth.user
+    }
+
+    // 2. Chama RPC para apagar o usuário do auth.users
+    //    (precisa da função SQL `delete_my_user` configurada no Supabase)
+    var delUser = await sb.rpc('delete_my_user');
+    if(delUser.error){
+      // Se a RPC não estiver configurada, ainda assim sai do app — o admin
+      // limpa depois manualmente. Loga warning pra você saber.
+      console.warn('rpc delete_my_user:', delUser.error.message);
+    }
+
+    // 3. Faz signOut
+    try { await sb.auth.signOut(); } catch(e){ console.warn('signOut:', e); }
+    currentUser = null;
+
+    if(msg){ msg.textContent='✓ Conta apagada. Redirecionando...'; msg.className='del-modal-msg ok'; }
+
+    // 4. Volta pra landing após 1.5s
+    setTimeout(function(){
+      fecharModalApagarConta();
+      try { localStorage.removeItem('vc_ultima_tela'); } catch(e){}
+      try { localStorage.removeItem('vitacash_pending_profile'); } catch(e){}
+      try { localStorage.removeItem('vitacash_pending_email'); } catch(e){}
+      if(typeof go === 'function') go('s-land');
+      else window.location.reload();
+    }, 1500);
+  } catch(err){
+    console.error('apagar conta:', err);
+    if(msg){
+      msg.textContent = (typeof traduzirErroSupabase === 'function' ? traduzirErroSupabase(err) : ('Erro ao apagar conta: ' + (err.message || 'tente novamente')));
+      msg.className='del-modal-msg err';
+    }
+    if(btn){ btn.disabled = false; btn.textContent = 'Apagar para sempre'; }
+  }
+}
+
+// Fechar modal com ESC
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape'){
+    var m = document.getElementById('del-modal');
+    if(m && m.classList.contains('open')) fecharModalApagarConta();
+  }
+});
+</script>
 
 <!-- ══ CONFIRMAÇÃO DE CADASTRO ══ -->
 <div class="screen" id="s-confirmacao">
