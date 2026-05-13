@@ -1926,7 +1926,7 @@ async function salvarPerfil(){
     if(nomeBig) nomeBig.textContent = nome.trim();
   } catch(err){
     console.error('salvar perfil:', err);
-    if(msg){ msg.textContent='Erro ao salvar: '+(err.message||'tente novamente'); msg.style.color='#dc2626'; }
+    if(msg){ msg.textContent = (typeof traduzirErroSupabase === 'function' ? traduzirErroSupabase(err) : ('Erro ao salvar: '+(err.message||'tente novamente'))); msg.style.color='#dc2626'; }
   } finally {
     if(btn){ btn.disabled = false; btn.textContent = 'Salvar alterações'; }
     setTimeout(function(){ if(msg) msg.textContent=''; }, 5000);
@@ -1950,7 +1950,7 @@ async function mudarSenhaPerfil(){
     if($('p-senha-conf')) $('p-senha-conf').value='';
   } catch(err){
     console.error('senha:', err);
-    if(msg){ msg.textContent='Erro: '+(err.message||'não foi possível atualizar'); msg.style.color='#dc2626'; }
+    if(msg){ msg.textContent = (typeof traduzirErroSupabase === 'function' ? traduzirErroSupabase(err) : ('Erro: '+(err.message||'não foi possível atualizar'))); msg.style.color='#dc2626'; }
   } finally {
     if(btn){ btn.disabled=false; btn.textContent='Atualizar senha'; }
   }
@@ -4550,11 +4550,7 @@ async function confirmarCodigoEmail(){
     }, 600);
   } catch(err){
     console.error('verifyOtp:', err);
-    var m = (err && err.message) || '';
-    var txt = 'Código inválido ou expirado. Tente reenviar.';
-    if(/expired/i.test(m)) txt = 'Código expirado. Clique em "Reenviar código".';
-    else if(/invalid/i.test(m)) txt = 'Código incorreto. Confira e tente de novo.';
-    if(msg){ msg.textContent = txt; msg.className='cmail-msg err'; }
+    if(msg){ msg.textContent = (typeof traduzirErroSupabase === 'function' ? traduzirErroSupabase(err) : 'Código inválido ou expirado. Tente reenviar.'); msg.className='cmail-msg err'; }
     btn.disabled = false;
     btn.textContent = 'Confirmar acesso →';
   }
@@ -4710,11 +4706,7 @@ async function lgOtpConfirmar(){
     }, 600);
   } catch(err){
     console.error('verifyOtp:', err);
-    var m = (err && err.message) || '';
-    var txt = 'Código inválido ou expirado. Tente reenviar.';
-    if(/expired/i.test(m)) txt = 'Código expirado. Clique em "Reenviar código".';
-    else if(/invalid/i.test(m)) txt = 'Código incorreto. Confira e tente de novo.';
-    if(msg){ msg.textContent = txt; msg.className='lgotp-msg err'; }
+    if(msg){ msg.textContent = (typeof traduzirErroSupabase === 'function' ? traduzirErroSupabase(err) : 'Código inválido ou expirado. Tente reenviar.'); msg.className='lgotp-msg err'; }
     btn.disabled = false;
     btn.textContent = 'Confirmar acesso →';
   }
@@ -5194,7 +5186,7 @@ async function abrirPortal() {
     }
   } catch (err) {
     console.error(err);
-    toast('Erro ao abrir portal: ' + err.message, 'erro');
+    toast('Não foi possível abrir o portal: ' + (typeof traduzirErroSupabase === 'function' ? traduzirErroSupabase(err) : err.message), 'erro');
   }
 }
 
@@ -5330,6 +5322,73 @@ function isDisposableEmail(email){
   return false;
 }
 
+// Traduz mensagens de erro do Supabase para português
+// Cobre os erros mais comuns; se não encontrar correspondência, devolve
+// uma versão genérica em português ou a mensagem original.
+function traduzirErroSupabase(msg){
+  if(!msg) return 'Ocorreu um erro. Tente novamente.';
+  var t = (typeof msg === 'string' ? msg : (msg.message || '')).toLowerCase().trim();
+  if(!t) return 'Ocorreu um erro. Tente novamente.';
+
+  // Auth — cadastro / login
+  if(t.indexOf('user already registered') !== -1 || t.indexOf('already been registered') !== -1)
+    return 'Este email já está cadastrado. Use a aba "Entrar" ou recupere a senha.';
+  if(t.indexOf('invalid login credentials') !== -1 || t.indexOf('invalid credentials') !== -1)
+    return 'Email ou senha incorretos. Verifique e tente de novo.';
+  if(t.indexOf('email not confirmed') !== -1)
+    return 'Confirme seu email antes de entrar. Procure o código na sua caixa de entrada.';
+  if(t.indexOf('user not found') !== -1 || t.indexOf('no user found') !== -1)
+    return 'Usuário não encontrado. Verifique o email digitado.';
+  if(t.indexOf('signups not allowed') !== -1 || t.indexOf('signups disabled') !== -1)
+    return 'Os cadastros estão temporariamente desativados.';
+
+  // Senha
+  if(t.indexOf('password should be at least') !== -1 || t.indexOf('password is too short') !== -1)
+    return 'A senha precisa ter pelo menos 8 caracteres.';
+  if(t.indexOf('new password should be different') !== -1 || t.indexOf('same as the old') !== -1)
+    return 'A nova senha precisa ser diferente da atual.';
+  if(t.indexOf('weak password') !== -1)
+    return 'Senha muito fraca. Use ao menos 8 caracteres com letras e números.';
+
+  // Email format
+  if(t.indexOf('invalid email') !== -1 || t.indexOf('email address is invalid') !== -1)
+    return 'Email inválido. Verifique o formato (ex: nome@dominio.com).';
+  if(t.indexOf('email address is not authorized') !== -1)
+    return 'Este email não está autorizado a se cadastrar.';
+
+  // Rate limits
+  if(t.indexOf('email rate limit') !== -1)
+    return 'Limite de emails atingido. Aguarde alguns minutos e tente novamente.';
+  if(t.indexOf('rate limit') !== -1 || t.indexOf('too many requests') !== -1)
+    return 'Muitas tentativas em pouco tempo. Aguarde um momento e tente de novo.';
+
+  // OTP / token
+  if(t.indexOf('token has expired') !== -1 || t.indexOf('otp expired') !== -1 || t.indexOf('expired') !== -1)
+    return 'Código expirado. Clique em "Reenviar código" para receber um novo.';
+  if(t.indexOf('invalid token') !== -1 || t.indexOf('invalid otp') !== -1 || t.indexOf('token is invalid') !== -1)
+    return 'Código inválido. Confira os dígitos e tente novamente.';
+
+  // Rede / conexão
+  if(t.indexOf('network') !== -1 || t.indexOf('failed to fetch') !== -1 || t.indexOf('connection') !== -1)
+    return 'Erro de conexão. Verifique sua internet e tente de novo.';
+  if(t.indexOf('timeout') !== -1)
+    return 'A requisição demorou demais. Verifique sua conexão e tente novamente.';
+
+  // Banco / RLS / permissões
+  if(t.indexOf('row-level security') !== -1 || t.indexOf('permission denied') !== -1 || t.indexOf('not allowed') !== -1)
+    return 'Você não tem permissão para esta ação.';
+  if(t.indexOf('duplicate key') !== -1 || t.indexOf('already exists') !== -1)
+    return 'Este registro já existe.';
+  if(t.indexOf('database error') !== -1)
+    return 'Erro temporário no servidor. Tente novamente em instantes.';
+
+  // Fallback: tenta retornar a mensagem original (já pode estar em PT) ou genérica
+  var original = (typeof msg === 'string' ? msg : (msg.message || ''));
+  // Se já tem caracter PT (acento) ou parece português, devolve original
+  if(/[áéíóúãõâêôçàèìòùÀ-ÿ]/i.test(original)) return original;
+  return 'Erro: ' + original;
+}
+
 // Normaliza email para evitar truques de "+" e "." no Gmail/Outlook
 // Ex: "joao.silva+spam@gmail.com" → "joaosilva@gmail.com"
 //     "joao+1@outlook.com"        → "joao@outlook.com"
@@ -5431,7 +5490,7 @@ async function lgConfirmarCadastro(planName, priceId) {
     setBtn('⏳ Identificando sua conta...', true);
     const { data: signInData, error: signInError } = await sb.auth.signInWithPassword({ email: e, password: s });
     if (signInError) {
-      showErr('E-mail já cadastrado. Verifique a senha ou use a aba "Entrar".');
+      showErr(traduzirErroSupabase(signInError));
       setBtn('Quero ver onde estou perdendo dinheiro →', false);
       return;
     }
@@ -5450,7 +5509,7 @@ async function lgConfirmarCadastro(planName, priceId) {
   }
 
   if (signUpError) {
-    showErr('Erro: ' + signUpError.message);
+    showErr(traduzirErroSupabase(signUpError));
     setBtn('Quero ver onde estou perdendo dinheiro →', false);
     return;
   }
@@ -5489,7 +5548,7 @@ async function lgConfirmarCadastro(planName, priceId) {
 
   if (upsertErr) {
     console.error('Erro ao salvar perfil:', upsertErr.message, upsertErr.code, upsertErr.details);
-    showErr('Erro ao salvar dados: ' + upsertErr.message + ' (código: ' + upsertErr.code + ')');
+    showErr('Não foi possível salvar seus dados: ' + traduzirErroSupabase(upsertErr));
     setBtn('Quero ver onde estou perdendo dinheiro →', false);
     return;
   }
@@ -5525,7 +5584,7 @@ async function lgEntrar() {
 
   if (error) {
     erro.style.display = 'block';
-    erro.textContent = 'E-mail ou senha incorretos. Tente novamente.';
+    erro.textContent = traduzirErroSupabase(error);
     btn.disabled = false;
     btn.textContent = 'Ver meu diagnóstico agora →';
     return;
