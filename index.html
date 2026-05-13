@@ -4235,23 +4235,119 @@ async function mudarSenhaPerfil(){
     </button>
   </div>
 
-  <!-- CARD: Zona de perigo — apagar conta (LGPD Art. 18) -->
+  <!-- CARD: Zona de perigo — pausar + apagar conta -->
   <div class="perfil-card perfil-card-danger">
     <div class="perfil-card-title" style="color:#dc2626;">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
       Zona de perigo
     </div>
-    <div style="font-size:13px;color:var(--text2);line-height:1.55;margin-bottom:1rem;">
-      Excluir sua conta vai <strong style="color:var(--text);">apagar permanentemente</strong> seus dados pessoais, histórico de análises e cancelar sua assinatura ativa. Esta ação é <strong style="color:#dc2626;">irreversível</strong>.
+
+    <!-- PAUSAR (opção menos agressiva) -->
+    <div class="perfil-danger-section perfil-danger-section-warn">
+      <div class="perfil-danger-section-title">⏸ Pausar minha conta</div>
+      <div class="perfil-danger-section-desc">
+        Cancela sua assinatura e bloqueia o acesso temporariamente, mas <strong>mantém todos os seus dados</strong>. Você pode reativar a qualquer momento fazendo login novamente.
+      </div>
+      <button type="button" class="perfil-btn perfil-btn-warn" onclick="abrirModalPausarConta()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+        Pausar conta
+      </button>
     </div>
-    <button type="button" class="perfil-btn perfil-btn-danger" onclick="abrirModalApagarConta()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 01-2 2H9a2 2 0 01-2-2L5 6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-      Apagar minha conta
-    </button>
+
+    <div class="perfil-danger-divider"></div>
+
+    <!-- APAGAR (opção definitiva) -->
+    <div class="perfil-danger-section">
+      <div class="perfil-danger-section-title" style="color:#dc2626;">🗑 Apagar permanentemente</div>
+      <div class="perfil-danger-section-desc">
+        Apaga <strong>permanentemente</strong> seus dados, histórico de análises e cancela sua assinatura. Esta ação é <strong style="color:#dc2626;">irreversível</strong>.
+      </div>
+      <button type="button" class="perfil-btn perfil-btn-danger" onclick="abrirModalApagarConta()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 01-2 2H9a2 2 0 01-2-2L5 6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+        Apagar minha conta
+      </button>
+    </div>
   </div>
 
 </div>
 </div> <!-- /screen s-perfil -->
+
+<!-- ══ MODAL: PAUSAR CONTA ══ -->
+<div class="pause-modal" id="pause-modal" aria-hidden="true">
+  <div class="del-modal-backdrop" onclick="fecharModalPausarConta()"></div>
+  <div class="del-modal-content" role="dialog" aria-modal="true">
+    <div class="del-modal-icon" style="background:#fffbeb;border-color:#fcd34d;">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+    </div>
+    <h2 class="del-modal-title">Pausar minha conta?</h2>
+    <p class="del-modal-sub">Você poderá voltar a qualquer momento <strong>fazendo login novamente</strong>. Seus dados ficam guardados em segurança.</p>
+
+    <div class="del-modal-list" style="background:#fffbeb;border-color:#fde68a;">
+      <div class="del-modal-list-item" style="color:#92400e;"><span class="del-modal-bullet" style="color:#b45309;">✓</span> Todos os seus dados pessoais e análises ficam salvos</div>
+      <div class="del-modal-list-item" style="color:#92400e;"><span class="del-modal-bullet" style="color:#b45309;">✓</span> Seu email/senha continuam funcionando</div>
+      <div class="del-modal-list-item" style="color:#92400e;"><span class="del-modal-bullet" style="color:#b45309;">⏸</span> Sua assinatura é cancelada (sem novas cobranças)</div>
+      <div class="del-modal-list-item" style="color:#92400e;"><span class="del-modal-bullet" style="color:#b45309;">⏸</span> Acesso ao app bloqueado até você reativar</div>
+    </div>
+
+    <div class="del-modal-msg" id="pause-modal-msg"></div>
+
+    <div class="del-modal-actions">
+      <button type="button" class="del-modal-btn-cancel" onclick="fecharModalPausarConta()">Cancelar</button>
+      <button type="button" class="del-modal-btn-confirm pause-modal-btn-confirm" id="pause-modal-btn-confirm" onclick="confirmarPausarConta()">Pausar minha conta</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.pause-modal { position:fixed; inset:0; z-index:9999; display:none; align-items:center; justify-content:center; padding:1rem; }
+.pause-modal.open { display:flex; }
+.pause-modal-btn-confirm { background:#f59e0b !important; box-shadow:0 4px 12px rgba(245,158,11,.3) !important; }
+.pause-modal-btn-confirm:hover:not(:disabled) { background:#d97706 !important; box-shadow:0 6px 16px rgba(245,158,11,.4) !important; }
+.pause-modal-btn-confirm:disabled { background:#fcd34d !important; }
+</style>
+
+<!-- ══ TELA: REATIVAR CONTA (quando login bate em conta pausada) ══ -->
+<div class="screen" id="s-reativar">
+<style>
+#s-reativar.active { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:1.5rem; background:#f5f4f0; z-index:100; overflow:auto; }
+.reativ-card { width:100%; max-width:460px; background:#fff; border-radius:18px; box-shadow:0 20px 60px rgba(0,0,0,.10); padding:2.25rem 2rem 1.75rem; text-align:center; }
+.reativ-icon { width:64px; height:64px; border-radius:50%; background:linear-gradient(160deg,#1D9E75 0%,#0f6e56 100%); display:inline-flex; align-items:center; justify-content:center; margin-bottom:1rem; box-shadow:0 8px 24px rgba(29,158,117,.32); }
+.reativ-title { font-family:'Sora',sans-serif; font-size:22px; font-weight:800; color:#0f172a; letter-spacing:-.5px; margin-bottom:.6rem; }
+.reativ-sub { font-size:13.5px; color:#475569; line-height:1.55; margin-bottom:1.5rem; }
+.reativ-info { background:#f0fdf8; border:1px solid #a7f3d0; border-radius:11px; padding:.85rem 1rem; margin-bottom:1.25rem; font-size:12.5px; color:#065f46; line-height:1.55; text-align:left; }
+.reativ-info strong { color:#0d2b1e; }
+.reativ-btn { width:100%; padding:13px; border-radius:12px; border:none; background:linear-gradient(135deg,#1D9E75 0%,#16a36a 100%); color:#fff; font-size:15px; font-weight:800; cursor:pointer; font-family:inherit; box-shadow:0 8px 28px rgba(29,158,117,.4); transition:all .2s; margin-bottom:.6rem; }
+.reativ-btn:hover:not(:disabled) { background:linear-gradient(135deg,#15835f 0%,#0f6e50 100%); transform:translateY(-1px); }
+.reativ-btn:disabled { background:#e2e8f0; color:#94a3b8; cursor:not-allowed; box-shadow:none; transform:none; }
+.reativ-btn-ghost { width:100%; padding:11px; border-radius:10px; background:transparent; border:1.5px solid #e2e8f0; color:#64748b; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s; }
+.reativ-btn-ghost:hover { background:#f8fafc; color:#475569; }
+.reativ-msg { font-size:12.5px; min-height:1em; margin-bottom:.5rem; font-weight:500; }
+.reativ-msg.err { color:#dc2626; }
+.reativ-msg.ok { color:#16a36a; }
+</style>
+
+<div class="reativ-card">
+  <div class="reativ-icon">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+  </div>
+  <h2 class="reativ-title">Bem-vindo de volta! 👋</h2>
+  <p class="reativ-sub">Sua conta está <strong>pausada</strong>. Seus dados foram preservados — é só reativar pra continuar de onde parou.</p>
+
+  <div class="reativ-info">
+    <strong>Olá <span id="reativ-nome">—</span>!</strong><br>
+    Sua conta foi pausada em <span id="reativ-data">—</span>. Todos os seus dados, histórico e configurações estão guardados.
+  </div>
+
+  <div class="reativ-msg" id="reativ-msg"></div>
+
+  <button type="button" class="reativ-btn" id="reativ-btn" onclick="reativarConta()">
+    Reativar minha conta →
+  </button>
+  <button type="button" class="reativ-btn-ghost" onclick="sair()">
+    Sair (continuar pausada)
+  </button>
+</div>
+</div>
 
 <!-- ══ MODAL: APAGAR CONTA ══ -->
 <div class="del-modal" id="del-modal" aria-hidden="true">
@@ -4286,7 +4382,18 @@ async function mudarSenhaPerfil(){
 
 <style>
 #s-perfil .perfil-card-danger { border-color:#fecaca; background:#fef9f9; }
-#s-perfil .perfil-card-danger .perfil-btn-danger { width:auto; }
+#s-perfil .perfil-card-danger .perfil-btn-danger,
+#s-perfil .perfil-card-danger .perfil-btn-warn { width:auto; }
+
+/* Seções dentro da Zona de perigo */
+#s-perfil .perfil-danger-section { padding:.25rem 0 .5rem; }
+#s-perfil .perfil-danger-section-title { font-size:13px; font-weight:700; color:var(--text); margin-bottom:.5rem; }
+#s-perfil .perfil-danger-section-desc { font-size:12.5px; color:var(--text2); line-height:1.55; margin-bottom:.85rem; }
+#s-perfil .perfil-danger-divider { height:1px; background:#fecaca; margin:1rem -.25rem; opacity:.6; }
+
+/* Botão de pausar (amarelo/aviso) — versão amigável */
+.perfil-btn-warn { background:#fff; color:#b45309; border:1.5px solid #fcd34d; box-shadow:none; }
+.perfil-btn-warn:hover:not(:disabled) { background:#fffbeb; border-color:#f59e0b; transform:none; box-shadow:none; }
 
 /* Modal de apagar conta */
 .del-modal { position:fixed; inset:0; z-index:9999; display:none; align-items:center; justify-content:center; padding:1rem; }
@@ -4408,8 +4515,130 @@ document.addEventListener('keydown', function(e){
   if(e.key === 'Escape'){
     var m = document.getElementById('del-modal');
     if(m && m.classList.contains('open')) fecharModalApagarConta();
+    var p = document.getElementById('pause-modal');
+    if(p && p.classList.contains('open')) fecharModalPausarConta();
   }
 });
+
+// ════════════════════════════════════════════════════════════════════
+// PAUSAR CONTA (retenção / win-back)
+// ════════════════════════════════════════════════════════════════════
+function abrirModalPausarConta(){
+  var m = document.getElementById('pause-modal');
+  var msg = document.getElementById('pause-modal-msg');
+  var btn = document.getElementById('pause-modal-btn-confirm');
+  if(msg){ msg.textContent=''; msg.className='del-modal-msg'; }
+  if(btn){ btn.disabled = false; btn.textContent = 'Pausar minha conta'; }
+  if(m){
+    m.classList.add('open');
+    m.setAttribute('aria-hidden','false');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function fecharModalPausarConta(){
+  var m = document.getElementById('pause-modal');
+  if(m){
+    m.classList.remove('open');
+    m.setAttribute('aria-hidden','true');
+    document.body.style.overflow = '';
+  }
+}
+
+async function confirmarPausarConta(){
+  var btn = document.getElementById('pause-modal-btn-confirm');
+  var msg = document.getElementById('pause-modal-msg');
+  if(typeof currentUser === 'undefined' || !currentUser){
+    if(msg){ msg.textContent='Sessão expirou. Faça login novamente.'; msg.className='del-modal-msg err'; }
+    return;
+  }
+  if(btn){ btn.disabled = true; btn.textContent = 'Pausando...'; }
+  if(msg){ msg.textContent='Pausando sua conta...'; msg.className='del-modal-msg'; }
+  try {
+    // Marca o perfil como pausado
+    var resp = await sb.from('profiles').update({
+      status: 'paused',
+      paused_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }).eq('id', currentUser.id);
+    if(resp.error){
+      // Provavelmente as colunas status/paused_at ainda não existem no banco
+      console.warn('pausar conta:', resp.error.message);
+      throw resp.error;
+    }
+    if(msg){ msg.textContent='✓ Conta pausada. Até logo!'; msg.className='del-modal-msg ok'; }
+    // Sign out e volta pra landing
+    setTimeout(async function(){
+      try { await sb.auth.signOut(); } catch(e){}
+      currentUser = null;
+      fecharModalPausarConta();
+      try { localStorage.removeItem('vc_ultima_tela'); } catch(e){}
+      if(typeof go === 'function') go('s-land');
+      else window.location.reload();
+    }, 1200);
+  } catch(err){
+    console.error('pausar conta:', err);
+    if(msg){
+      msg.textContent = (typeof traduzirErroSupabase === 'function' ? traduzirErroSupabase(err) : ('Erro ao pausar: ' + (err.message || 'tente novamente')));
+      msg.className='del-modal-msg err';
+    }
+    if(btn){ btn.disabled = false; btn.textContent = 'Pausar minha conta'; }
+  }
+}
+
+// ── Verifica se a conta do usuário logado está pausada ─────────────
+async function checarContaPausada(){
+  if(typeof currentUser === 'undefined' || !currentUser) return false;
+  try {
+    var resp = await sb.from('profiles').select('status, paused_at, full_name').eq('id', currentUser.id).single();
+    if(resp.error) return false;
+    var d = resp.data || {};
+    if(d.status === 'paused'){
+      // Preenche dados na tela de reativação
+      var $ = function(id){ return document.getElementById(id); };
+      if($('reativ-nome')) $('reativ-nome').textContent = (d.full_name || '').split(' ')[0] || 'cliente';
+      if($('reativ-data')){
+        if(d.paused_at){
+          try { $('reativ-data').textContent = new Date(d.paused_at).toLocaleDateString('pt-BR'); }
+          catch(e){ $('reativ-data').textContent = '—'; }
+        } else { $('reativ-data').textContent = '—'; }
+      }
+      return true;
+    }
+    return false;
+  } catch(err){ console.warn('checar pausada:', err); return false; }
+}
+
+async function reativarConta(){
+  var btn = document.getElementById('reativ-btn');
+  var msg = document.getElementById('reativ-msg');
+  if(typeof currentUser === 'undefined' || !currentUser){
+    if(msg){ msg.textContent='Sessão expirou. Faça login novamente.'; msg.className='reativ-msg err'; }
+    return;
+  }
+  if(btn){ btn.disabled = true; btn.textContent = 'Reativando...'; }
+  if(msg){ msg.textContent=''; msg.className='reativ-msg'; }
+  try {
+    var resp = await sb.from('profiles').update({
+      status: 'active',
+      paused_at: null,
+      updated_at: new Date().toISOString()
+    }).eq('id', currentUser.id);
+    if(resp.error) throw resp.error;
+    if(msg){ msg.textContent='✓ Conta reativada! Bem-vindo de volta.'; msg.className='reativ-msg ok'; }
+    setTimeout(function(){
+      // Cliente sem plano ativo cai em escolher plano; com plano cai no dashboard
+      if(typeof go === 'function') go('s-escolher-plano');
+    }, 800);
+  } catch(err){
+    console.error('reativar:', err);
+    if(msg){
+      msg.textContent = (typeof traduzirErroSupabase === 'function' ? traduzirErroSupabase(err) : ('Erro ao reativar: ' + (err.message || 'tente novamente')));
+      msg.className='reativ-msg err';
+    }
+    if(btn){ btn.disabled = false; btn.textContent = 'Reativar minha conta →'; }
+  }
+}
 </script>
 
 <!-- ══ CONFIRMAÇÃO DE CADASTRO ══ -->
@@ -5767,6 +5996,14 @@ async function lgEntrar() {
   currentUser = data.user;
   btn.disabled = false;
   btn.textContent = 'Ver meu diagnóstico agora →';
+
+  // Conta pausada? → vai pra tela de reativação em vez do dashboard
+  if(typeof checarContaPausada === 'function'){
+    try {
+      var pausada = await checarContaPausada();
+      if(pausada){ if(typeof go === 'function') go('s-reativar'); return; }
+    } catch(e){ console.warn('checar pausada:', e); }
+  }
 
   // Salva perfil pendente caso venha de um cadastro com confirmação de e-mail
   var pending = localStorage.getItem('vitacash_pending_profile');
