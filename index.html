@@ -6524,9 +6524,9 @@ function lgMaskTel(input) {
 
 <style>
 #btn-export-pdf button:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(29,158,117,.5); }
-/* Esconde o botão Exportar PDF nas telas onde não faz sentido (landing, login) */
-body:has(#s-land.active) #btn-export-pdf,
-body:has(#s-login.active) #btn-export-pdf { display:none!important; }
+/* Botão Exportar PDF: escondido por padrão, visível apenas no dashboard */
+#btn-export-pdf { display:none!important; }
+body:has(#s-dash.active) #btn-export-pdf { display:block!important; }
 
 @media print {
   /* Esconde tudo que não é conteúdo */
