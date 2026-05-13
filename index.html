@@ -4050,6 +4050,12 @@ async function mudarSenhaPerfil(){
 #s-perfil .perfil-input, #s-perfil .perfil-select { width:100%; padding:9px 12px; border:1.5px solid #e2e8f0; border-radius:9px; font-size:13px; color:#0f172a; font-family:inherit; outline:none; transition:border-color .18s, box-shadow .18s; background:#fafafa; }
 #s-perfil .perfil-input:focus, #s-perfil .perfil-select:focus { border-color:var(--green); box-shadow:0 0 0 3px rgba(29,158,117,.1); background:#fff; }
 #s-perfil .perfil-input[readonly] { background:#f1f5f9; color:#64748b; cursor:not-allowed; }
+/* Custom select bloqueado (visualização apenas) */
+#s-perfil .perfil-locked-hint { font-size:10.5px; font-weight:500; color:var(--text3); letter-spacing:0; margin-left:4px; font-style:italic; }
+#s-perfil .lg-cs-readonly .lg-cs-trigger { background:#f1f5f9 !important; cursor:not-allowed !important; pointer-events:none; }
+#s-perfil .lg-cs-readonly .lg-cs-trigger:hover { border-color:#e2e8f0 !important; box-shadow:none !important; background:#f1f5f9 !important; }
+#s-perfil .lg-cs-readonly .lg-cs-val { color:#475569 !important; }
+#s-perfil .lg-cs-lock { margin-left:auto; flex-shrink:0; opacity:.55; }
 #s-perfil .perfil-btn { display:inline-flex; align-items:center; gap:7px; padding:10px 18px; border-radius:10px; border:none; background:var(--green); color:#fff; font-size:13.5px; font-weight:700; cursor:pointer; font-family:inherit; transition:all .18s; box-shadow:0 4px 14px rgba(29,158,117,.32); margin-top:.5rem; }
 #s-perfil .perfil-btn:hover:not(:disabled) { background:#15835f; transform:translateY(-1px); box-shadow:0 6px 18px rgba(29,158,117,.4); }
 #s-perfil .perfil-btn:disabled { opacity:.6; cursor:not-allowed; transform:none; }
@@ -4101,41 +4107,23 @@ async function mudarSenhaPerfil(){
         <input type="tel" id="p-tel" class="perfil-input" placeholder="(11) 99999-9999">
       </div>
       <div class="perfil-field">
-        <label class="perfil-label">Segmento da empresa</label>
-        <div class="lg-cs" id="pf-cs-nicho">
-          <div class="lg-cs-trigger" onclick="lgCsToggle('pf-cs-nicho')">
+        <label class="perfil-label">Segmento da empresa <span class="perfil-locked-hint">(definido no cadastro)</span></label>
+        <div class="lg-cs lg-cs-readonly" id="pf-cs-nicho">
+          <div class="lg-cs-trigger" aria-disabled="true">
             <svg class="lg-cs-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-            <span class="lg-cs-val" id="pf-cs-nicho-val">Selecione…</span>
-            <svg class="lg-cs-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-          </div>
-          <div class="lg-cs-menu">
-            <div class="lg-cs-item" onclick="pfCsSelect('pf-cs-nicho','Restaurante / Alimentação',this)">🍽️&nbsp; Restaurante / Alimentação</div>
-            <div class="lg-cs-item" onclick="pfCsSelect('pf-cs-nicho','Varejo / Comércio',this)">🛒&nbsp; Varejo / Comércio</div>
-            <div class="lg-cs-item" onclick="pfCsSelect('pf-cs-nicho','Clínica / Saúde',this)">🏥&nbsp; Clínica / Saúde</div>
-            <div class="lg-cs-item" onclick="pfCsSelect('pf-cs-nicho','Distribuidora / Logística',this)">🚚&nbsp; Distribuidora / Logística</div>
-            <div class="lg-cs-item" onclick="pfCsSelect('pf-cs-nicho','Indústria / Manufatura',this)">🏭&nbsp; Indústria / Manufatura</div>
-            <div class="lg-cs-item" onclick="pfCsSelect('pf-cs-nicho','Prestação de Serviços',this)">💼&nbsp; Prestação de Serviços</div>
-            <div class="lg-cs-item" onclick="pfCsSelect('pf-cs-nicho','Construção / Engenharia',this)">🏗️&nbsp; Construção / Engenharia</div>
-            <div class="lg-cs-item" onclick="pfCsSelect('pf-cs-nicho','E-commerce / Digital',this)">📦&nbsp; E-commerce / Digital</div>
-            <div class="lg-cs-item" onclick="pfCsSelect('pf-cs-nicho','Outro',this)">➕&nbsp; Outro</div>
+            <span class="lg-cs-val" id="pf-cs-nicho-val">—</span>
+            <svg class="lg-cs-lock" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" title="Campo bloqueado"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
           </div>
           <input type="hidden" id="p-nicho"/>
         </div>
       </div>
       <div class="perfil-field full">
-        <label class="perfil-label">Faixa de faturamento mensal</label>
-        <div class="lg-cs" id="pf-cs-fat">
-          <div class="lg-cs-trigger" onclick="lgCsToggle('pf-cs-fat')">
+        <label class="perfil-label">Faixa de faturamento mensal <span class="perfil-locked-hint">(definido no cadastro)</span></label>
+        <div class="lg-cs lg-cs-readonly" id="pf-cs-fat">
+          <div class="lg-cs-trigger" aria-disabled="true">
             <svg class="lg-cs-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            <span class="lg-cs-val" id="pf-cs-fat-val">Selecione…</span>
-            <svg class="lg-cs-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-          </div>
-          <div class="lg-cs-menu">
-            <div class="lg-cs-item" onclick="pfCsSelect('pf-cs-fat','Até R$ 50 mil/mês',this)">Até R$ 50 mil/mês</div>
-            <div class="lg-cs-item" onclick="pfCsSelect('pf-cs-fat','R$ 50k – R$ 200k/mês',this)">R$ 50k – R$ 200k/mês</div>
-            <div class="lg-cs-item" onclick="pfCsSelect('pf-cs-fat','R$ 200k – R$ 500k/mês',this)">R$ 200k – R$ 500k/mês</div>
-            <div class="lg-cs-item" onclick="pfCsSelect('pf-cs-fat','R$ 500k – R$ 2 mi/mês',this)">R$ 500k – R$ 2 mi/mês</div>
-            <div class="lg-cs-item" onclick="pfCsSelect('pf-cs-fat','Acima de R$ 2 mi/mês',this)">Acima de R$ 2 mi/mês</div>
+            <span class="lg-cs-val" id="pf-cs-fat-val">—</span>
+            <svg class="lg-cs-lock" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" title="Campo bloqueado"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
           </div>
           <input type="hidden" id="p-fat"/>
         </div>
