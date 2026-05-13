@@ -5378,16 +5378,16 @@ function lgCadastrar() {
   // Guarda temporariamente na memória — nada vai ao banco ainda
   window._cadPending = { n, e, tel, nicho, fat, s };
 
-  // Preenche a tela de confirmação com os dados
-  var el = function(id){ return document.getElementById(id); };
-  if(el('conf-nome'))  el('conf-nome').textContent  = n     || '—';
-  if(el('conf-email')) el('conf-email').textContent = e     || '—';
-  if(el('conf-tel'))   el('conf-tel').textContent   = tel   || '—';
-  if(el('conf-nicho')) el('conf-nicho').textContent = nicho || '—';
-  if(el('conf-fat'))   el('conf-fat').textContent   = fat   || '—';
+  // Atualiza o botão para estado de loading
+  var btnCad = document.getElementById('lg-btn-cad');
+  if(btnCad){
+    btnCad.disabled = true;
+    btnCad.textContent = '⏳ Criando sua conta...';
+  }
+  if(err){ err.style.display = 'none'; err.textContent = ''; }
 
-  // Vai para a tela de confirmação
-  go('s-confirmacao');
+  // Pula a tela de revisão — chama o handler do cadastro diretamente
+  lgHandleConfirmacao();
 }
 
 // ── ETAPA 2: CONFIRMAR E SALVAR NO SUPABASE ────────────────────────
@@ -5397,12 +5397,27 @@ async function lgConfirmarCadastro(planName, priceId) {
   if (!pending) { go('s-login'); return; }
 
   var { n, e, tel, nicho, fat, s } = pending;
-  var btn  = document.getElementById('conf-btn-cta');
-  var erro = document.getElementById('conf-err');
+  var btn   = document.getElementById('conf-btn-cta');
+  var erro  = document.getElementById('conf-err');
+  var btnLg = document.getElementById('lg-btn-cad');
+  var errLg = document.getElementById('lg-err-cad');
 
-  btn.disabled = true;
-  btn.textContent = '⏳ Criando sua conta...';
-  erro.style.display = 'none';
+  // Atualiza ambos os botões/erros para que funcione com ou sem a tela de revisão
+  function setBtn(text, disabled){
+    if(btn){ btn.disabled = disabled; btn.textContent = text; }
+    if(btnLg){ btnLg.disabled = disabled; btnLg.textContent = text; }
+  }
+  function showErr(msg){
+    if(erro){ erro.style.display = 'block'; erro.textContent = msg; }
+    if(errLg){ errLg.style.display = 'block'; errLg.textContent = msg; }
+  }
+  function hideErr(){
+    if(erro){ erro.style.display = 'none'; erro.textContent = ''; }
+    if(errLg){ errLg.style.display = 'none'; errLg.textContent = ''; }
+  }
+
+  setBtn('⏳ Criando sua conta...', true);
+  hideErr();
 
   // 1. Tentar criar conta no Supabase Auth
   const { data: signUpData, error: signUpError } = await sb.auth.signUp({
@@ -5413,20 +5428,17 @@ async function lgConfirmarCadastro(planName, priceId) {
 
   // Se e-mail já cadastrado → fazer login com as credenciais fornecidas
   if (signUpError && signUpError.message === 'User already registered') {
-    btn.textContent = '⏳ Identificando sua conta...';
+    setBtn('⏳ Identificando sua conta...', true);
     const { data: signInData, error: signInError } = await sb.auth.signInWithPassword({ email: e, password: s });
     if (signInError) {
-      erro.style.display = 'block';
-      erro.textContent = 'E-mail já cadastrado. Verifique a senha ou use a aba "Entrar".';
-      btn.disabled = false;
-      btn.textContent = 'Descobrir meu dinheiro perdido agora →';
+      showErr('E-mail já cadastrado. Verifique a senha ou use a aba "Entrar".');
+      setBtn('Quero ver onde estou perdendo dinheiro →', false);
       return;
     }
     // Login ok → prosseguir como usuário existente
     currentUser = signInData.user;
     window._cadPending = null;
-    btn.disabled = false;
-    btn.textContent = 'Descobrir meu dinheiro perdido agora →';
+    setBtn('Quero ver onde estou perdendo dinheiro →', false);
     if (planName && priceId) {
       localStorage.removeItem('vc_pending_plan');
       localStorage.removeItem('vc_pending_price');
@@ -5438,10 +5450,8 @@ async function lgConfirmarCadastro(planName, priceId) {
   }
 
   if (signUpError) {
-    erro.style.display = 'block';
-    erro.textContent = 'Erro: ' + signUpError.message;
-    btn.disabled = false;
-    btn.textContent = 'Descobrir meu dinheiro perdido agora →';
+    showErr('Erro: ' + signUpError.message);
+    setBtn('Quero ver onde estou perdendo dinheiro →', false);
     return;
   }
 
@@ -5456,8 +5466,7 @@ async function lgConfirmarCadastro(planName, priceId) {
       localStorage.setItem('vc_pending_price', priceId);
     }
     window._cadPending = null;
-    btn.disabled = false;
-    btn.textContent = 'Descobrir meu dinheiro perdido agora →';
+    setBtn('Quero ver onde estou perdendo dinheiro →', false);
     // Navega para a tela de inserir o código
     irParaConfirmacaoEmail(e);
     return;
@@ -5480,17 +5489,14 @@ async function lgConfirmarCadastro(planName, priceId) {
 
   if (upsertErr) {
     console.error('Erro ao salvar perfil:', upsertErr.message, upsertErr.code, upsertErr.details);
-    erro.style.display = 'block';
-    erro.textContent = 'Erro ao salvar dados: ' + upsertErr.message + ' (código: ' + upsertErr.code + ')';
-    btn.disabled = false;
-    btn.textContent = 'Descobrir meu dinheiro perdido agora →';
+    showErr('Erro ao salvar dados: ' + upsertErr.message + ' (código: ' + upsertErr.code + ')');
+    setBtn('Quero ver onde estou perdendo dinheiro →', false);
     return;
   }
 
   // 5. Limpar dados temporários e avançar
   window._cadPending = null;
-  btn.disabled = false;
-  btn.textContent = 'Descobrir meu dinheiro perdido agora →';
+  setBtn('Quero ver onde estou perdendo dinheiro →', false);
 
   if (planName && priceId) {
     localStorage.removeItem('vc_pending_plan');
