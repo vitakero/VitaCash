@@ -1912,9 +1912,18 @@ async function carregarPerfil(){
       'unpaid':   'Não pago'
     })[status] || (status ? status.charAt(0).toUpperCase()+status.slice(1) : 'Inativo');
 
-    // Hero pill
-    if($('p-plano-label'))  $('p-plano-label').textContent  = 'Plano ' + planoTxt;
-    if($('p-plano-status')) $('p-plano-status').textContent = status ? '· ' + statusLabel : '';
+    // Hero pill (badge premium discreto)
+    if($('p-plano-label'))  $('p-plano-label').textContent  = planoTxt;
+    if($('p-plano-status')) $('p-plano-status').textContent = status ? statusLabel : '';
+    // Esconde o separador se não tiver status pra mostrar
+    if($('p-plano-pill-sep')) $('p-plano-pill-sep').style.display = status ? '' : 'none';
+    // Mostra estrela e eyebrow só para planos premium (Pro / Growth)
+    var planoLower = (d.current_plan || '').toLowerCase();
+    var isPremium = (planoLower === 'pro' || planoLower === 'growth' || planoLower === 'premium');
+    var pillIcon = document.querySelector('#s-perfil .perfil-pill-icon');
+    if(pillIcon) pillIcon.style.display = isPremium ? '' : 'none';
+    var eyebrow = $('p-plan-eyebrow');
+    if(eyebrow) eyebrow.style.display = isPremium ? '' : 'none';
 
     // Plan card
     if($('p-plano-label-2')) $('p-plano-label-2').textContent = planoTxt;
@@ -4302,22 +4311,35 @@ async function mudarSenhaPerfil(){
   font-weight:400; letter-spacing:-.003em;
   font-family:'Inter',-apple-system,sans-serif;
 }
+/* Badge premium refinado — slate-50 com estrela pequena slate-900 */
 #s-perfil .perfil-plano-pill {
   display:inline-flex; align-items:center; gap:6px;
-  padding:3px 9px 3px 8px;
+  padding:3px 10px 3px 8px;
   border-radius:99px;
-  background:#fff;
+  background:#f8fafc;
   border:1px solid #e8edf2;
   font-size:10.5px; font-weight:600;
-  color:#475569;
-  letter-spacing:.04em; text-transform:uppercase;
+  color:#0f172a;
+  letter-spacing:.05em; text-transform:uppercase;
+  flex-shrink:0;
+  box-shadow:inset 0 -1px 0 rgba(15,23,42,.02);
+}
+#s-perfil .perfil-plano-pill .perfil-pill-icon {
+  width:11px; height:11px;
+  color:#0f172a;
   flex-shrink:0;
 }
-#s-perfil .perfil-plano-pill .dot {
-  width:5px; height:5px; border-radius:50%;
-  background:#16a36a;
+#s-perfil .perfil-plano-pill .perfil-pill-sep {
+  color:#cbd5e1;
+  font-weight:400;
+  font-size:11px;
+  margin:0 1px;
 }
-#s-perfil .perfil-plano-pill #p-plano-status { color:#94a3b8; font-weight:500; }
+#s-perfil .perfil-plano-pill #p-plano-status {
+  color:#64748b;
+  font-weight:500;
+  letter-spacing:.04em;
+}
 
 /* Métricas inline (strip dentro do card de conta) */
 #s-perfil .perfil-stats {
@@ -4496,20 +4518,38 @@ async function mudarSenhaPerfil(){
   position:relative;
   border-bottom:1px solid #f1f5f9;
 }
-/* Ícone monoline neutro — sem gradient verde brilhante */
+/* Ícone monoline neutro com toque premium discreto */
 #s-perfil .plan-card-icon {
-  width:36px; height:36px; border-radius:9px;
+  width:38px; height:38px; border-radius:10px;
   background:#f8fafc;
   border:1px solid #e2e8f0;
   display:flex; align-items:center; justify-content:center;
-  color:#475569; flex-shrink:0;
+  color:#0f172a; flex-shrink:0;
+  box-shadow:inset 0 -1px 0 rgba(15,23,42,.03);
 }
 #s-perfil .plan-card-info { flex:1; min-width:0; }
+
+/* Eyebrow Premium tier — pequena estrela + texto caps neutro */
+#s-perfil .plan-card-eyebrow {
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:10px; font-weight:500;
+  color:#64748b;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  font-family:'Inter',sans-serif;
+  margin-bottom:4px;
+}
+#s-perfil .plan-card-eyebrow-icon {
+  width:9.5px; height:9.5px;
+  color:#0f172a;
+  flex-shrink:0;
+}
+
 #s-perfil .plan-card-name-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:2px; }
 #s-perfil .plan-card-name {
   font-family:'Sora',sans-serif;
-  font-size:15.5px; font-weight:600;
-  color:#0f172a; letter-spacing:-.015em;
+  font-size:16px; font-weight:600;
+  color:#0f172a; letter-spacing:-.018em;
 }
 #s-perfil .plan-card-status {
   font-size:10px; font-weight:600;
@@ -4685,8 +4725,9 @@ async function mudarSenhaPerfil(){
         <div class="perfil-email" id="p-email-display">—</div>
       </div>
       <div class="perfil-plano-pill">
-        <span class="dot"></span>
+        <svg class="perfil-pill-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.47 6.07 6.53.55-4.96 4.3 1.49 6.38L12 16.5l-5.53 3.3 1.49-6.38L3 9.12l6.53-.55L12 2.5z"/></svg>
         <span id="p-plano-label">—</span>
+        <span class="perfil-pill-sep" id="p-plano-pill-sep">·</span>
         <span id="p-plano-status"></span>
       </div>
     </div>
@@ -4791,6 +4832,10 @@ async function mudarSenhaPerfil(){
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
       </div>
       <div class="plan-card-info">
+        <div class="plan-card-eyebrow" id="p-plan-eyebrow">
+          <svg class="plan-card-eyebrow-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.47 6.07 6.53.55-4.96 4.3 1.49 6.38L12 16.5l-5.53 3.3 1.49-6.38L3 9.12l6.53-.55L12 2.5z"/></svg>
+          <span>Premium tier</span>
+        </div>
         <div class="plan-card-name-row">
           <span class="plan-card-name" id="p-plano-label-2">—</span>
           <span class="plan-card-status" id="p-plano-status-2">Trial</span>
