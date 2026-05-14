@@ -4274,116 +4274,116 @@ async function mudarSenhaPerfil(){
   margin-bottom:1.5rem;
 }
 
-/* Card com cabeçalho do usuário + métricas inline */
+/* ══════ HERO PREMIUM — gradient verde sóbrio (Stripe/Mercury vibe) ══════ */
 #s-perfil .perfil-hero {
-  background:#fff;
-  border:1px solid #e8edf2;
+  background:linear-gradient(160deg, #052e1d 0%, #0a4530 50%, #0f6e56 100%);
+  border:1px solid rgba(8,80,65,.25);
   border-radius:14px;
   padding:0;
   margin-bottom:1rem;
   display:block;
   overflow:hidden;
-  box-shadow:0 1px 2px rgba(15,23,42,.03);
+  box-shadow:0 1px 2px rgba(15,23,42,.04), 0 4px 16px -8px rgba(8,80,65,.15);
 }
 /* Linha superior: avatar + identidade + status */
 #s-perfil .perfil-hero-top {
-  padding:1.25rem 1.4rem 1.15rem;
-  display:flex; align-items:center; gap:14px;
+  padding:1.4rem 1.5rem 1.3rem;
+  display:flex; align-items:center; gap:15px;
 }
+/* Avatar com fundo translúcido sutil */
 #s-perfil .perfil-av {
-  width:48px; height:48px; border-radius:50%;
-  background:#f1f5f9;
-  border:1px solid #e2e8f0;
+  width:52px; height:52px; border-radius:50%;
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.16);
   display:inline-flex; align-items:center; justify-content:center;
-  font-family:'Sora',sans-serif; font-size:16px; font-weight:600;
-  color:#334155; letter-spacing:-.01em; flex-shrink:0;
+  font-family:'Sora',sans-serif; font-size:17px; font-weight:600;
+  color:#fff; letter-spacing:-.01em; flex-shrink:0;
 }
 #s-perfil .perfil-hero-text { flex:1; min-width:0; }
 #s-perfil .perfil-nome {
-  font-family:'Sora',sans-serif; font-size:16.5px; font-weight:600;
-  color:#0f172a;
-  letter-spacing:-.015em; line-height:1.2;
-  margin-bottom:2px;
+  font-family:'Sora',sans-serif; font-size:18px; font-weight:600;
+  color:#fff;
+  letter-spacing:-.018em; line-height:1.2;
+  margin-bottom:3px;
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
 #s-perfil .perfil-email {
-  font-size:13px; color:#64748b;
+  font-size:13px; color:rgba(255,255,255,.65);
   font-weight:400; letter-spacing:-.003em;
   font-family:'Inter',-apple-system,sans-serif;
 }
-/* Badge premium estilo Linear/Raycast — compacto, tight, sofisticado */
+/* Badge premium — pequeno e refinado sobre o gradient verde */
 #s-perfil .perfil-plano-pill {
   display:inline-flex; align-items:center; gap:5px;
   padding:2px 8px 2px 6px;
   border-radius:6px;
-  background:#f8fafc;
-  border:1px solid #e8edf2;
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.18);
   font-size:10px; font-weight:500;
-  color:#1e293b;
+  color:#fff;
   letter-spacing:.04em; text-transform:uppercase;
   flex-shrink:0;
   line-height:1.5;
 }
 #s-perfil .perfil-plano-pill .perfil-pill-icon {
   width:9.5px; height:9.5px;
-  color:#16a36a;
+  color:#6ee7b7;
   flex-shrink:0;
 }
 #s-perfil .perfil-plano-pill .perfil-pill-sep {
-  color:#cbd5e1;
+  color:rgba(255,255,255,.30);
   font-weight:400;
   font-size:10px;
   margin:0 1px;
   letter-spacing:0;
 }
 #s-perfil .perfil-plano-pill #p-plano-status {
-  color:#64748b;
+  color:rgba(255,255,255,.65);
   font-weight:500;
   letter-spacing:.04em;
 }
 
-/* Métricas inline (strip dentro do card de conta) */
+/* Métricas inline (strip dentro do card de conta verde) */
 #s-perfil .perfil-stats {
   display:grid; grid-template-columns:repeat(4, 1fr);
   gap:0;
-  border-top:1px solid #f1f5f9;
-  background:#fafbfc;
+  border-top:1px solid rgba(255,255,255,.10);
+  background:rgba(0,0,0,.10);
 }
 #s-perfil .perfil-stat-card {
   background:transparent;
   border:none;
-  border-right:1px solid #f1f5f9;
+  border-right:1px solid rgba(255,255,255,.07);
   border-radius:0;
-  padding:.85rem 1.1rem .9rem;
+  padding:.9rem 1.1rem .95rem;
   position:relative;
   overflow:hidden;
-  transition:none;
+  transition:background .15s;
 }
 #s-perfil .perfil-stat-card:last-child { border-right:none; }
 #s-perfil .perfil-stat-card::before { display:none; }
 #s-perfil .perfil-stat-card:hover {
-  background:#f6f8fa;
+  background:rgba(255,255,255,.04);
   transform:none;
   box-shadow:none;
-  border-color:#f1f5f9;
 }
-/* Métrica: label fininho em caps + valor em peso editorial */
-#s-perfil .perfil-stat-icon { display:none; } /* ícones removidos, deixa só texto */
+/* Métrica: label fininho em caps + valor em peso editorial (no hero verde) */
+#s-perfil .perfil-stat-icon { display:none; }
 #s-perfil .perfil-stat-label {
   font-size:10.5px; font-weight:500;
-  color:#94a3b8; letter-spacing:.04em;
+  color:rgba(255,255,255,.55); letter-spacing:.04em;
   text-transform:uppercase; margin-bottom:4px;
   font-family:'Inter',sans-serif;
 }
 #s-perfil .perfil-stat-value {
   font-family:'Inter','Sora',sans-serif;
   font-size:14px; font-weight:500;
-  color:#0f172a; letter-spacing:-.005em;
+  color:#fff; letter-spacing:-.005em;
   line-height:1.25;
   font-variant-numeric:tabular-nums;
 }
 #s-perfil .perfil-stat-value .perfil-stat-sub {
-  font-size:12px; font-weight:400; color:#94a3b8; margin-left:3px; letter-spacing:0;
+  font-size:12px; font-weight:400; color:rgba(255,255,255,.55); margin-left:3px; letter-spacing:0;
 }
 
 /* ══════ CARDS (calmos, editorial, sem hover dramático) ══════ */
@@ -4519,14 +4519,13 @@ async function mudarSenhaPerfil(){
   position:relative;
   border-bottom:1px solid #f1f5f9;
 }
-/* Ícone monoline neutro com toque premium discreto */
+/* Ícone do plano — quadrado verde suave com estrela premium */
 #s-perfil .plan-card-icon {
   width:38px; height:38px; border-radius:10px;
-  background:#f8fafc;
-  border:1px solid #e2e8f0;
+  background:#f0fdf4;
+  border:1px solid rgba(22,163,74,.18);
   display:flex; align-items:center; justify-content:center;
-  color:#0f172a; flex-shrink:0;
-  box-shadow:inset 0 -1px 0 rgba(15,23,42,.03);
+  color:#15803d; flex-shrink:0;
 }
 #s-perfil .plan-card-info { flex:1; min-width:0; }
 
