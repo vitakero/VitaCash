@@ -1304,7 +1304,12 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
 .lg-cs-val.sel{color:#0f172a;}
 .lg-cs-arrow{flex-shrink:0;color:#94a3b8;transition:transform .2s;}
 .lg-cs.open .lg-cs-arrow{transform:rotate(180deg);}
-.lg-cs-menu{position:absolute;top:calc(100% + 5px);left:0;right:0;background:#fff;border:1.5px solid #e8edf2;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.11),0 3px 10px rgba(0,0,0,.06);z-index:300;overflow:hidden;opacity:0;transform:translateY(-8px) scale(.98);transform-origin:top center;pointer-events:none;transition:opacity .17s ease,transform .17s ease;}
+.lg-cs-menu{position:absolute;top:calc(100% + 5px);left:0;right:0;background:#fff;border:1.5px solid #e8edf2;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.11),0 3px 10px rgba(0,0,0,.06);z-index:300;overflow-y:auto;max-height:min(360px,calc(100vh - 100px));padding:4px 0;opacity:0;transform:translateY(-8px) scale(.98);transform-origin:top center;pointer-events:none;transition:opacity .17s ease,transform .17s ease;}
+/* Scrollbar refinada (apenas WebKit) */
+.lg-cs-menu::-webkit-scrollbar{width:8px;}
+.lg-cs-menu::-webkit-scrollbar-track{background:transparent;}
+.lg-cs-menu::-webkit-scrollbar-thumb{background:#e2e8f0;border-radius:99px;border:2px solid #fff;}
+.lg-cs-menu::-webkit-scrollbar-thumb:hover{background:#cbd5e1;}
 .lg-cs.open .lg-cs-menu{opacity:1;transform:translateY(0) scale(1);pointer-events:all;}
 /* Item do dropdown — refinado, sem emojis, ícone monoline */
 .lg-cs-item{
