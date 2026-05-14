@@ -8481,14 +8481,34 @@ function ndreRemove(tipo) {
 // Limpa toda a tela de nova análise — usado pelo botão "Nova análise"
 // do dashboard pra começar do zero (sem arquivos do upload anterior).
 function ndreLimpar() {
+  // 1) Arquivos (DRE + Balanço)
   ['dre', 'bp'].forEach(function(t){
     if (typeof ndreRemove === 'function') ndreRemove(t);
   });
-  // Reseta também os campos de período/ano (se existirem)
-  ['ndre-ano', 'ndre-periodo'].forEach(function(id){
-    var el = document.getElementById(id);
-    if (el) el.value = '';
+
+  // 2) Selects customizados de ano e período
+  //    Reseta hidden input + label visível + remove 'active' dos itens
+  var selects = [
+    { id:'ndre-cs-ano',     valId:'ndre-cs-ano-val',     hiddenId:'ndre-ano',     placeholder:'Selecione o ano' },
+    { id:'ndre-cs-periodo', valId:'ndre-cs-periodo-val', hiddenId:'ndre-periodo', placeholder:'Período' }
+  ];
+  selects.forEach(function(s){
+    var hidden = document.getElementById(s.hiddenId);
+    if (hidden) hidden.value = '';
+    var val = document.getElementById(s.valId);
+    if (val){
+      val.textContent = s.placeholder;
+      val.classList.remove('sel');
+    }
+    var cs = document.getElementById(s.id);
+    if (cs){
+      cs.classList.remove('open');
+      cs.querySelectorAll('.ndre-cs-item').forEach(function(it){ it.classList.remove('active'); });
+    }
   });
+
+  // 3) Re-valida o botão (deixa desabilitado já que tudo foi limpo)
+  if (typeof ndreChkBtn === 'function') ndreChkBtn();
 }
 
 // Atalho usado por botões "Nova análise" do dashboard: limpa + navega
