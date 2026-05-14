@@ -1313,7 +1313,7 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
 .lg-cs.open .lg-cs-menu{opacity:1;transform:translateY(0) scale(1);pointer-events:all;}
 /* Item do dropdown — refinado, sem emojis, ícone monoline */
 .lg-cs-item{
-  padding:7px 14px;
+  padding:6px 14px;
   font-size:13px;
   color:#1e293b;
   letter-spacing:-.003em;
@@ -1323,7 +1323,7 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
   display:flex;
   align-items:center;
   gap:10px;
-  line-height:1.4;
+  line-height:1.35;
 }
 .lg-cs-item-icon{
   width:16px; height:16px;
@@ -8780,9 +8780,9 @@ function lgCsToggle(id) {
     var trigger = cs.querySelector('.lg-cs-trigger');
     if (menu && trigger) {
       var rect = trigger.getBoundingClientRect();
-      var espacoAbaixo = window.innerHeight - rect.bottom - 24; // 24px de respiro
-      // Limita entre 180px (mínimo razoável) e 320px (máximo confortável)
-      var alturaIdeal = Math.max(180, Math.min(320, espacoAbaixo));
+      var espacoAbaixo = window.innerHeight - rect.bottom - 16; // respiro
+      // Mínimo 180px (sempre rolável), máximo 380px (cabe todos os 9 itens sem scroll)
+      var alturaIdeal = Math.max(180, Math.min(380, espacoAbaixo));
       menu.style.maxHeight = alturaIdeal + 'px';
     }
   }
