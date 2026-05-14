@@ -983,19 +983,21 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
 [data-theme="dark"] #s-land .nav-link:hover { background:rgba(255,255,255,.04) !important; color:var(--text) !important; }
 /* Logo VitaCash (Vita em escuro hardcoded) */
 [data-theme="dark"] #main-nav > div > div[onclick*="scrollTo"] { color:var(--text) !important; }
-/* Botão Entrar (outline) */
+/* Botão Entrar (outline) — força full override */
 [data-theme="dark"] #nav-btns-desktop button:first-child,
 [data-theme="dark"] #nav-mobile-menu button[onclick*="login"] {
-  border-color:rgba(255,255,255,.38) !important;
-  background:rgba(255,255,255,.08) !important;
+  border:1.5px solid rgba(255,255,255,.55) !important;
+  background:rgba(255,255,255,.12) !important;
   color:#ffffff !important;
   font-weight:700 !important;
+  text-shadow:0 1px 2px rgba(0,0,0,.2) !important;
 }
 [data-theme="dark"] #nav-btns-desktop button:first-child:hover,
 [data-theme="dark"] #nav-mobile-menu button[onclick*="login"]:hover {
   border-color:#6ee7b7 !important;
-  background:rgba(110,231,183,.14) !important;
+  background:rgba(110,231,183,.18) !important;
   color:#6ee7b7 !important;
+  text-shadow:none !important;
 }
 /* Hambúrguer */
 [data-theme="dark"] #nav-hamburger { color:var(--text) !important; }
