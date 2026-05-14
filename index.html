@@ -1603,6 +1603,12 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
           <input type="hidden" id="lg-cad-nicho"/>
         </div>
 
+        <!-- Campo dinâmico: especificar o "Outro" (aparece só quando esse for selecionado) -->
+        <div class="lg-iw lg-outro-wrap" id="lg-cad-outro-wrap" style="display:none;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          <input type="text" class="lg-inp" id="lg-cad-outro" placeholder="Especifique seu nicho (ex: Tecnologia, Agência…)" maxlength="60" oninput="lgChkCad()"/>
+        </div>
+
         <!-- ── FATURAMENTO: custom select premium ── -->
         <div class="lg-cs" id="cs-fat">
           <div class="lg-cs-trigger" onclick="lgCsToggle('cs-fat')">
@@ -7048,10 +7054,17 @@ function lgCadastrar() {
   const n     = document.getElementById('lg-nome').value.trim();
   const rawE  = document.getElementById('lg-cad-email').value.trim();
   const tel   = document.getElementById('lg-cad-tel').value.trim();
-  const nicho = document.getElementById('lg-cad-nicho').value;
+  let   nicho = document.getElementById('lg-cad-nicho').value;
   const fat   = document.getElementById('lg-cad-fat').value;
   const s     = document.getElementById('lg-cad-senha').value;
   const err   = document.getElementById('lg-err-cad');
+
+  // Se nicho for "Outro", concatena o texto especificado pelo cliente
+  if (nicho === 'Outro') {
+    const outroInp = document.getElementById('lg-cad-outro');
+    const outroTxt = outroInp ? outroInp.value.trim() : '';
+    if (outroTxt) nicho = 'Outro: ' + outroTxt;
+  }
 
   // PROTEÇÃO 1 — Bloqueia emails descartáveis (mailinator, tempmail, etc.)
   if(isDisposableEmail(rawE)){
@@ -8103,13 +8116,21 @@ function lgChkCad() {
     err.style.display = 'none';
     err.textContent = '';
   }
+  // Se nicho for "Outro", exige que o campo de especificação esteja preenchido
+  var outroOk = true;
+  if (nicho.value === 'Outro') {
+    var outroInp = document.getElementById('lg-cad-outro');
+    outroOk = !!(outroInp && outroInp.value.trim().length >= 2);
+  }
+
   btn.disabled = !(
     nome.value.trim().length >= 2 &&
     email.value.includes('@') &&
     telOk &&
     nicho.value !== '' &&
     fat.value !== '' &&
-    senhasOk
+    senhasOk &&
+    outroOk
   );
 }
 
@@ -8778,6 +8799,22 @@ function lgCsSelect(id, value, el) {
   el.classList.add('active');
   if (inp) inp.value = value;
   cs.classList.remove('open');
+
+  // Mostra/esconde o input de especificar "Outro"
+  if (id === 'cs-nicho') {
+    var wrap = document.getElementById('lg-cad-outro-wrap');
+    var outroInp = document.getElementById('lg-cad-outro');
+    if (wrap) {
+      if (value === 'Outro') {
+        wrap.style.display = 'block';
+        setTimeout(function(){ if (outroInp) outroInp.focus(); }, 150);
+      } else {
+        wrap.style.display = 'none';
+        if (outroInp) outroInp.value = '';
+      }
+    }
+  }
+
   lgChkCad();
 }
 
