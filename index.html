@@ -983,8 +983,8 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
 [data-theme="dark"] #s-land .nav-link:hover { background:rgba(255,255,255,.04) !important; color:var(--text) !important; }
 /* Logo VitaCash (Vita em escuro hardcoded) */
 [data-theme="dark"] #main-nav > div > div[onclick*="scrollTo"] { color:var(--text) !important; }
-/* Botão Entrar (outline) — força full override */
-[data-theme="dark"] #nav-btns-desktop button:first-child,
+/* Botão Entrar (outline) — targeting via onclick (era :first-child = theme toggle, bug) */
+[data-theme="dark"] #nav-btns-desktop button[onclick*="goLogin('login')"],
 [data-theme="dark"] #nav-mobile-menu button[onclick*="login"] {
   border:1.5px solid rgba(255,255,255,.55) !important;
   background:rgba(255,255,255,.12) !important;
@@ -992,7 +992,7 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
   font-weight:700 !important;
   text-shadow:0 1px 2px rgba(0,0,0,.2) !important;
 }
-[data-theme="dark"] #nav-btns-desktop button:first-child:hover,
+[data-theme="dark"] #nav-btns-desktop button[onclick*="goLogin('login')"]:hover,
 [data-theme="dark"] #nav-mobile-menu button[onclick*="login"]:hover {
   border-color:#6ee7b7 !important;
   background:rgba(110,231,183,.18) !important;
