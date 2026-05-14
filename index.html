@@ -79,6 +79,13 @@
 [data-theme="dark"] #s-reativar.active,
 [data-theme="dark"] #s-perfil.active,
 [data-theme="dark"] #s-escolher-plano.active { background:var(--bg) !important; }
+/* Login — painel direito (.lg-right) precisa ficar dark, senão fica branco no branco */
+[data-theme="dark"] .lg-right { background:var(--surface) !important; }
+[data-theme="dark"] .lg-tab { background:rgba(255,255,255,.04) !important; }
+[data-theme="dark"] .lg-tab-btn.active { background:var(--bg) !important; color:var(--text) !important; box-shadow:0 2px 8px rgba(0,0,0,.3) !important; }
+[data-theme="dark"] .lg-forgot { color:var(--text2) !important; }
+[data-theme="dark"] .lg-divider { border-top-color:var(--border2) !important; }
+
 /* Inputs e textos em cinza-claro precisam clarear */
 [data-theme="dark"] .lg-inp,
 [data-theme="dark"] .lg-cs-trigger,
