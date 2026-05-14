@@ -81,6 +81,14 @@
 [data-theme="dark"] #s-escolher-plano.active { background:var(--bg) !important; }
 /* Login — painel direito (.lg-right) precisa ficar dark, senão fica branco no branco */
 [data-theme="dark"] .lg-right { background:var(--surface) !important; }
+/* Ícones dos inputs (envelope, cadeado, pessoa, telefone) — apagados demais no dark */
+[data-theme="dark"] .lg-iw > svg { stroke:#cbd5e1 !important; }
+[data-theme="dark"] .lg-iw > svg [stroke="#94a3b8"] { stroke:#cbd5e1 !important; }
+/* Texto digitado nos inputs — mais claro e levemente mais grosso */
+[data-theme="dark"] .lg-inp,
+[data-theme="dark"] .perfil-input { color:#ffffff !important; font-weight:500 !important; }
+[data-theme="dark"] .lg-inp::placeholder,
+[data-theme="dark"] .perfil-input::placeholder { color:#94a3b8 !important; font-weight:400 !important; }
 [data-theme="dark"] .lg-tab { background:rgba(255,255,255,.04) !important; }
 [data-theme="dark"] .lg-tab-btn.active { background:var(--bg) !important; color:var(--text) !important; box-shadow:0 2px 8px rgba(0,0,0,.3) !important; }
 [data-theme="dark"] .lg-forgot { color:var(--text2) !important; }
