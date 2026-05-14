@@ -241,6 +241,159 @@
 [data-theme="dark"] [style*="border:.5px solid #b5d4f4" i],
 [data-theme="dark"] [style*="border:1px solid #b5d4f4" i],
 [data-theme="dark"] [style*="border:.5px solid #bfdbfe" i] { border-color:rgba(59,130,246,.32) !important; }
+
+/* ════════════════════════════════════════════════════════════════
+   REFINAMENTO DARK MODE — Stripe / Mercury / Ramp / Linear vibe
+   Menos cor, mais credibilidade. Slate como base, accent só onde
+   realmente importa. 'Silêncio visual' enterprise.
+   ════════════════════════════════════════════════════════════════ */
+
+/* Verde mais 'emerald' (menos neon mint) — texto/accents */
+[data-theme="dark"] {
+  --green-dark: #6ee7b7 !important;
+  --green-bg:   #6ee7b7 !important;
+}
+
+/* ── CHIPS: base slate neutra, accent só na cor do texto + border sutil ── */
+[data-theme="dark"] .chip.ok,
+[data-theme="dark"] .chip.quick {
+  background:rgba(255,255,255,.04) !important;
+  color:#6ee7b7 !important;
+  border:1px solid rgba(110,231,183,.16) !important;
+  font-weight:500 !important;
+}
+[data-theme="dark"] .chip.warn {
+  background:rgba(255,255,255,.04) !important;
+  color:#fbbf24 !important;
+  border:1px solid rgba(251,191,36,.16) !important;
+  font-weight:500 !important;
+}
+[data-theme="dark"] .chip.bad,
+[data-theme="dark"] .chip.impact {
+  background:rgba(255,255,255,.04) !important;
+  color:#fca5a5 !important;
+  border:1px solid rgba(252,165,165,.18) !important;
+  font-weight:500 !important;
+}
+[data-theme="dark"] .chip.new,
+[data-theme="dark"] .chip.gain {
+  background:rgba(255,255,255,.04) !important;
+  color:#93c5fd !important;
+  border:1px solid rgba(147,197,253,.16) !important;
+  font-weight:500 !important;
+}
+
+/* ── BADGES IMPACTO: muito mais discretos, slate-based ── */
+[data-theme="dark"] .impacto.alto {
+  background:rgba(255,255,255,.04) !important;
+  color:#6ee7b7 !important;
+  border:1px solid rgba(110,231,183,.14) !important;
+  font-weight:500 !important;
+}
+[data-theme="dark"] .impacto.medio {
+  background:rgba(255,255,255,.04) !important;
+  color:#fbbf24 !important;
+  border:1px solid rgba(251,191,36,.14) !important;
+  font-weight:500 !important;
+}
+
+/* ── BANNER 'IMPACTO ESTIMADO': mais sóbrio ── */
+[data-theme="dark"] .ind-impacto-r {
+  background:rgba(255,255,255,.03) !important;
+  border-color:rgba(255,255,255,.10) !important;
+  color:var(--text) !important;
+  font-weight:500 !important;
+}
+[data-theme="dark"] .ind-impacto-r strong { color:#6ee7b7 !important; }
+[data-theme="dark"] .ind-impacto-r svg { color:#6ee7b7 !important; }
+
+/* ── NUMERADORES (1,2,3): neutros com toque de cor ── */
+[data-theme="dark"] .acao-num.bom {
+  background:rgba(255,255,255,.05) !important;
+  color:#6ee7b7 !important;
+  border:1px solid rgba(110,231,183,.16) !important;
+}
+[data-theme="dark"] .acao-num.ruim {
+  background:rgba(255,255,255,.05) !important;
+  color:#fca5a5 !important;
+  border:1px solid rgba(252,165,165,.16) !important;
+}
+
+/* ── TÍTULOS '3 ações para...': caps neutro, sem cor saturada ── */
+[data-theme="dark"] .acoes-titulo,
+[data-theme="dark"] .acoes-titulo.ruim,
+[data-theme="dark"] .acoes-titulo.bom {
+  color:var(--text2) !important;
+  font-weight:600 !important;
+}
+
+/* ── STATUS dot/ícone dos indicadores: base slate + cor sutil ── */
+[data-theme="dark"] .ind-status.bom {
+  background:rgba(255,255,255,.05) !important;
+  border-color:rgba(110,231,183,.18) !important;
+  color:#6ee7b7 !important;
+}
+[data-theme="dark"] .ind-status.ruim {
+  background:rgba(255,255,255,.05) !important;
+  border-color:rgba(252,165,165,.20) !important;
+  color:#fca5a5 !important;
+}
+
+/* ── VAL labels (margem: 3,7%, etc) menos saturados ── */
+[data-theme="dark"] .ind-val.ruim { color:#fca5a5 !important; }
+[data-theme="dark"] .ind-val.bom { color:#6ee7b7 !important; }
+
+/* ── CARDS: borders mais suaves, sem 'pulsação' visual ── */
+[data-theme="dark"] .mc,
+[data-theme="dark"] .ind-card,
+[data-theme="dark"] .tmc,
+[data-theme="dark"] .ai-card,
+[data-theme="dark"] .cg-card {
+  border-color:rgba(255,255,255,.06) !important;
+  background:rgba(255,255,255,.015) !important;
+}
+[data-theme="dark"] .mc:hover,
+[data-theme="dark"] .ind-card:hover,
+[data-theme="dark"] .ai-card:hover {
+  border-color:rgba(255,255,255,.12) !important;
+  box-shadow:none !important;
+}
+
+/* ── TAGS 'Receita: R$ X', 'Você: Y%' (pills verdes/amber/red) ── */
+/* Tornar base slate com leve accent — não mais 'sólido colorido' */
+[data-theme="dark"] [style*="background:#E1F5EE" i] {
+  background:rgba(255,255,255,.04) !important;
+  color:#6ee7b7 !important;
+  border-color:rgba(110,231,183,.18) !important;
+}
+[data-theme="dark"] [style*="background:#FAEEDA" i] {
+  background:rgba(255,255,255,.04) !important;
+  color:#fbbf24 !important;
+  border-color:rgba(251,191,36,.18) !important;
+}
+[data-theme="dark"] [style*="background:#FCE7F3" i],
+[data-theme="dark"] [style*="background:#FEE2E2" i] {
+  background:rgba(255,255,255,.04) !important;
+  color:#fca5a5 !important;
+  border-color:rgba(252,165,165,.18) !important;
+}
+
+/* ── CTAs '.ind-cta' mais sóbrios ── */
+[data-theme="dark"] .ind-cta { color:#6ee7b7 !important; font-weight:500 !important; }
+[data-theme="dark"] .ind-cta.urgente { color:#fca5a5 !important; font-weight:500 !important; }
+
+/* ── SIDEBAR (se existir) mais discreta ── */
+[data-theme="dark"] .sidebar,
+[data-theme="dark"] .snav {
+  background:rgba(255,255,255,.02) !important;
+  border-color:rgba(255,255,255,.05) !important;
+}
+[data-theme="dark"] .snav-item.active {
+  background:rgba(255,255,255,.06) !important;
+  color:var(--text) !important;
+  border-left-color:#6ee7b7 !important;
+}
+
 body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;justify-content:center;padding:2rem 1.5rem;letter-spacing:-.01em;transition:background .25s ease, color .25s ease;}
 .wrap{width:100%;max-width:960px;}
 .screen{display:none;}.screen.active{display:block;}
