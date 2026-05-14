@@ -7593,6 +7593,18 @@ function go(id){
   }
   // Carrega perfil na tela de perfil
   if(id==='s-perfil' && currentUser) setTimeout(carregarPerfil, 50);
+  // Restaura estado do botão de envio ao entrar na tela de Nova análise
+  if(id==='s-nova-dre'){
+    var btnNdre = document.getElementById('ndre-btn');
+    if(btnNdre){
+      btnNdre.textContent = 'Descobrir quanto estou perdendo →';
+      btnNdre.style.background = '';
+      btnNdre.style.boxShadow = '';
+      btnNdre.disabled = true;
+      // Re-aplica a validação pra liberar o botão se a tela já tem arquivos
+      if(typeof ndreChk === 'function') ndreChk();
+    }
+  }
   // Limpa flag de novo cadastro ao sair da pagina de planos
   if(id !== 's-escolher-plano') sessionStorage.removeItem('vc_novo_cadastro');
   // Controla badge cadastro vs botão voltar na página de planos
