@@ -243,6 +243,64 @@
 [data-theme="dark"] [style*="border:.5px solid #bfdbfe" i] { border-color:rgba(59,130,246,.32) !important; }
 
 /* ════════════════════════════════════════════════════════════════
+   LANDING — Banners e cards específicos em dark mode
+   ════════════════════════════════════════════════════════════════ */
+
+/* Banner CTA 'Chega de adivinhar para onde vai o dinheiro' */
+[data-theme="dark"] [style*="linear-gradient(135deg,#f0fdf8" i],
+[data-theme="dark"] [style*="linear-gradient(135deg, #f0fdf8" i] {
+  background:linear-gradient(135deg, rgba(22,163,74,.08), rgba(22,163,74,.04)) !important;
+  border-top-color:rgba(22,163,74,.18) !important;
+  border-bottom-color:rgba(22,163,74,.18) !important;
+}
+
+/* PRO card destaque (gradient verde claro → branco) */
+[data-theme="dark"] [style*="linear-gradient(180deg,#f0fdf8" i],
+[data-theme="dark"] [style*="linear-gradient(180deg, #f0fdf8" i] {
+  background:linear-gradient(180deg, rgba(22,163,74,.10) 0%, var(--surface) 60%) !important;
+  border-color:rgba(22,163,74,.45) !important;
+}
+
+/* Badge azul '+R$18k/mês' (testimonial) */
+[data-theme="dark"] [style*="background:#eff6ff" i] {
+  background:rgba(59,130,246,.12) !important;
+  color:#93c5fd !important;
+  border-color:rgba(59,130,246,.28) !important;
+}
+
+/* Cards de plano STARTER/GROWTH (bg branco + border slate) */
+[data-theme="dark"] [style*="background:#fff;border:1px solid #e2e8f0" i],
+[data-theme="dark"] [style*="background:#ffffff;border:1px solid #e2e8f0" i] {
+  background:var(--surface) !important;
+  border-color:var(--border2) !important;
+  box-shadow:none !important;
+}
+
+/* Card PREMIUM (já é dark slate #0f172a — ajuste pra coerência) */
+[data-theme="dark"] [style*="background:#0f172a;border:1px solid #1e293b" i] {
+  background:rgba(255,255,255,.02) !important;
+  border-color:var(--border2) !important;
+}
+
+/* Border #e2e8f0 em buttons e inputs da landing */
+[data-theme="dark"] [style*="border:1.5px solid #e2e8f0" i] { border-color:rgba(255,255,255,.15) !important; }
+[data-theme="dark"] [style*="border:2px solid #1D9E75" i] { border-color:rgba(22,163,74,.55) !important; }
+
+/* Border #334155 (PREMIUM card button) */
+[data-theme="dark"] [style*="border:1.5px solid #334155" i] { border-color:rgba(255,255,255,.15) !important; }
+
+/* Cores hardcoded de texto que faltavam */
+[data-theme="dark"] [style*="color:#065f46" i],
+[data-theme="dark"] [style*="color:#6ee7b7" i] { color:#86efac !important; }
+[data-theme="dark"] [style*="color:#cbd5e1" i],
+[data-theme="dark"] [style*="color:#7bb89a" i] { color:rgba(255,255,255,.32) !important; }
+[data-theme="dark"] [style*="color:#e2e8f0" i] { color:var(--text) !important; }
+
+/* Borders #1D9E75 e variações */
+[data-theme="dark"] [style*="border-top:1px solid #a7f3d0" i],
+[data-theme="dark"] [style*="border-bottom:1px solid #a7f3d0" i] { border-color:rgba(22,163,74,.20) !important; }
+
+/* ════════════════════════════════════════════════════════════════
    REFINAMENTO DARK MODE — Stripe / Mercury / Ramp / Linear vibe
    Menos cor, mais credibilidade. Slate como base, accent só onde
    realmente importa. 'Silêncio visual' enterprise.
