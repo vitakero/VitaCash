@@ -5017,7 +5017,7 @@ async function mudarSenhaPerfil(){
     <div class="del-modal-list" style="background:#fffbeb;border-color:#fde68a;">
       <div class="del-modal-list-item" style="color:#92400e;"><span class="del-modal-bullet" style="color:#b45309;">✓</span> Todos os seus dados pessoais e análises ficam salvos</div>
       <div class="del-modal-list-item" style="color:#92400e;"><span class="del-modal-bullet" style="color:#b45309;">✓</span> Seu email/senha continuam funcionando</div>
-      <div class="del-modal-list-item" style="color:#92400e;"><span class="del-modal-bullet" style="color:#b45309;">⏸</span> Sua assinatura é cancelada (sem novas cobranças)</div>
+      <div class="del-modal-list-item" style="color:#92400e;"><span class="del-modal-bullet" style="color:#b45309;">⏸</span> Sua assinatura continua ativa (gerencie em "Minha assinatura")</div>
       <div class="del-modal-list-item" style="color:#92400e;"><span class="del-modal-bullet" style="color:#b45309;">⏸</span> Acesso ao app bloqueado até você reativar</div>
     </div>
 
@@ -5758,17 +5758,43 @@ async function reativarConta(){
   if(btn){ btn.disabled = true; btn.textContent = 'Reativando...'; }
   if(msg){ msg.textContent=''; msg.className='reativ-msg'; }
   try {
+    // 1. Marca a conta como ativa
     var resp = await sb.from('profiles').update({
       status: 'active',
       paused_at: null,
       updated_at: new Date().toISOString()
     }).eq('id', currentUser.id);
     if(resp.error) throw resp.error;
-    if(msg){ msg.textContent='✓ Conta reativada! Bem-vindo de volta.'; msg.className='reativ-msg ok'; }
-    setTimeout(function(){
-      // Cliente sem plano ativo cai em escolher plano; com plano cai no dashboard
-      if(typeof go === 'function') go('s-escolher-plano');
-    }, 800);
+
+    // 2. Verifica se o cliente já tinha plano pago ativo
+    var planResp = await sb.from('profiles')
+      .select('current_plan, subscription_status')
+      .eq('id', currentUser.id).single();
+    var p = planResp.data || {};
+    var plano = (p.current_plan || '').toLowerCase();
+    var st = (p.subscription_status || '').toLowerCase();
+    var temAssinaturaAtiva =
+      plano && plano !== 'starter' && plano !== 'free' &&
+      (st === 'active' || st === 'trialing' || st === 'past_due');
+
+    // 3. Mensagem e redirect contextuais
+    if(temAssinaturaAtiva){
+      if(msg){
+        msg.textContent = '✓ Conta reativada — sua assinatura ' + (p.current_plan ? p.current_plan.toUpperCase() : '') + ' está ativa.';
+        msg.className='reativ-msg ok';
+      }
+      setTimeout(function(){
+        if(typeof go === 'function') go('s-dash');
+      }, 900);
+    } else {
+      if(msg){
+        msg.textContent = '✓ Conta reativada! Escolha um plano para continuar.';
+        msg.className='reativ-msg ok';
+      }
+      setTimeout(function(){
+        if(typeof go === 'function') go('s-escolher-plano');
+      }, 900);
+    }
   } catch(err){
     console.error('reativar:', err);
     if(msg){
