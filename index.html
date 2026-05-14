@@ -105,29 +105,29 @@
 [data-theme="dark"] .lg-tab { background:var(--surface2) !important; }
 [data-theme="dark"] .lg-tab-btn { color:var(--text2) !important; }
 [data-theme="dark"] .lg-tab-btn.active { background:var(--surface) !important; color:var(--text) !important; }
-/* Background bege #f5f4f0 hardcoded em várias telas */
-[data-theme="dark"] [style*="background:#f5f4f0"],
-[data-theme="dark"] [style*="background:#fff"],
-[data-theme="dark"] [style*="background:#ffffff"],
-[data-theme="dark"] [style*="background:#fafafa"] { background:var(--surface) !important; }
+/* Background bege #f5f4f0 hardcoded em várias telas (case-insensitive) */
+[data-theme="dark"] [style*="background:#f5f4f0" i],
+[data-theme="dark"] [style*="background:#fff" i],
+[data-theme="dark"] [style*="background:#ffffff" i],
+[data-theme="dark"] [style*="background:#fafafa" i] { background:var(--surface) !important; }
 /* Chips bege neutros ('Comece por aqui', 'Menos de 1h', etc) */
-[data-theme="dark"] [style*="background:#f8f8f6"],
-[data-theme="dark"] [style*="background:#f7f6f2"],
-[data-theme="dark"] [style*="background:#f1f5f9"],
-[data-theme="dark"] [style*="background:#f8fafc"] { background:rgba(255,255,255,.06) !important; }
-[data-theme="dark"] [style*="border:.5px solid #d0cfc9"],
-[data-theme="dark"] [style*="border:1px solid #d0cfc9"] { border-color:var(--border2) !important; }
-[data-theme="dark"] [style*="color:#0f172a"],
-[data-theme="dark"] [style*="color:#1a1a18"],
-[data-theme="dark"] [style*="color:#1e293b"] { color:var(--text) !important; }
-[data-theme="dark"] [style*="color:#475569"],
-[data-theme="dark"] [style*="color:#5f5e5a"],
-[data-theme="dark"] [style*="color:#64748b"] { color:var(--text2) !important; }
-[data-theme="dark"] [style*="color:#94a3b8"],
-[data-theme="dark"] [style*="color:#888780"] { color:var(--text3) !important; }
-[data-theme="dark"] [style*="border:.5px solid var(--border)"],
-[data-theme="dark"] [style*="border:1px solid #e8edf2"],
-[data-theme="dark"] [style*="border:1px solid #e2e8f0"] { border-color:var(--border2) !important; }
+[data-theme="dark"] [style*="background:#f8f8f6" i],
+[data-theme="dark"] [style*="background:#f7f6f2" i],
+[data-theme="dark"] [style*="background:#f1f5f9" i],
+[data-theme="dark"] [style*="background:#f8fafc" i] { background:rgba(255,255,255,.06) !important; }
+[data-theme="dark"] [style*="border:.5px solid #d0cfc9" i],
+[data-theme="dark"] [style*="border:1px solid #d0cfc9" i] { border-color:var(--border2) !important; }
+[data-theme="dark"] [style*="color:#0f172a" i],
+[data-theme="dark"] [style*="color:#1a1a18" i],
+[data-theme="dark"] [style*="color:#1e293b" i] { color:var(--text) !important; }
+[data-theme="dark"] [style*="color:#475569" i],
+[data-theme="dark"] [style*="color:#5f5e5a" i],
+[data-theme="dark"] [style*="color:#64748b" i] { color:var(--text2) !important; }
+[data-theme="dark"] [style*="color:#94a3b8" i],
+[data-theme="dark"] [style*="color:#888780" i] { color:var(--text3) !important; }
+[data-theme="dark"] [style*="border:.5px solid var(--border)" i],
+[data-theme="dark"] [style*="border:1px solid #e8edf2" i],
+[data-theme="dark"] [style*="border:1px solid #e2e8f0" i] { border-color:var(--border2) !important; }
 
 /* ══════════════════════════════════════════════════
    DARK MODE — Correções de contraste no dashboard
@@ -181,46 +181,66 @@
 [data-theme="dark"] .tt-bench { background:rgba(22,163,74,.16) !important; color:#86efac !important; border-color:rgba(22,163,74,.28) !important; }
 
 /* Banners verdes hardcoded (Radar IA, Você já tem R$ X mapeados, etc) */
-[data-theme="dark"] [style*="background:#f0fdf8"],
-[data-theme="dark"] [style*="background:#f0fdf4"],
-[data-theme="dark"] [style*="background:#e1f5ee"],
-[data-theme="dark"] [style*="background:#ecfdf5"],
-[data-theme="dark"] [style*="background: #f0fdf8"],
-[data-theme="dark"] [style*="background: #f0fdf4"]   { background:rgba(22,163,74,.10) !important; }
-[data-theme="dark"] [style*="color:#0d6e4c"],
-[data-theme="dark"] [style*="color:#15803d"],
-[data-theme="dark"] [style*="color:#0d2b1e"],
-[data-theme="dark"] [style*="color:#085041"],
-[data-theme="dark"] [style*="color:#065f46"],
-[data-theme="dark"] [style*="color:#0f6e56"],
-[data-theme="dark"] [style*="color:#16a36a"]         { color:#86efac !important; }
+[data-theme="dark"] [style*="background:#f0fdf8" i],
+[data-theme="dark"] [style*="background:#f0fdf4" i],
+[data-theme="dark"] [style*="background:#e1f5ee" i],
+[data-theme="dark"] [style*="background:#ecfdf5" i],
+[data-theme="dark"] [style*="background:#f0faf5" i],
+[data-theme="dark"] [style*="background: #f0fdf8" i],
+[data-theme="dark"] [style*="background: #f0fdf4" i]   { background:rgba(22,163,74,.14) !important; }
+[data-theme="dark"] [style*="color:#0d6e4c" i],
+[data-theme="dark"] [style*="color:#15803d" i],
+[data-theme="dark"] [style*="color:#0d2b1e" i],
+[data-theme="dark"] [style*="color:#085041" i],
+[data-theme="dark"] [style*="color:#065f46" i],
+[data-theme="dark"] [style*="color:#0f6e56" i],
+[data-theme="dark"] [style*="color:#16a36a" i],
+[data-theme="dark"] [style*="color:#1a6e50" i]         { color:#86efac !important; }
+/* Borders verdes hardcoded */
+[data-theme="dark"] [style*="border:.5px solid #9fe1cb" i],
+[data-theme="dark"] [style*="border:1px solid #9fe1cb" i],
+[data-theme="dark"] [style*="border:.5px solid #a7f3d0" i],
+[data-theme="dark"] [style*="border:1px solid #a7f3d0" i] { border-color:rgba(22,163,74,.32) !important; }
 
 /* Backgrounds amarelos hardcoded */
-[data-theme="dark"] [style*="background:#fffbeb"],
-[data-theme="dark"] [style*="background:#fef3c7"],
-[data-theme="dark"] [style*="background:#faeeda"]    { background:rgba(245,158,11,.10) !important; }
-[data-theme="dark"] [style*="color:#92400e"],
-[data-theme="dark"] [style*="color:#7a6000"],
-[data-theme="dark"] [style*="color:#633806"],
-[data-theme="dark"] [style*="color:#b45309"]         { color:#fcd34d !important; }
+[data-theme="dark"] [style*="background:#fffbeb" i],
+[data-theme="dark"] [style*="background:#fef3c7" i],
+[data-theme="dark"] [style*="background:#fdfaf0" i],
+[data-theme="dark"] [style*="background:#faeeda" i]    { background:rgba(245,158,11,.14) !important; }
+[data-theme="dark"] [style*="color:#92400e" i],
+[data-theme="dark"] [style*="color:#7a6000" i],
+[data-theme="dark"] [style*="color:#633806" i],
+[data-theme="dark"] [style*="color:#b45309" i]         { color:#fcd34d !important; }
+[data-theme="dark"] [style*="border:.5px solid #fac775" i],
+[data-theme="dark"] [style*="border:1px solid #fac775" i],
+[data-theme="dark"] [style*="border:.5px solid #fde68a" i] { border-color:rgba(245,158,11,.32) !important; }
 
 /* Backgrounds vermelhos hardcoded */
-[data-theme="dark"] [style*="background:#fef2f2"],
-[data-theme="dark"] [style*="background:#fee2e2"],
-[data-theme="dark"] [style*="background:#faece7"]    { background:rgba(220,38,38,.10) !important; }
-[data-theme="dark"] [style*="color:#7f1d1d"],
-[data-theme="dark"] [style*="color:#991b1b"],
-[data-theme="dark"] [style*="color:#b91c1c"],
-[data-theme="dark"] [style*="color:#dc2626"],
-[data-theme="dark"] [style*="color:#993c1d"],
-[data-theme="dark"] [style*="color:#8a1c1c"]         { color:#fca5a5 !important; }
+[data-theme="dark"] [style*="background:#fef2f2" i],
+[data-theme="dark"] [style*="background:#fee2e2" i],
+[data-theme="dark"] [style*="background:#fdf2f2" i],
+[data-theme="dark"] [style*="background:#faece7" i]    { background:rgba(220,38,38,.14) !important; }
+[data-theme="dark"] [style*="color:#7f1d1d" i],
+[data-theme="dark"] [style*="color:#991b1b" i],
+[data-theme="dark"] [style*="color:#b91c1c" i],
+[data-theme="dark"] [style*="color:#dc2626" i],
+[data-theme="dark"] [style*="color:#993c1d" i],
+[data-theme="dark"] [style*="color:#8a1c1c" i]         { color:#fca5a5 !important; }
+[data-theme="dark"] [style*="border:.5px solid #fecaca" i],
+[data-theme="dark"] [style*="border:1px solid #fecaca" i],
+[data-theme="dark"] [style*="border:.5px solid #f0997b" i] { border-color:rgba(220,38,38,.32) !important; }
 
 /* Backgrounds azuis hardcoded */
-[data-theme="dark"] [style*="background:#e6f1fb"],
-[data-theme="dark"] [style*="background:#f0f5ff"]    { background:rgba(59,130,246,.10) !important; }
-[data-theme="dark"] [style*="color:#0c447c"],
-[data-theme="dark"] [style*="color:#1e3a8a"],
-[data-theme="dark"] [style*="color:#1e40af"]         { color:#93c5fd !important; }
+[data-theme="dark"] [style*="background:#e6f1fb" i],
+[data-theme="dark"] [style*="background:#f0f5ff" i],
+[data-theme="dark"] [style*="background:#f3f4f9" i]    { background:rgba(59,130,246,.14) !important; }
+[data-theme="dark"] [style*="color:#0c447c" i],
+[data-theme="dark"] [style*="color:#1e3a8a" i],
+[data-theme="dark"] [style*="color:#1e40af" i],
+[data-theme="dark"] [style*="color:#3730a3" i]         { color:#93c5fd !important; }
+[data-theme="dark"] [style*="border:.5px solid #b5d4f4" i],
+[data-theme="dark"] [style*="border:1px solid #b5d4f4" i],
+[data-theme="dark"] [style*="border:.5px solid #bfdbfe" i] { border-color:rgba(59,130,246,.32) !important; }
 body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;justify-content:center;padding:2rem 1.5rem;letter-spacing:-.01em;transition:background .25s ease, color .25s ease;}
 .wrap{width:100%;max-width:960px;}
 .screen{display:none;}.screen.active{display:block;}
