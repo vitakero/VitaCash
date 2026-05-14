@@ -7566,6 +7566,9 @@ function go(id){
   requestAnimationFrame(()=>requestAnimationFrame(()=>{el.style.opacity='1';el.style.transform='translateY(0)';}));
   document.body.style.overflow = (id==='s-login'||id==='s-nova-dre') ? 'hidden' : '';
   window.scrollTo(0,0);
+  // Para telas com position:fixed e scroll interno (s-nova-dre, s-login,
+  // s-confirmar-email, s-reativar), reseta o scrollTop da própria tela.
+  el.scrollTop = 0;
   if(id==='s-c4'){
     const n=document.getElementById('inp-nome').value.trim();
     nome=n?n.split(' ')[0]:'João';
