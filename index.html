@@ -1306,10 +1306,43 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
 .lg-cs.open .lg-cs-arrow{transform:rotate(180deg);}
 .lg-cs-menu{position:absolute;top:calc(100% + 5px);left:0;right:0;background:#fff;border:1.5px solid #e8edf2;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.11),0 3px 10px rgba(0,0,0,.06);z-index:300;overflow:hidden;opacity:0;transform:translateY(-8px) scale(.98);transform-origin:top center;pointer-events:none;transition:opacity .17s ease,transform .17s ease;}
 .lg-cs.open .lg-cs-menu{opacity:1;transform:translateY(0) scale(1);pointer-events:all;}
-.lg-cs-item{padding:10px 16px;font-size:13.5px;color:#334155;cursor:pointer;transition:background .1s;font-family:inherit;display:flex;align-items:center;justify-content:space-between;}
-.lg-cs-item:hover{background:#f8fafc;color:#0f172a;}
-.lg-cs-item.active{background:#f0fdf8;color:#0d6e4c;font-weight:600;}
-.lg-cs-item.active::after{content:"✓";color:#1D9E75;font-weight:700;font-size:13px;}
+/* Item do dropdown — refinado, sem emojis, ícone monoline */
+.lg-cs-item{
+  padding:7px 14px;
+  font-size:13px;
+  color:#1e293b;
+  letter-spacing:-.003em;
+  cursor:pointer;
+  transition:background .12s ease, color .12s ease;
+  font-family:inherit;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  line-height:1.4;
+}
+.lg-cs-item-icon{
+  width:16px; height:16px;
+  color:#64748b;
+  flex-shrink:0;
+  transition:color .12s ease;
+}
+.lg-cs-item-label{ flex:1; min-width:0; }
+.lg-cs-item:hover{ background:#f6f8fa; color:#0f172a; }
+.lg-cs-item:hover .lg-cs-item-icon{ color:#334155; }
+.lg-cs-item.active{
+  background:#f0fdf4;
+  color:#0f172a;
+  font-weight:500;
+}
+.lg-cs-item.active .lg-cs-item-icon{ color:#16a36a; }
+.lg-cs-item.active::after{
+  content:"";
+  width:14px; height:14px;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2316a36a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>");
+  background-size:contain;
+  background-repeat:no-repeat;
+  flex-shrink:0;
+}
 @media(max-width:700px){
   .lg-outer{grid-template-columns:1fr;min-height:auto;margin:0;}
   .lg-left{display:none;}
@@ -1525,15 +1558,42 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
             <svg class="lg-cs-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
           </div>
           <div class="lg-cs-menu" id="cs-nicho-menu">
-            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Restaurante / Alimentação',this)">🍽️&nbsp; Restaurante / Alimentação</div>
-            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Varejo / Comércio',this)">🛒&nbsp; Varejo / Comércio</div>
-            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Clínica / Saúde',this)">🏥&nbsp; Clínica / Saúde</div>
-            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Distribuidora / Logística',this)">🚚&nbsp; Distribuidora / Logística</div>
-            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Indústria / Manufatura',this)">🏭&nbsp; Indústria / Manufatura</div>
-            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Prestação de Serviços',this)">💼&nbsp; Prestação de Serviços</div>
-            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Construção / Engenharia',this)">🏗️&nbsp; Construção / Engenharia</div>
-            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','E-commerce / Digital',this)">📦&nbsp; E-commerce / Digital</div>
-            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Outro',this)">➕&nbsp; Outro</div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Restaurante / Alimentação',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><line x1="7" y1="2" x2="7" y2="22"/><path d="M21 15V2a5 5 0 00-5 5v6c0 1.1.9 2 2 2h3z"/><line x1="21" y1="15" x2="21" y2="22"/></svg>
+              <span class="lg-cs-item-label">Restaurante / Alimentação</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Varejo / Comércio',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9v11a1 1 0 001 1h16a1 1 0 001-1V9"/><path d="M3 9h18"/><path d="M9 13v4"/><path d="M15 13v4"/></svg>
+              <span class="lg-cs-item-label">Varejo / Comércio</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Clínica / Saúde',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16v13a1 1 0 01-1 1H5a1 1 0 01-1-1V8z"/><path d="M2 8h20"/><path d="M9 4h6v4H9z"/><path d="M12 12v6"/><path d="M9 15h6"/></svg>
+              <span class="lg-cs-item-label">Clínica / Saúde</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Distribuidora / Logística',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a1 1 0 00-1-1H3a1 1 0 00-1 1v12a1 1 0 001 1h1"/><path d="M14 9h4l4 4v5a1 1 0 01-1 1h-1"/><circle cx="7" cy="19" r="2"/><circle cx="17" cy="19" r="2"/></svg>
+              <span class="lg-cs-item-label">Distribuidora / Logística</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Indústria / Manufatura',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M2 20V10l6 4V10l6 4V6l8 4v10"/><path d="M6 16h.01"/><path d="M11 16h.01"/><path d="M16 16h.01"/></svg>
+              <span class="lg-cs-item-label">Indústria / Manufatura</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Prestação de Serviços',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/><path d="M2 13h20"/></svg>
+              <span class="lg-cs-item-label">Prestação de Serviços</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Construção / Engenharia',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-7h6v7"/><path d="M8 6h.01"/><path d="M12 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/></svg>
+              <span class="lg-cs-item-label">Construção / Engenharia</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','E-commerce / Digital',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+              <span class="lg-cs-item-label">E-commerce / Digital</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Outro',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="6" cy="12" r="1.4" fill="currentColor"/><circle cx="18" cy="12" r="1.4" fill="currentColor"/></svg>
+              <span class="lg-cs-item-label">Outro</span>
+            </div>
           </div>
           <input type="hidden" id="lg-cad-nicho"/>
         </div>
