@@ -23,7 +23,78 @@
   --shadow-md:0 4px 12px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.04);
   --shadow-lg:0 8px 24px rgba(0,0,0,.08),0 3px 6px rgba(0,0,0,.04);
 }
-body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f4f0;color:#1a1a18;min-height:100vh;display:flex;justify-content:center;padding:2rem 1.5rem;letter-spacing:-.01em;}
+/* ══════════════════════════════════════════════════
+   DARK MODE — overrides via [data-theme="dark"] no <html>
+   Aplicado automaticamente quando o cliente ativa o tema
+   ══════════════════════════════════════════════════ */
+:root[data-theme="dark"]{
+  --bg:#0a0f1a;
+  --surface:#131a2b;
+  --surface2:#1a2440;
+  --border:rgba(241,245,249,.08);
+  --border2:rgba(241,245,249,.15);
+  --text:#f1f5f9;
+  --text2:#cbd5e1;
+  --text3:#94a3b8;
+  --green-light:rgba(29,158,117,.14);
+  --green-mid:rgba(29,158,117,.28);
+  --shadow-sm:0 1px 3px rgba(0,0,0,.45),0 1px 2px rgba(0,0,0,.30);
+  --shadow-md:0 4px 12px rgba(0,0,0,.55),0 2px 4px rgba(0,0,0,.35);
+  --shadow-lg:0 8px 24px rgba(0,0,0,.65),0 3px 6px rgba(0,0,0,.45);
+}
+/* Sobrescreve cores hardcoded que não usam vars — só em dark mode */
+[data-theme="dark"] body { background:var(--bg) !important; }
+[data-theme="dark"] .screen { color:var(--text); }
+/* Telas com position:fixed que fazem override do background */
+[data-theme="dark"] #s-login.active,
+[data-theme="dark"] #s-nova-dre.active,
+[data-theme="dark"] #s-confirmar-email.active,
+[data-theme="dark"] #s-reativar.active,
+[data-theme="dark"] #s-perfil.active,
+[data-theme="dark"] #s-escolher-plano.active { background:var(--bg) !important; }
+/* Inputs e textos em cinza-claro precisam clarear */
+[data-theme="dark"] .lg-inp,
+[data-theme="dark"] .lg-cs-trigger,
+[data-theme="dark"] .perfil-input,
+[data-theme="dark"] .perfil-select {
+  background:var(--surface2) !important;
+  border-color:var(--border2) !important;
+  color:var(--text) !important;
+}
+[data-theme="dark"] .lg-inp::placeholder,
+[data-theme="dark"] .perfil-input::placeholder { color:var(--text3) !important; }
+/* Menu dropdowns */
+[data-theme="dark"] .lg-cs-menu,
+[data-theme="dark"] .ndre-cs-menu {
+  background:var(--surface) !important;
+  border-color:var(--border2) !important;
+}
+[data-theme="dark"] .lg-cs-item,
+[data-theme="dark"] .ndre-cs-item { color:var(--text) !important; }
+[data-theme="dark"] .lg-cs-item:hover,
+[data-theme="dark"] .ndre-cs-item:hover { background:var(--surface2) !important; }
+[data-theme="dark"] .lg-cs-item.active { background:rgba(22,163,74,.15) !important; }
+/* Tabs do login */
+[data-theme="dark"] .lg-tab { background:var(--surface2) !important; }
+[data-theme="dark"] .lg-tab-btn { color:var(--text2) !important; }
+[data-theme="dark"] .lg-tab-btn.active { background:var(--surface) !important; color:var(--text) !important; }
+/* Background bege #f5f4f0 hardcoded em várias telas */
+[data-theme="dark"] [style*="background:#f5f4f0"],
+[data-theme="dark"] [style*="background:#fff"],
+[data-theme="dark"] [style*="background:#ffffff"],
+[data-theme="dark"] [style*="background:#fafafa"] { background:var(--surface) !important; }
+[data-theme="dark"] [style*="color:#0f172a"],
+[data-theme="dark"] [style*="color:#1a1a18"],
+[data-theme="dark"] [style*="color:#1e293b"] { color:var(--text) !important; }
+[data-theme="dark"] [style*="color:#475569"],
+[data-theme="dark"] [style*="color:#5f5e5a"],
+[data-theme="dark"] [style*="color:#64748b"] { color:var(--text2) !important; }
+[data-theme="dark"] [style*="color:#94a3b8"],
+[data-theme="dark"] [style*="color:#888780"] { color:var(--text3) !important; }
+[data-theme="dark"] [style*="border:.5px solid var(--border)"],
+[data-theme="dark"] [style*="border:1px solid #e8edf2"],
+[data-theme="dark"] [style*="border:1px solid #e2e8f0"] { border-color:var(--border2) !important; }
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;justify-content:center;padding:2rem 1.5rem;letter-spacing:-.01em;transition:background .25s ease, color .25s ease;}
 .wrap{width:100%;max-width:960px;}
 .screen{display:none;}.screen.active{display:block;}
 .logo{font-size:18px;font-weight:600;color:var(--text);letter-spacing:-.3px;}
@@ -1933,11 +2004,45 @@ function abrirPerfil(){
   // O carregamento dos dados acontece em seguida (não bloqueia a transição)
   setTimeout(carregarPerfil, 50);
 }
+// ════════════════════════════════════════════════════════════════════
+// TEMA (DARK / LIGHT)
+// ════════════════════════════════════════════════════════════════════
+function setTheme(theme){
+  if(theme === 'dark'){
+    document.documentElement.setAttribute('data-theme', 'dark');
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+    theme = 'light';
+  }
+  try { localStorage.setItem('vc_theme', theme); } catch(e){}
+  // Sincroniza o estado do toggle se já estiver renderizado
+  var tg = document.getElementById('theme-toggle');
+  if(tg) tg.checked = (theme === 'dark');
+}
+
+function initTheme(){
+  var saved = null;
+  try { saved = localStorage.getItem('vc_theme'); } catch(e){}
+  // Se nunca escolheu, respeita a preferência do sistema
+  var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var theme = saved || (prefersDark ? 'dark' : 'light');
+  setTheme(theme);
+}
+
+// Aplica o tema imediatamente (antes do DOM render completo, evita flash)
+initTheme();
+
 async function carregarPerfil(){
   if(typeof currentUser === 'undefined' || !currentUser){ if(typeof go === 'function') go('s-land'); return; }
   var $ = function(id){ return document.getElementById(id); };
   if($('p-email-display')) $('p-email-display').textContent = currentUser.email || '—';
   if($('p-email-input'))   $('p-email-input').value         = currentUser.email || '';
+
+  // Sincroniza o toggle de tema com o estado atual
+  var themeToggle = $('theme-toggle');
+  if(themeToggle){
+    themeToggle.checked = (document.documentElement.getAttribute('data-theme') === 'dark');
+  }
 
   // ── Helper: formata data PT-BR curta (ex: 13 mai 2026) ──────────
   function fmtDateShort(d){
@@ -4715,6 +4820,30 @@ async function mudarSenhaPerfil(){
   background:#fafbfc;
 }
 
+/* ══════ APARÊNCIA — toggle switch dark/light ══════ */
+#s-perfil .theme-row { display:flex; align-items:center; justify-content:space-between; gap:1rem; }
+#s-perfil .theme-row-text { flex:1; min-width:0; }
+#s-perfil .theme-row-label { font-size:13.5px; font-weight:600; color:var(--text); margin-bottom:3px; letter-spacing:-.005em; }
+#s-perfil .theme-row-desc { font-size:12.5px; color:var(--text2); line-height:1.5; letter-spacing:-.003em; max-width:48ch; }
+.theme-switch { position:relative; display:inline-block; width:42px; height:24px; flex-shrink:0; }
+.theme-switch input { opacity:0; width:0; height:0; }
+.theme-switch-slider {
+  position:absolute; cursor:pointer; inset:0;
+  background:#cbd5e1;
+  transition:background .2s ease;
+  border-radius:99px;
+}
+.theme-switch-slider::before {
+  position:absolute; content:""; height:18px; width:18px; left:3px; bottom:3px;
+  background:#fff;
+  transition:transform .22s cubic-bezier(.16,1,.3,1);
+  border-radius:50%;
+  box-shadow:0 1px 3px rgba(0,0,0,.18);
+}
+.theme-switch input:checked + .theme-switch-slider { background:#16a36a; }
+.theme-switch input:checked + .theme-switch-slider::before { transform:translateX(18px); }
+.theme-switch input:focus-visible + .theme-switch-slider { box-shadow:0 0 0 3px rgba(22,163,74,.20); }
+
 /* ══════ ATIVIDADE RECENTE (substitui o widget de IA) ══════ */
 #s-perfil .perfil-activity {
   background:#fff;
@@ -4981,6 +5110,24 @@ async function mudarSenhaPerfil(){
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         Gerenciar assinatura
       </button>
+    </div>
+  </div>
+
+  <!-- ══ APARÊNCIA (tema claro/escuro) ══ -->
+  <div class="perfil-card">
+    <div class="perfil-card-title">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      Aparência
+    </div>
+    <div class="theme-row">
+      <div class="theme-row-text">
+        <div class="theme-row-label">Modo escuro</div>
+        <div class="theme-row-desc">Reduz o brilho da tela em ambientes com pouca luz. Sua preferência é salva neste dispositivo.</div>
+      </div>
+      <label class="theme-switch" title="Alternar tema">
+        <input type="checkbox" id="theme-toggle" onchange="setTheme(this.checked ? 'dark' : 'light')"/>
+        <span class="theme-switch-slider"></span>
+      </label>
     </div>
   </div>
 
