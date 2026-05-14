@@ -1769,7 +1769,7 @@ document.addEventListener('keydown', function(e){
 
   <div class="hdr">
     <div class="logo">Vita<span style="color:var(--green);">Cash</span></div>
-    <div style="display:flex;align-items:center;gap:10px;"><div class="ntag" id="ut">🛒 Atacado/Distribuição</div><div class="av" id="uav">JO</div></div>
+    <div style="display:flex;align-items:center;gap:10px;"><div class="ntag" id="ut"></div><div class="av" id="uav">JO</div></div>
   </div>
   <div class="sl">Análise da sua DRE</div>
   <div class="info-box"><div style="font-size:14px;flex-shrink:0;">💡</div><div style="font-size:12px;color:var(--green-dark);line-height:1.6;">Envie a DRE que seu contador gerou e o VitaCash extrai os indicadores automaticamente.</div></div>
@@ -1810,7 +1810,7 @@ document.addEventListener('keydown', function(e){
 
   <div class="hdr">
     <div class="logo">Vita<span style="color:var(--green);">Cash</span></div>
-    <div style="display:flex;align-items:center;gap:10px;"><div class="ntag" id="ut2">🛒 Atacado/Distribuição</div><div class="av" id="uav2">JO</div></div>
+    <div style="display:flex;align-items:center;gap:10px;"><div class="ntag" id="ut2"></div><div class="av" id="uav2">JO</div></div>
   </div>
   <div class="sl">Arquivo selecionado</div>
   <div class="fp">
@@ -1878,7 +1878,7 @@ document.addEventListener('keydown', function(e){
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:nowrap;flex-shrink:0;">
 
       <!-- Tag nicho premium -->
-      <div class="ntag" id="dt" style="font-size:13px;padding:6px 14px;">🛒 Atacado/Distribuição</div>
+      <div class="ntag" id="dt" style="font-size:13px;padding:6px 14px;"></div>
 
       <!-- Seletor de período com ícone de calendário -->
       <div class="dash-cs" id="dash-cs-wrap">
@@ -7348,6 +7348,29 @@ const NICHO_EMOJI = {
   'Outro':                     '🏢'
 };
 
+// Mapeamento de SVGs Lucide-style — mesmos ícones do dropdown de cadastro
+const NICHO_ICON_SVG = {
+  'Restaurante / Alimentação': '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><line x1="7" y1="2" x2="7" y2="22"/><path d="M21 15V2a5 5 0 00-5 5v6c0 1.1.9 2 2 2h3z"/><line x1="21" y1="15" x2="21" y2="22"/></svg>',
+  'Varejo / Comércio':         '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9v11a1 1 0 001 1h16a1 1 0 001-1V9"/><path d="M3 9h18"/><path d="M9 13v4"/><path d="M15 13v4"/></svg>',
+  'Clínica / Saúde':           '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16v13a1 1 0 01-1 1H5a1 1 0 01-1-1V8z"/><path d="M2 8h20"/><path d="M9 4h6v4H9z"/><path d="M12 12v6"/><path d="M9 15h6"/></svg>',
+  'Distribuidora / Logística': '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a1 1 0 00-1-1H3a1 1 0 00-1 1v12a1 1 0 001 1h1"/><path d="M14 9h4l4 4v5a1 1 0 01-1 1h-1"/><circle cx="7" cy="19" r="2"/><circle cx="17" cy="19" r="2"/></svg>',
+  'Indústria / Manufatura':    '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M2 20V10l6 4V10l6 4V6l8 4v10"/><path d="M6 16h.01"/><path d="M11 16h.01"/><path d="M16 16h.01"/></svg>',
+  'Prestação de Serviços':     '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/><path d="M2 13h20"/></svg>',
+  'Construção / Engenharia':   '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-7h6v7"/><path d="M8 6h.01"/><path d="M12 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/></svg>',
+  'E-commerce / Digital':      '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+  'Outro':                     '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="6" cy="12" r="1.4" fill="currentColor"/><circle cx="18" cy="12" r="1.4" fill="currentColor"/></svg>'
+};
+
+function nichoToHTML(nicho){
+  var n = nicho || 'Outro';
+  // Aceita "Outro: <texto customizado>" — usa o ícone de Outro
+  var key = (n.indexOf('Outro') === 0) ? 'Outro' : n;
+  var icon = NICHO_ICON_SVG[key] || NICHO_ICON_SVG['Outro'];
+  // Escapa HTML do texto
+  var safe = String(n).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return icon + '<span>' + safe + '</span>';
+}
+
 async function carregarPerfilDash() {
   if (!currentUser) return;
   try {
@@ -7363,11 +7386,11 @@ async function carregarPerfilDash() {
     if (data.faturamento_faixa) fat = data.faturamento_faixa;
     emoji = NICHO_EMOJI[nicho] || '🏢';
 
-    // Atualiza todos os elementos de tag e avatar no header
-    var tag = emoji + ' ' + nicho;
+    // Atualiza todos os elementos de tag e avatar no header (SVG + texto)
+    var tagHTML = nichoToHTML(nicho);
     ['ut','ut2','dt'].forEach(function(x){
       var e = document.getElementById(x);
-      if (e) e.textContent = tag;
+      if (e) e.innerHTML = tagHTML;
     });
     ['uav','uav2','dav'].forEach(function(x){
       var e = document.getElementById(x);
@@ -8631,11 +8654,11 @@ async function dashFilterChange(id) {
 
   if (error || !data) return;
 
-  // Atualiza rótulo do nicho/período no header
+  // Atualiza rótulo do nicho/período no header (SVG + texto)
   var labelPeriodo = data.year + (data.period && data.period !== 'Não informado' ? ' · ' + data.period : '');
   ['dt'].forEach(function(eid) {
     var el = document.getElementById(eid);
-    if (el) el.textContent = emoji + ' ' + nicho; // mantém nicho do usuário
+    if (el) el.innerHTML = nichoToHTML(nicho); // mantém nicho do usuário
   });
   // Atualiza microcopy com nicho + ano
   var mc = document.getElementById('dash-microcopy');
