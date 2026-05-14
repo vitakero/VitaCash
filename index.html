@@ -2090,6 +2090,12 @@ document.addEventListener('keydown', function(e){
         Nova análise
       </button>
 
+      <!-- BOTÃO TOGGLE DARK/LIGHT MODE -->
+      <button type="button" class="theme-toggle-btn" onclick="toggleTheme()" title="Alternar tema claro/escuro" aria-label="Alternar tema">
+        <svg class="theme-icon-light" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        <svg class="theme-icon-dark" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M6.34 17.66l-1.41 1.41"/><path d="M19.07 4.93l-1.41 1.41"/></svg>
+      </button>
+
       <!-- BADGE DO PLANO (apenas informativo — gerenciar assinatura está no dropdown do perfil) -->
       <div id="dash-plano-badge" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;border:.5px solid var(--border2);background:var(--surface);color:var(--text2);font-size:12px;font-weight:600;font-family:inherit;white-space:nowrap;user-select:none;">
         <span id="dash-plano-dot" style="width:7px;height:7px;border-radius:50%;background:var(--border2);display:inline-block;flex-shrink:0;"></span>
@@ -2110,6 +2116,28 @@ document.addEventListener('keydown', function(e){
 /* ── HEADER: gatilho do perfil ── */
 .user-menu-trigger { display:inline-flex; align-items:center; gap:9px; cursor:pointer; padding:5px 10px 5px 11px; border-radius:10px; border:1px solid transparent; transition:background .15s, border-color .15s; user-select:none; }
 .user-menu-trigger:hover { background:var(--surface2); border-color:var(--border); }
+
+/* ── BOTÃO TOGGLE TEMA (header do dashboard) ── */
+.theme-toggle-btn {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:34px; height:34px;
+  padding:0;
+  border-radius:9px;
+  border:.5px solid var(--border2);
+  background:var(--surface);
+  color:var(--text2);
+  cursor:pointer;
+  font-family:inherit;
+  transition:background .18s, color .18s, border-color .18s, transform .12s;
+  flex-shrink:0;
+}
+.theme-toggle-btn:hover { background:var(--surface2); color:var(--text); border-color:var(--border); }
+.theme-toggle-btn:active { transform:scale(.96); }
+.theme-toggle-btn:focus-visible { outline:none; box-shadow:0 0 0 3px rgba(22,163,74,.20); }
+/* Sun aparece só em dark; Moon aparece só em light */
+.theme-icon-dark { display:none; }
+[data-theme="dark"] .theme-icon-dark { display:inline-block; }
+[data-theme="dark"] .theme-icon-light { display:none; }
 </style>
 
 <script>
@@ -2147,6 +2175,12 @@ function initTheme(){
   var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   var theme = saved || (prefersDark ? 'dark' : 'light');
   setTheme(theme);
+}
+
+// Alterna entre dark e light — usado pelo botão do header do dashboard
+function toggleTheme(){
+  var current = document.documentElement.getAttribute('data-theme');
+  setTheme(current === 'dark' ? 'light' : 'dark');
 }
 
 // Aplica o tema imediatamente (antes do DOM render completo, evita flash)
