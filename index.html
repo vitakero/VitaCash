@@ -97,6 +97,22 @@
 }
 [data-theme="dark"] .lg-btn-ghost:hover { background:rgba(110,231,183,.10) !important; }
 
+/* Autofill do navegador (Chrome/Safari) sobrescreve bg pra branco — fix com box-shadow inset */
+[data-theme="dark"] .lg-inp:-webkit-autofill,
+[data-theme="dark"] .lg-inp:-webkit-autofill:hover,
+[data-theme="dark"] .lg-inp:-webkit-autofill:focus,
+[data-theme="dark"] .lg-inp:-webkit-autofill:active,
+[data-theme="dark"] .perfil-input:-webkit-autofill,
+[data-theme="dark"] .perfil-input:-webkit-autofill:hover,
+[data-theme="dark"] .perfil-input:-webkit-autofill:focus,
+[data-theme="dark"] input:-webkit-autofill {
+  -webkit-box-shadow:0 0 0 1000px var(--surface2) inset !important;
+  -webkit-text-fill-color:var(--text) !important;
+  caret-color:var(--text) !important;
+  border-color:var(--border2) !important;
+  transition:background-color 9999s ease-in-out 0s !important;
+}
+
 /* Inputs e textos em cinza-claro precisam clarear */
 [data-theme="dark"] .lg-inp,
 [data-theme="dark"] .lg-cs-trigger,
