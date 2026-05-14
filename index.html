@@ -811,10 +811,32 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
 @media(min-width:821px){
   #nav-mobile-menu{display:none!important;}
 }
+/* Toggle tema dentro do nav da landing */
+.nav-theme-btn{
+  background:transparent !important;
+  border:1.5px solid rgba(0,0,0,.13) !important;
+  color:#475569 !important;
+  width:38px; height:38px;
+}
+.nav-theme-btn:hover{ background:rgba(0,0,0,.04) !important; border-color:#1D9E75 !important; color:#1D9E75 !important; }
+.nav-theme-row .theme-label-dark { display:none; }
+[data-theme="dark"] .nav-theme-row .theme-label-light { display:none; }
+[data-theme="dark"] .nav-theme-row .theme-label-dark { display:inline; }
+[data-theme="dark"] .nav-theme-row{ border-color:rgba(255,255,255,.10) !important; color:var(--text2) !important; }
+
 /* ── DARK MODE — Landing nav ── */
 [data-theme="dark"] #main-nav {
   background:rgba(10,15,26,.92) !important;
   border-bottom-color:rgba(255,255,255,.06) !important;
+}
+[data-theme="dark"] .nav-theme-btn{
+  border-color:rgba(255,255,255,.15) !important;
+  color:var(--text2) !important;
+}
+[data-theme="dark"] .nav-theme-btn:hover{
+  background:rgba(255,255,255,.04) !important;
+  border-color:#6ee7b7 !important;
+  color:#6ee7b7 !important;
 }
 [data-theme="dark"] #s-land .nav-link { color:var(--text2) !important; }
 [data-theme="dark"] #s-land .nav-link:hover { background:rgba(255,255,255,.04) !important; color:var(--text) !important; }
@@ -858,6 +880,11 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
 
     <!-- BOTÕES (desktop) -->
     <div id="nav-btns-desktop" style="display:flex;gap:10px;align-items:center;flex-shrink:0;">
+      <!-- Toggle tema -->
+      <button type="button" class="theme-toggle-btn nav-theme-btn" onclick="toggleTheme()" title="Alternar tema claro/escuro" aria-label="Alternar tema">
+        <svg class="theme-icon-light" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M6.34 17.66l-1.41 1.41"/><path d="M19.07 4.93l-1.41 1.41"/></svg>
+        <svg class="theme-icon-dark" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      </button>
       <button onclick="goLogin('login')" style="padding:10px 22px;border-radius:9px;border:1.5px solid rgba(0,0,0,.13);background:transparent;color:#475569;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .18s;" onmouseover="this.style.borderColor='#1D9E75';this.style.color='#1D9E75'" onmouseout="this.style.borderColor='rgba(0,0,0,.13)';this.style.color='#475569'">Entrar</button>
       <button onclick="goLogin('cadastro')" style="padding:11px 26px;border-radius:9px;border:none;background:#1D9E75;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:-.1px;box-shadow:0 2px 16px rgba(29,158,117,.38);transition:all .2s;" onmouseover="this.style.background='#15835f';this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 24px rgba(29,158,117,.48)'" onmouseout="this.style.background='#1D9E75';this.style.transform='';this.style.boxShadow='0 2px 16px rgba(29,158,117,.38)'">Começar grátis →</button>
     </div>
@@ -879,6 +906,16 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
       <button class="nav-link" style="text-align:left;width:100%;padding:12px 14px;" onclick="document.getElementById('suporte')?.scrollIntoView({behavior:'smooth'});toggleNavMenu()">Suporte</button>
     </div>
     <div style="display:flex;flex-direction:column;gap:8px;">
+      <!-- Toggle tema (mobile) -->
+      <button type="button" onclick="toggleTheme()" class="nav-theme-row" style="display:flex;width:100%;padding:12px 14px;border-radius:9px;border:1.5px solid rgba(0,0,0,.10);background:transparent;color:#475569;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;align-items:center;justify-content:space-between;gap:8px;">
+        <span style="display:flex;align-items:center;gap:8px;">
+          <svg class="theme-icon-light" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M6.34 17.66l-1.41 1.41"/><path d="M19.07 4.93l-1.41 1.41"/></svg>
+          <svg class="theme-icon-dark" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+          <span class="theme-label-light">Modo escuro</span>
+          <span class="theme-label-dark">Modo claro</span>
+        </span>
+        <span style="font-size:12px;opacity:.5;">↺</span>
+      </button>
       <button onclick="goLogin('login');toggleNavMenu()" style="width:100%;padding:12px;border-radius:9px;border:1.5px solid rgba(0,0,0,.13);background:transparent;color:#475569;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Entrar</button>
       <button onclick="goLogin('cadastro');toggleNavMenu()" style="width:100%;padding:13px;border-radius:9px;border:none;background:#1D9E75;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 2px 14px rgba(29,158,117,.38);">Começar grátis →</button>
     </div>
