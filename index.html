@@ -268,6 +268,16 @@
   border-color:rgba(59,130,246,.28) !important;
 }
 
+/* Badge roxo '2x faturamento' (testimonial Ana Cristina) */
+[data-theme="dark"] [style*="background:#f5f3ff" i] {
+  background:rgba(139,92,246,.14) !important;
+  color:#c4b5fd !important;
+  border-color:rgba(139,92,246,.30) !important;
+}
+[data-theme="dark"] [style*="color:#6d28d9" i],
+[data-theme="dark"] [style*="color:#7c3aed" i] { color:#c4b5fd !important; }
+[data-theme="dark"] [style*="border:1px solid #ddd6fe" i] { border-color:rgba(139,92,246,.30) !important; }
+
 /* Cards de plano STARTER/GROWTH (bg branco + border slate) */
 [data-theme="dark"] [style*="background:#fff;border:1px solid #e2e8f0" i],
 [data-theme="dark"] [style*="background:#ffffff;border:1px solid #e2e8f0" i] {
@@ -299,6 +309,41 @@
 /* Borders #1D9E75 e variações */
 [data-theme="dark"] [style*="border-top:1px solid #a7f3d0" i],
 [data-theme="dark"] [style*="border-bottom:1px solid #a7f3d0" i] { border-color:rgba(22,163,74,.20) !important; }
+
+/* ════════════════════════════════════════════════════════════════
+   LANDING — Correções finais dark (FAQ hover, suporte, CTAs brancos)
+   ════════════════════════════════════════════════════════════════ */
+
+/* FAQ — hover não pode clarear no dark (texto fica invisível) */
+[data-theme="dark"] .faq-item { background:var(--surface) !important; border-color:var(--border2) !important; }
+[data-theme="dark"] .faq-item > div:first-child:hover { background:rgba(255,255,255,.05) !important; }
+[data-theme="dark"] .faq-item span[style*="color:#0f172a" i] { color:var(--text) !important; }
+
+/* Cards de suporte (.sup-card-secondary) — bg branco hardcoded na classe */
+[data-theme="dark"] .sup-card-secondary {
+  background:var(--surface) !important;
+  border-color:var(--border2) !important;
+  box-shadow:0 1px 8px rgba(0,0,0,.25) !important;
+}
+[data-theme="dark"] .sup-card-secondary:hover {
+  box-shadow:0 12px 36px rgba(0,0,0,.4) !important;
+}
+
+/* Reforço badge roxo '2x faturamento' — match também por color/border isolados */
+[data-theme="dark"] [style*="background:#f5f3ff" i][style*="color:#6d28d9" i],
+[data-theme="dark"] [style*="background:#f5f3ff" i][style*="color:#7c3aed" i] {
+  background:rgba(139,92,246,.16) !important;
+  color:#c4b5fd !important;
+  border-color:rgba(139,92,246,.32) !important;
+}
+
+/* CTA branco em fundos verdes permanentes (não converter pra slate) */
+[data-theme="dark"] [style*="background:#fff;color:#064e35" i],
+[data-theme="dark"] [style*="background:#fff" i][style*="color:#064e35" i] {
+  background:#fff !important;
+  color:#064e35 !important;
+}
+[data-theme="dark"] [style*="color:#064e35" i] { color:#064e35 !important; }
 
 /* ════════════════════════════════════════════════════════════════
    REFINAMENTO DARK MODE — Stripe / Mercury / Ramp / Linear vibe
@@ -1371,18 +1416,21 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
       </div>
 
       <!-- PREMIUM -->
-      <div style="background:#0f172a;border:1px solid #1e293b;border-radius:16px;padding:1.25rem;display:flex;flex-direction:column;box-shadow:0 2px 10px rgba(0,0,0,.12);">
-        <div style="font-size:12px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:1px;margin-bottom:.75rem;">Premium</div>
-        <div style="font-family:'Sora',sans-serif;font-size:30px;font-weight:800;color:#fff;letter-spacing:-2px;line-height:1;margin-bottom:.25rem;">R$347<span style="font-size:16px;font-weight:500;color:#475569;">/mês</span></div>
-        <div style="font-size:12px;color:#475569;margin-bottom:.75rem;">Para múltiplas empresas</div>
-        <div style="display:flex;flex-direction:column;gap:7px;flex:1;margin-bottom:1rem;">
-          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#94a3b8;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Empresas ilimitadas</div>
-          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#94a3b8;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Tudo do PRO</div>
-          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#94a3b8;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Relatórios PDF exportáveis</div>
-          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#94a3b8;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Acesso para contador</div>
-          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#94a3b8;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Suporte prioritário</div>
+      <div style="position:relative;background:linear-gradient(180deg,#0f172a 0%,#0a1120 100%);border:1px solid rgba(251,191,36,.22);border-radius:16px;padding:1.25rem;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,.28),0 0 0 1px rgba(251,191,36,.04),inset 0 1px 0 rgba(255,255,255,.04);">
+        <div style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#fbbf24;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:.75rem;align-self:flex-start;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.22);padding:4px 10px;border-radius:99px;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg>
+          Premium
         </div>
-        <button onclick="window.open('https://wa.me/5500000000000?text=Olá! Tenho interesse no plano Premium do VitaCash. Gostaria de saber mais sobre como funciona.','_blank')" style="width:100%;padding:13px;border-radius:10px;border:1.5px solid #334155;background:transparent;color:#e2e8f0;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;" onmouseover="this.style.borderColor='#1D9E75';this.style.color='#1D9E75'" onmouseout="this.style.borderColor='#334155';this.style.color='#e2e8f0'">Falar com consultor</button>
+        <div style="font-family:'Sora',sans-serif;font-size:30px;font-weight:800;color:#fff;letter-spacing:-2px;line-height:1;margin-bottom:.25rem;">R$347<span style="font-size:16px;font-weight:500;color:#64748b;">/mês</span></div>
+        <div style="font-size:12px;color:#94a3b8;margin-bottom:.75rem;">Para múltiplas empresas</div>
+        <div style="display:flex;flex-direction:column;gap:7px;flex:1;margin-bottom:1rem;">
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#cbd5e1;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Empresas ilimitadas</div>
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#cbd5e1;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Tudo do PRO</div>
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#cbd5e1;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Relatórios PDF exportáveis</div>
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#cbd5e1;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Acesso para contador</div>
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#cbd5e1;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Suporte prioritário</div>
+        </div>
+        <button onclick="window.open('https://wa.me/5500000000000?text=Olá! Tenho interesse no plano Premium do VitaCash. Gostaria de saber mais sobre como funciona.','_blank')" style="width:100%;padding:13px;border-radius:10px;border:1px solid rgba(255,255,255,.10);background:#fff;color:#0f172a;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;letter-spacing:-.2px;" onmouseover="this.style.background='#fbbf24';this.style.color='#0f172a';this.style.borderColor='rgba(251,191,36,.5)'" onmouseout="this.style.background='#fff';this.style.color='#0f172a';this.style.borderColor='rgba(255,255,255,.10)'">Falar com consultor</button>
       </div>
 
     </div>
@@ -9773,18 +9821,21 @@ function okComecarAgora(){
       </div>
 
       <!-- PREMIUM -->
-      <div style="background:#0f172a;border:1px solid #1e293b;border-radius:16px;padding:1.25rem;display:flex;flex-direction:column;box-shadow:0 2px 10px rgba(0,0,0,.12);">
-        <div style="font-size:12px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:1px;margin-bottom:.75rem;">Premium</div>
-        <div style="font-family:'Sora',sans-serif;font-size:30px;font-weight:800;color:#fff;letter-spacing:-2px;line-height:1;margin-bottom:.25rem;">R$347<span style="font-size:16px;font-weight:500;color:#475569;">/mês</span></div>
-        <div style="font-size:12px;color:#475569;margin-bottom:.75rem;">Para múltiplas empresas</div>
-        <div style="display:flex;flex-direction:column;gap:7px;flex:1;margin-bottom:1rem;">
-          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#94a3b8;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Empresas ilimitadas</div>
-          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#94a3b8;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Tudo do PRO</div>
-          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#94a3b8;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Relatórios PDF exportáveis</div>
-          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#94a3b8;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Acesso para contador</div>
-          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#94a3b8;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Suporte prioritário</div>
+      <div style="position:relative;background:linear-gradient(180deg,#0f172a 0%,#0a1120 100%);border:1px solid rgba(251,191,36,.22);border-radius:16px;padding:1.25rem;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,.28),0 0 0 1px rgba(251,191,36,.04),inset 0 1px 0 rgba(255,255,255,.04);">
+        <div style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#fbbf24;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:.75rem;align-self:flex-start;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.22);padding:4px 10px;border-radius:99px;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/></svg>
+          Premium
         </div>
-        <button onclick="window.open('https://wa.me/5500000000000?text=Olá! Tenho interesse no plano Premium do VitaCash. Gostaria de saber mais sobre como funciona.','_blank')" style="width:100%;padding:13px;border-radius:10px;border:1.5px solid #334155;background:transparent;color:#e2e8f0;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;" onmouseover="this.style.borderColor='#1D9E75';this.style.color='#1D9E75'" onmouseout="this.style.borderColor='#334155';this.style.color='#e2e8f0'">Falar com consultor</button>
+        <div style="font-family:'Sora',sans-serif;font-size:30px;font-weight:800;color:#fff;letter-spacing:-2px;line-height:1;margin-bottom:.25rem;">R$347<span style="font-size:16px;font-weight:500;color:#64748b;">/mês</span></div>
+        <div style="font-size:12px;color:#94a3b8;margin-bottom:.75rem;">Para múltiplas empresas</div>
+        <div style="display:flex;flex-direction:column;gap:7px;flex:1;margin-bottom:1rem;">
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#cbd5e1;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Empresas ilimitadas</div>
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#cbd5e1;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Tudo do PRO</div>
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#cbd5e1;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Relatórios PDF exportáveis</div>
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#cbd5e1;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Acesso para contador</div>
+          <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#cbd5e1;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Suporte prioritário</div>
+        </div>
+        <button onclick="window.open('https://wa.me/5500000000000?text=Olá! Tenho interesse no plano Premium do VitaCash. Gostaria de saber mais sobre como funciona.','_blank')" style="width:100%;padding:13px;border-radius:10px;border:1px solid rgba(255,255,255,.10);background:#fff;color:#0f172a;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;letter-spacing:-.2px;" onmouseover="this.style.background='#fbbf24';this.style.color='#0f172a';this.style.borderColor='rgba(251,191,36,.5)'" onmouseout="this.style.background='#fff';this.style.color='#0f172a';this.style.borderColor='rgba(255,255,255,.10)'">Falar com consultor</button>
       </div>
 
     </div>
