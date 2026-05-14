@@ -94,6 +94,99 @@
 [data-theme="dark"] [style*="border:.5px solid var(--border)"],
 [data-theme="dark"] [style*="border:1px solid #e8edf2"],
 [data-theme="dark"] [style*="border:1px solid #e2e8f0"] { border-color:var(--border2) !important; }
+
+/* ══════════════════════════════════════════════════
+   DARK MODE — Correções de contraste no dashboard
+   ══════════════════════════════════════════════════ */
+
+/* AI Cards (Maior impacto, Ação rápida, Ganho imediato) */
+[data-theme="dark"] .ai-card { background:var(--surface) !important; border-color:var(--border) !important; }
+[data-theme="dark"] .ai-card:hover { border-color:var(--border2) !important; }
+[data-theme="dark"] .ai-card-title { color:var(--text) !important; }
+[data-theme="dark"] .ai-card-desc { color:var(--text2) !important; }
+
+/* Chips coloridos — clarear texto pra ler em dark */
+[data-theme="dark"] .chip.ok     { background:rgba(22,163,74,.16) !important;  color:#86efac !important; }
+[data-theme="dark"] .chip.warn   { background:rgba(217,119,6,.16) !important;  color:#fcd34d !important; }
+[data-theme="dark"] .chip.bad    { background:rgba(220,38,38,.16) !important;  color:#fca5a5 !important; }
+[data-theme="dark"] .chip.new    { background:rgba(99,102,241,.16) !important; color:#a5b4fc !important; }
+[data-theme="dark"] .chip.impact { background:rgba(220,38,38,.14) !important;  color:#fca5a5 !important; border-color:rgba(220,38,38,.30) !important; }
+[data-theme="dark"] .chip.quick  { background:rgba(22,163,74,.14) !important;  color:#86efac !important; border-color:rgba(22,163,74,.30) !important; }
+[data-theme="dark"] .chip.gain   { background:rgba(59,130,246,.14) !important; color:#93c5fd !important; border-color:rgba(59,130,246,.30) !important; }
+
+/* Avatar (.av) — fundo green-light + texto green-dark deixam ilegível em dark */
+[data-theme="dark"] .av { background:rgba(22,163,74,.22) !important; color:#86efac !important; }
+
+/* Banner ".ana-left" (com barra verde lateral — Resumo, Pense assim, etc) */
+[data-theme="dark"] .ana-left { color:#86efac !important; }
+
+/* Alertas amarelos (.alt) */
+[data-theme="dark"] .alt { background:rgba(245,158,11,.12) !important; color:#fcd34d !important; border-color:rgba(245,158,11,.28) !important; }
+
+/* Step numbers (1, 2, 3, 4) com fundo green-light */
+[data-theme="dark"] .acao-num.bom  { background:rgba(22,163,74,.22) !important; color:#86efac !important; }
+[data-theme="dark"] .acao-num.ruim { background:rgba(220,38,38,.22) !important; color:#fca5a5 !important; }
+[data-theme="dark"] .sn { background:var(--surface2) !important; color:#cbd5e1 !important; }
+
+/* Indicador de status (✓ verde / ✗ vermelho redondo) */
+[data-theme="dark"] .ind-status.bom  { background:rgba(22,163,74,.22) !important; border-color:rgba(22,163,74,.32) !important; color:#86efac !important; }
+[data-theme="dark"] .ind-status.ruim { background:rgba(220,38,38,.22) !important; border-color:rgba(220,38,38,.32) !important; color:#fca5a5 !important; }
+[data-theme="dark"] .ind-card { background:var(--surface) !important; border-color:var(--border) !important; }
+[data-theme="dark"] .ind-card:hover { border-color:var(--border2) !important; }
+
+/* Cards expansíveis (.cc / .cn / .cd / .tmt) */
+[data-theme="dark"] .cn  { color:var(--text) !important; }
+[data-theme="dark"] .cd  { color:var(--text2) !important; }
+[data-theme="dark"] .tmt { color:var(--text) !important; }
+[data-theme="dark"] .tmc { background:var(--surface) !important; border-color:var(--border) !important; }
+
+/* Formula box (.fm) */
+[data-theme="dark"] .fm { background:var(--surface2) !important; color:var(--text) !important; }
+
+/* Tag bench (.tt-bench) */
+[data-theme="dark"] .tt-bench { background:rgba(22,163,74,.16) !important; color:#86efac !important; border-color:rgba(22,163,74,.28) !important; }
+
+/* Banners verdes hardcoded (Radar IA, Você já tem R$ X mapeados, etc) */
+[data-theme="dark"] [style*="background:#f0fdf8"],
+[data-theme="dark"] [style*="background:#f0fdf4"],
+[data-theme="dark"] [style*="background:#e1f5ee"],
+[data-theme="dark"] [style*="background:#ecfdf5"],
+[data-theme="dark"] [style*="background: #f0fdf8"],
+[data-theme="dark"] [style*="background: #f0fdf4"]   { background:rgba(22,163,74,.10) !important; }
+[data-theme="dark"] [style*="color:#0d6e4c"],
+[data-theme="dark"] [style*="color:#15803d"],
+[data-theme="dark"] [style*="color:#0d2b1e"],
+[data-theme="dark"] [style*="color:#085041"],
+[data-theme="dark"] [style*="color:#065f46"],
+[data-theme="dark"] [style*="color:#0f6e56"],
+[data-theme="dark"] [style*="color:#16a36a"]         { color:#86efac !important; }
+
+/* Backgrounds amarelos hardcoded */
+[data-theme="dark"] [style*="background:#fffbeb"],
+[data-theme="dark"] [style*="background:#fef3c7"],
+[data-theme="dark"] [style*="background:#faeeda"]    { background:rgba(245,158,11,.10) !important; }
+[data-theme="dark"] [style*="color:#92400e"],
+[data-theme="dark"] [style*="color:#7a6000"],
+[data-theme="dark"] [style*="color:#633806"],
+[data-theme="dark"] [style*="color:#b45309"]         { color:#fcd34d !important; }
+
+/* Backgrounds vermelhos hardcoded */
+[data-theme="dark"] [style*="background:#fef2f2"],
+[data-theme="dark"] [style*="background:#fee2e2"],
+[data-theme="dark"] [style*="background:#faece7"]    { background:rgba(220,38,38,.10) !important; }
+[data-theme="dark"] [style*="color:#7f1d1d"],
+[data-theme="dark"] [style*="color:#991b1b"],
+[data-theme="dark"] [style*="color:#b91c1c"],
+[data-theme="dark"] [style*="color:#dc2626"],
+[data-theme="dark"] [style*="color:#993c1d"],
+[data-theme="dark"] [style*="color:#8a1c1c"]         { color:#fca5a5 !important; }
+
+/* Backgrounds azuis hardcoded */
+[data-theme="dark"] [style*="background:#e6f1fb"],
+[data-theme="dark"] [style*="background:#f0f5ff"]    { background:rgba(59,130,246,.10) !important; }
+[data-theme="dark"] [style*="color:#0c447c"],
+[data-theme="dark"] [style*="color:#1e3a8a"],
+[data-theme="dark"] [style*="color:#1e40af"]         { color:#93c5fd !important; }
 body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;justify-content:center;padding:2rem 1.5rem;letter-spacing:-.01em;transition:background .25s ease, color .25s ease;}
 .wrap{width:100%;max-width:960px;}
 .screen{display:none;}.screen.active{display:block;}
