@@ -6518,6 +6518,69 @@ async function mudarSenhaPerfil(){
 [data-theme="dark"] #s-perfil .dz-badge-neutral { background:rgba(22,163,74,.12); border-color:rgba(22,163,74,.25); color:#86efac; }
 [data-theme="dark"] #s-perfil .dz-badge-destructive { background:rgba(248,113,113,.10); border-color:rgba(248,113,113,.25); color:#fca5a5; }
 
+/* ════════════════════════════════════════════════════════════════
+   #s-perfil — Cards principais (perfil-card, perfil-activity) em dark
+   ════════════════════════════════════════════════════════════════ */
+
+/* Page title "Sua conta" e descrição */
+[data-theme="dark"] #s-perfil .perfil-page-title { color:#f1f5f9 !important; }
+[data-theme="dark"] #s-perfil .perfil-page-desc { color:#94a3b8 !important; }
+[data-theme="dark"] #s-perfil .perfil-eyebrow { color:#64748b !important; }
+
+/* Cards brancos → dark surface */
+[data-theme="dark"] #s-perfil .perfil-card {
+  background:var(--surface) !important;
+  border-color:var(--border2) !important;
+  box-shadow:0 1px 2px rgba(0,0,0,.2) !important;
+}
+[data-theme="dark"] #s-perfil .perfil-card:hover { border-color:rgba(255,255,255,.18) !important; }
+[data-theme="dark"] #s-perfil .perfil-card-title {
+  color:#f1f5f9 !important;
+  border-bottom-color:rgba(255,255,255,.06) !important;
+}
+[data-theme="dark"] #s-perfil .perfil-card-title svg { color:#cbd5e1 !important; }
+
+/* Atividade recente — card branco também */
+[data-theme="dark"] #s-perfil .perfil-activity {
+  background:var(--surface) !important;
+  border-color:var(--border2) !important;
+  box-shadow:0 1px 2px rgba(0,0,0,.2) !important;
+}
+[data-theme="dark"] #s-perfil .perfil-activity-head { border-bottom-color:rgba(255,255,255,.06) !important; }
+[data-theme="dark"] #s-perfil .perfil-activity-title { color:#f1f5f9 !important; }
+[data-theme="dark"] #s-perfil .perfil-activity-meta { color:#64748b !important; }
+[data-theme="dark"] #s-perfil .perfil-activity-item { border-bottom-color:rgba(255,255,255,.04) !important; }
+[data-theme="dark"] #s-perfil .perfil-activity-time { color:#94a3b8 !important; }
+[data-theme="dark"] #s-perfil .perfil-activity-text { color:#e2e8f0 !important; }
+[data-theme="dark"] #s-perfil .perfil-activity-tag { color:#64748b !important; }
+
+/* Theme row (Aparência — Modo escuro) */
+[data-theme="dark"] #s-perfil .theme-row-label { color:#f1f5f9 !important; }
+[data-theme="dark"] #s-perfil .theme-row-desc { color:#cbd5e1 !important; }
+
+/* Botão "Voltar ao dashboard" */
+[data-theme="dark"] #s-perfil .perfil-back {
+  background:var(--surface) !important;
+  border-color:var(--border2) !important;
+  color:#e2e8f0 !important;
+}
+[data-theme="dark"] #s-perfil .perfil-back:hover {
+  background:var(--surface2) !important;
+  border-color:rgba(255,255,255,.25) !important;
+  color:#ffffff !important;
+}
+
+/* Custom selects bloqueados (Segmento da empresa, Faixa de faturamento) */
+[data-theme="dark"] #s-perfil .lg-cs-readonly .lg-cs-trigger,
+[data-theme="dark"] #s-perfil .lg-cs-readonly .lg-cs-trigger:hover {
+  background:var(--surface2) !important;
+  border-color:var(--border2) !important;
+}
+[data-theme="dark"] #s-perfil .lg-cs-readonly .lg-cs-val { color:#e2e8f0 !important; }
+[data-theme="dark"] #s-perfil .lg-cs-readonly .lg-cs-icon { stroke:#cbd5e1 !important; }
+[data-theme="dark"] #s-perfil .lg-cs-readonly .lg-cs-lock { opacity:.8 !important; color:#cbd5e1 !important; }
+[data-theme="dark"] #s-perfil .perfil-locked-hint { color:#94a3b8 !important; }
+
 /* Modal de apagar conta */
 .del-modal { position:fixed; inset:0; z-index:9999; display:none; align-items:center; justify-content:center; padding:1rem; }
 .del-modal.open { display:flex; }
