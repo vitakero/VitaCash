@@ -460,14 +460,14 @@
   text-transform:none !important;
   font-size:11.5px !important;
 }
-/* Sub-banners — base comum (bg neutro, weight, borda) */
+/* Sub-banners — base comum (weight, size, borda) */
 [data-theme="dark"] #tbp [style*="background:#1A5C3A" i]:not([style*="text-align:center" i]),
 [data-theme="dark"] #tbp [style*="background:#1A4A8A" i]:not([style*="text-align:center" i]),
 [data-theme="dark"] #tbp [style*="background:#1A3A6B" i]:not([style*="text-align:center" i]),
 [data-theme="dark"] #tbp [style*="background:#0F2A52" i],
 [data-theme="dark"] #tbp [style*="background:#0A2240" i],
 [data-theme="dark"] #tbp [style*="background:#3A5FA0" i] {
-  background:rgba(255,255,255,.018) !important;
+  color:#ffffff !important;
   letter-spacing:.6px !important;
   font-weight:700 !important;
   font-size:11px !important;
@@ -475,17 +475,17 @@
   border-top:1px solid rgba(255,255,255,.04) !important;
   border-bottom:1px solid rgba(255,255,255,.04) !important;
 }
-/* Sub-banners ATIVO (verde da marca, suave) */
-[data-theme="dark"] #tbp [style*="background:#1A5C3A" i]:not([style*="text-align:center" i]) {
-  color:#6ee7b7 !important;
+/* Sub-banners ATIVO — fundo verde sóbrio (não saturado) */
+[data-theme="dark"] #tbp [style*="background:#1A5C3A" i]:not([style*="text-align:center" i]),
+[data-theme="dark"] #tbp [style*="background:#1A4A8A" i]:not([style*="text-align:center" i]) {
+  background:rgba(16,109,75,.45) !important;
 }
-/* Sub-banners PASSIVO + PL (azul cool) */
+/* Sub-banners PASSIVO + PL — fundo navy sóbrio */
 [data-theme="dark"] #tbp [style*="background:#1A3A6B" i]:not([style*="text-align:center" i]),
-[data-theme="dark"] #tbp [style*="background:#1A4A8A" i]:not([style*="text-align:center" i]),
 [data-theme="dark"] #tbp [style*="background:#0F2A52" i],
 [data-theme="dark"] #tbp [style*="background:#0A2240" i],
 [data-theme="dark"] #tbp [style*="background:#3A5FA0" i] {
-  color:#93c5fd !important;
+  background:rgba(30,58,107,.55) !important;
 }
 /* TOTAL ATIVO / TOTAL PASSIVO + PL — banner final */
 [data-theme="dark"] #tbp [style*="background:#1D6B4A" i],
