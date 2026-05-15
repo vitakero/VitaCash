@@ -441,28 +441,46 @@
   background:transparent !important;
 }
 
-/* ── Banners de seção (ATIVO CIRCULANTE / PASSIVO CIRCULANTE etc) ── */
-/* Emerald deep em vez de #2D8A5E saturado */
+/* ── Banners principais (ATIVO / PASSIVO + PL) — neutros com accent superior fino ── */
 [data-theme="dark"] #tbp [style*="background:#2D8A5E" i] {
-  background:rgba(16,94,68,.85) !important;
-  letter-spacing:1.2px !important;
-  font-weight:600 !important;
+  background:rgba(255,255,255,.02) !important;
+  color:var(--text2) !important;
+  border-top:2px solid rgba(16,185,129,.45) !important;
+  letter-spacing:1.4px !important;
+  font-weight:500 !important;
+  text-transform:uppercase !important;
+  font-size:11px !important;
 }
-/* Navy deep em vez de #1A3A6B saturado */
 [data-theme="dark"] #tbp [style*="background:#1A3A6B" i] {
-  background:rgba(30,58,103,.85) !important;
-  letter-spacing:1.2px !important;
-  font-weight:600 !important;
+  background:rgba(255,255,255,.02) !important;
+  color:var(--text2) !important;
+  border-top:2px solid rgba(96,165,250,.40) !important;
+  letter-spacing:1.4px !important;
+  font-weight:500 !important;
+  text-transform:uppercase !important;
+  font-size:11px !important;
 }
-/* Headers de lado (verde/azul claro) */
+/* Sub-banners (ATIVO CIRCULANTE, PASSIVO CIRCULANTE, PATRIMÔNIO LÍQUIDO etc) — neutros */
 [data-theme="dark"] #tbp [style*="background:#1A5C3A" i],
 [data-theme="dark"] #tbp [style*="background:#1A4A8A" i] {
+  background:rgba(255,255,255,.018) !important;
+  color:var(--text2) !important;
+  letter-spacing:1.2px !important;
+  font-weight:500 !important;
+  font-size:10.5px !important;
+  border-top:1px solid rgba(255,255,255,.04) !important;
+  border-bottom:1px solid rgba(255,255,255,.04) !important;
+}
+/* TOTAL ATIVO / TOTAL PASSIVO + PL — banner final */
+[data-theme="dark"] #tbp [style*="background:#1D6B4A" i],
+[data-theme="dark"] #tbp [style*="background:#1A6B4A" i] {
   background:rgba(255,255,255,.025) !important;
-  letter-spacing:1px !important;
+  color:var(--text) !important;
+  border-top:1px solid rgba(255,255,255,.06) !important;
 }
 
-/* ── Textos: hierarquia editorial mais clara ── */
-/* Valores principais (R$ 5,48 mi) — protagonistas */
+/* ── Textos: monocromáticos editoriais (sem matiz verde/azul) ── */
+/* Valores principais (R$ 5,48 mi) — protagonistas brancos */
 [data-theme="dark"] #tbp [style*="font-size:13px;font-weight:700;color:#1A4A2E" i],
 [data-theme="dark"] #tbp [style*="font-size:13px;font-weight:700;color:#0A2240" i],
 [data-theme="dark"] #tbp [style*="font-size:13px;font-weight:700;color:#1A3A6B" i] {
@@ -471,7 +489,7 @@
   color:#f8fafc !important;
   letter-spacing:-.3px !important;
 }
-/* Títulos de linha (Caixa e equivalentes) */
+/* Títulos de linha (Caixa e equivalentes) — slate neutro, não verde nem azul */
 [data-theme="dark"] #tbp [style*="font-size:12px;font-weight:600;color:#1A4A2E" i],
 [data-theme="dark"] #tbp [style*="font-size:12px;font-weight:600;color:#0A2240" i],
 [data-theme="dark"] #tbp [style*="font-size:12px;font-weight:600;color:#1A3A6B" i] {
@@ -480,7 +498,7 @@
   font-size:12.5px !important;
   letter-spacing:-.1px !important;
 }
-/* Subtítulos (Caixa + bancos + aplicações) */
+/* Subtítulos — slate neutro */
 [data-theme="dark"] #tbp [style*="font-size:10px;color:#2D7A50" i],
 [data-theme="dark"] #tbp [style*="font-size:10px;color:#2A6AB0" i],
 [data-theme="dark"] #tbp [style*="font-size:10px;color:#3A5FA0" i] {
@@ -489,11 +507,18 @@
   font-weight:400 !important;
   letter-spacing:.1px !important;
 }
-/* Percentual (56,0%) */
-[data-theme="dark"] #tbp [style*="font-size:10px;color:#2D7A50;\""],
-[data-theme="dark"] #tbp [style*="font-size:10px;color:#2A6AB0;\""] {
+
+/* ── Ícones monocromáticos (sobrescreve currentColor inherited dos textos) ── */
+[data-theme="dark"] #tbp .bp-box svg {
+  stroke-width:1.5 !important;
   color:#94a3b8 !important;
+  stroke:#94a3b8 !important;
 }
+/* Estoques (alerta âmbar) e Empréstimos CP (alerta vermelho) — mantêm cor de warning */
+[data-theme="dark"] #tbp [style*="color:#EF9F27" i],
+[data-theme="dark"] #tbp [style*="color:#7A5800" i] svg { color:#f59e0b !important; stroke:#f59e0b !important; }
+[data-theme="dark"] #tbp [style*="color:#C0392B" i],
+[data-theme="dark"] #tbp [style*="color:#8A2A00" i] svg { color:#ef4444 !important; stroke:#ef4444 !important; }
 
 /* ── Barras de progresso: estilo Linear/Ramp — finas, matte ── */
 [data-theme="dark"] #tbp [style*="height:5px;background:#D0EEE0" i],
