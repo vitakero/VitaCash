@@ -432,6 +432,8 @@
   background:rgba(255,255,255,.015) !important;
   border-right-color:rgba(255,255,255,.04) !important;
 }
+/* Override mais robusto via classe (.bp-box) — pega TODAS as variações de bg */
+[data-theme="dark"] #tbp .bp-box,
 [data-theme="dark"] #tbp [style*="background:#F0FAF5" i],
 [data-theme="dark"] #tbp [style*="background:#F0F5FA" i],
 [data-theme="dark"] #tbp [style*="background:#EEF2FA" i],
@@ -508,20 +510,39 @@
   background:#3b82f6 !important;
   box-shadow:none !important;
 }
-/* Indicador vertical 10x28 (chip da esquerda do card) — afinar */
-[data-theme="dark"] #tbp [style*="width:10px;height:28px;background:#5DCAA5" i] {
+/* Indicador vertical (chip lateral esquerdo) — afinar TODOS (verde claro, verde escuro, azul) */
+[data-theme="dark"] #tbp [style*="width:10px"][style*="background:#5DCAA5" i],
+[data-theme="dark"] #tbp [style*="width:10px"][style*="background:#1A8A5A" i],
+[data-theme="dark"] #tbp [style*="width:10px"][style*="background:#1A6B4A" i],
+[data-theme="dark"] #tbp [style*="width:10px"][style*="background:#9FE1CB" i] {
   width:3px !important;
-  height:32px !important;
   background:#10b981 !important;
   border-radius:99px !important;
   opacity:.85 !important;
 }
-[data-theme="dark"] #tbp [style*="width:10px;height:28px;background:#2A6AB0" i] {
+[data-theme="dark"] #tbp [style*="width:10px"][style*="background:#2A6AB0" i],
+[data-theme="dark"] #tbp [style*="width:10px"][style*="background:#1A4A8A" i],
+[data-theme="dark"] #tbp [style*="width:10px"][style*="background:#7A90C0" i],
+[data-theme="dark"] #tbp [style*="width:10px"][style*="background:#B5D4F4" i] {
   width:3px !important;
-  height:32px !important;
   background:#3b82f6 !important;
   border-radius:99px !important;
   opacity:.85 !important;
+}
+/* Progress fill (verde/azul) — qualquer variação */
+[data-theme="dark"] #tbp [style*="height:100%"][style*="background:#5DCAA5" i],
+[data-theme="dark"] #tbp [style*="height:100%"][style*="background:#1A8A5A" i],
+[data-theme="dark"] #tbp [style*="height:100%"][style*="background:#1A6B4A" i],
+[data-theme="dark"] #tbp [style*="height:100%"][style*="background:#9FE1CB" i] {
+  background:#10b981 !important;
+  box-shadow:none !important;
+}
+[data-theme="dark"] #tbp [style*="height:100%"][style*="background:#2A6AB0" i],
+[data-theme="dark"] #tbp [style*="height:100%"][style*="background:#1A4A8A" i],
+[data-theme="dark"] #tbp [style*="height:100%"][style*="background:#7A90C0" i],
+[data-theme="dark"] #tbp [style*="height:100%"][style*="background:#B5D4F4" i] {
+  background:#3b82f6 !important;
+  box-shadow:none !important;
 }
 
 /* ── Ícones: stroke fino premium ── */
