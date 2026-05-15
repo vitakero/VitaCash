@@ -422,6 +422,141 @@
 [data-theme="dark"] [style*="color:#7A5800" i] { color:#fcd34d !important; }
 
 /* ════════════════════════════════════════════════════════════════
+   #tbp — REFINAMENTO ENTERPRISE PREMIUM (Bloomberg / Ramp / Linear)
+   Menos cor, mais profundidade, tipografia editorial.
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── Background com camadas sutis em vez de cores saturadas ── */
+[data-theme="dark"] #tbp [style*="background:#E8F5EE" i],
+[data-theme="dark"] #tbp [style*="background:#E8F1FB" i] {
+  background:rgba(255,255,255,.015) !important;
+  border-right-color:rgba(255,255,255,.04) !important;
+}
+[data-theme="dark"] #tbp [style*="background:#F0FAF5" i],
+[data-theme="dark"] #tbp [style*="background:#F0F5FA" i],
+[data-theme="dark"] #tbp [style*="background:#EEF2FA" i],
+[data-theme="dark"] #tbp [style*="background:#E8EEF8" i] {
+  background:transparent !important;
+}
+
+/* ── Banners de seção (ATIVO CIRCULANTE / PASSIVO CIRCULANTE etc) ── */
+/* Emerald deep em vez de #2D8A5E saturado */
+[data-theme="dark"] #tbp [style*="background:#2D8A5E" i] {
+  background:rgba(16,94,68,.85) !important;
+  letter-spacing:1.2px !important;
+  font-weight:600 !important;
+}
+/* Navy deep em vez de #1A3A6B saturado */
+[data-theme="dark"] #tbp [style*="background:#1A3A6B" i] {
+  background:rgba(30,58,103,.85) !important;
+  letter-spacing:1.2px !important;
+  font-weight:600 !important;
+}
+/* Headers de lado (verde/azul claro) */
+[data-theme="dark"] #tbp [style*="background:#1A5C3A" i],
+[data-theme="dark"] #tbp [style*="background:#1A4A8A" i] {
+  background:rgba(255,255,255,.025) !important;
+  letter-spacing:1px !important;
+}
+
+/* ── Textos: hierarquia editorial mais clara ── */
+/* Valores principais (R$ 5,48 mi) — protagonistas */
+[data-theme="dark"] #tbp [style*="font-size:13px;font-weight:700;color:#1A4A2E" i],
+[data-theme="dark"] #tbp [style*="font-size:13px;font-weight:700;color:#0A2240" i],
+[data-theme="dark"] #tbp [style*="font-size:13px;font-weight:700;color:#1A3A6B" i] {
+  font-size:14.5px !important;
+  font-weight:600 !important;
+  color:#f8fafc !important;
+  letter-spacing:-.3px !important;
+}
+/* Títulos de linha (Caixa e equivalentes) */
+[data-theme="dark"] #tbp [style*="font-size:12px;font-weight:600;color:#1A4A2E" i],
+[data-theme="dark"] #tbp [style*="font-size:12px;font-weight:600;color:#0A2240" i],
+[data-theme="dark"] #tbp [style*="font-size:12px;font-weight:600;color:#1A3A6B" i] {
+  color:#e2e8f0 !important;
+  font-weight:500 !important;
+  font-size:12.5px !important;
+  letter-spacing:-.1px !important;
+}
+/* Subtítulos (Caixa + bancos + aplicações) */
+[data-theme="dark"] #tbp [style*="font-size:10px;color:#2D7A50" i],
+[data-theme="dark"] #tbp [style*="font-size:10px;color:#2A6AB0" i],
+[data-theme="dark"] #tbp [style*="font-size:10px;color:#3A5FA0" i] {
+  color:#64748b !important;
+  font-size:10.5px !important;
+  font-weight:400 !important;
+  letter-spacing:.1px !important;
+}
+/* Percentual (56,0%) */
+[data-theme="dark"] #tbp [style*="font-size:10px;color:#2D7A50;\""],
+[data-theme="dark"] #tbp [style*="font-size:10px;color:#2A6AB0;\""] {
+  color:#94a3b8 !important;
+}
+
+/* ── Barras de progresso: estilo Linear/Ramp — finas, matte ── */
+[data-theme="dark"] #tbp [style*="height:5px;background:#D0EEE0" i],
+[data-theme="dark"] #tbp [style*="height:5px;background:#C5D0E8" i] {
+  height:3px !important;
+  background:rgba(255,255,255,.06) !important;
+  border-radius:99px !important;
+}
+[data-theme="dark"] #tbp [style*="background:#5DCAA5" i] {
+  background:#10b981 !important;
+  box-shadow:none !important;
+}
+[data-theme="dark"] #tbp [style*="background:#2A6AB0" i]:not([style*="font"]) {
+  background:#3b82f6 !important;
+  box-shadow:none !important;
+}
+/* Indicador vertical 10x28 (chip da esquerda do card) — afinar */
+[data-theme="dark"] #tbp [style*="width:10px;height:28px;background:#5DCAA5" i] {
+  width:3px !important;
+  height:32px !important;
+  background:#10b981 !important;
+  border-radius:99px !important;
+  opacity:.85 !important;
+}
+[data-theme="dark"] #tbp [style*="width:10px;height:28px;background:#2A6AB0" i] {
+  width:3px !important;
+  height:32px !important;
+  background:#3b82f6 !important;
+  border-radius:99px !important;
+  opacity:.85 !important;
+}
+
+/* ── Ícones: stroke fino premium ── */
+[data-theme="dark"] #tbp .bp-box svg,
+[data-theme="dark"] #tbp [class*="bp-"] svg { stroke-width:1.5 !important; }
+
+/* ── Bordas/divisórias: quase invisíveis, só pra ritmo ── */
+[data-theme="dark"] #tbp [style*="border-bottom:.5px solid #C5E8D5" i],
+[data-theme="dark"] #tbp [style*="border-bottom:.5px solid #C5D0E8" i] {
+  border-bottom-color:rgba(255,255,255,.04) !important;
+}
+[data-theme="dark"] #tbp [style*="border-right:3px solid #fff" i] {
+  border-right:1px solid rgba(255,255,255,.04) !important;
+}
+
+/* ── Padding/spacing nos cards: mais respiro ── */
+[data-theme="dark"] #tbp .bp-box {
+  padding:.95rem 1.25rem !important;
+}
+
+/* ── Card destacado/selecionado (Estoques, etc) ── */
+[data-theme="dark"] #tbp [style*="background:#1C1C1C" i],
+[data-theme="dark"] #tbp [style*="background:#0A1A3A" i] {
+  background:rgba(255,255,255,.04) !important;
+  box-shadow:inset 2px 0 0 #f59e0b !important;
+}
+
+/* ── Total ATIVO / Total PASSIVO + PL — banner final ── */
+[data-theme="dark"] #tbp [style*="background:#1A5C3A" i],
+[data-theme="dark"] #tbp [style*="background:#1A4A8A" i] {
+  background:rgba(255,255,255,.025) !important;
+  border-top:1px solid rgba(255,255,255,.06) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════
    LANDING — Correções finais dark (FAQ hover, suporte, CTAs brancos)
    ════════════════════════════════════════════════════════════════ */
 
