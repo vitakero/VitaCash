@@ -501,15 +501,17 @@
 /* Valores principais (R$ 5,48 mi) — protagonistas brancos */
 [data-theme="dark"] #tbp [style*="font-size:13px;font-weight:700;color:#1A4A2E" i],
 [data-theme="dark"] #tbp [style*="font-size:13px;font-weight:700;color:#0A2240" i],
+[data-theme="dark"] #tbp [style*="font-size:13px;font-weight:700;color:#0A1A3A" i],
 [data-theme="dark"] #tbp [style*="font-size:13px;font-weight:700;color:#1A3A6B" i] {
   font-size:14.5px !important;
   font-weight:600 !important;
   color:#f8fafc !important;
   letter-spacing:-.3px !important;
 }
-/* Títulos de linha (Caixa e equivalentes) — slate neutro, não verde nem azul */
+/* Títulos de linha (Caixa e equivalentes, Fornecedores etc) — slate neutro */
 [data-theme="dark"] #tbp [style*="font-size:12px;font-weight:600;color:#1A4A2E" i],
 [data-theme="dark"] #tbp [style*="font-size:12px;font-weight:600;color:#0A2240" i],
+[data-theme="dark"] #tbp [style*="font-size:12px;font-weight:600;color:#0A1A3A" i],
 [data-theme="dark"] #tbp [style*="font-size:12px;font-weight:600;color:#1A3A6B" i] {
   color:#e2e8f0 !important;
   font-weight:500 !important;
@@ -519,12 +521,16 @@
 /* Subtítulos — slate neutro */
 [data-theme="dark"] #tbp [style*="font-size:10px;color:#2D7A50" i],
 [data-theme="dark"] #tbp [style*="font-size:10px;color:#2A6AB0" i],
+[data-theme="dark"] #tbp [style*="font-size:10px;color:#2A4A8A" i],
 [data-theme="dark"] #tbp [style*="font-size:10px;color:#3A5FA0" i] {
   color:#64748b !important;
   font-size:10.5px !important;
   font-weight:400 !important;
   letter-spacing:.1px !important;
 }
+/* Catch-all pra qualquer texto azul-escuro restante no #tbp */
+[data-theme="dark"] #tbp [style*="color:#0A1A3A" i],
+[data-theme="dark"] #tbp [style*="color:#2A4A8A" i] { color:#e2e8f0 !important; }
 
 /* ── Ícones monocromáticos (sobrescreve currentColor inherited dos textos) ── */
 [data-theme="dark"] #tbp .bp-box svg {
