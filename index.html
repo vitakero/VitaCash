@@ -458,11 +458,11 @@
   text-transform:none !important;
   font-size:11.5px !important;
 }
-/* Sub-banners — base comum (weight, size, borda) */
+/* Sub-banners — base comum (weight, size, borda, centralizados) */
 [data-theme="dark"] #tbp [style*="background:#2D8A5E" i]:not([style*="text-align:center" i]),
 [data-theme="dark"] #tbp [style*="background:#1A5C3A" i]:not([style*="text-align:center" i]),
 [data-theme="dark"] #tbp [style*="background:#1A4A8A" i]:not([style*="text-align:center" i]),
-[data-theme="dark"] #tbp [style*="background:#1A3A6B" i]:not([style*="text-align:center" i]),
+[data-theme="dark"] #tbp [style*="background:#1A3A6B" i]:not([style*="text-align:center" i]):not([style*="display:flex" i]),
 [data-theme="dark"] #tbp [style*="background:#0F2A52" i],
 [data-theme="dark"] #tbp [style*="background:#0A2240" i],
 [data-theme="dark"] #tbp [style*="background:#3A5FA0" i] {
@@ -471,6 +471,7 @@
   font-weight:700 !important;
   font-size:11px !important;
   text-transform:none !important;
+  text-align:center !important;
   border-top:1px solid rgba(255,255,255,.04) !important;
   border-bottom:1px solid rgba(255,255,255,.04) !important;
 }
