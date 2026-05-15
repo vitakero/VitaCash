@@ -6629,6 +6629,34 @@ async function mudarSenhaPerfil(){
   border-top-color:rgba(255,255,255,.06) !important;
 }
 
+/* ══ Botões secundários (Atualizar senha, Gerenciar assinatura) — ghost premium ══ */
+[data-theme="dark"] #s-perfil .perfil-btn-secondary {
+  background:rgba(255,255,255,.04) !important;
+  border:1px solid rgba(255,255,255,.16) !important;
+  color:#e2e8f0 !important;
+  box-shadow:none !important;
+}
+[data-theme="dark"] #s-perfil .perfil-btn-secondary:hover:not(:disabled) {
+  background:rgba(255,255,255,.08) !important;
+  border-color:rgba(255,255,255,.28) !important;
+  color:#ffffff !important;
+  box-shadow:0 1px 3px rgba(0,0,0,.3) !important;
+}
+
+/* Botão Sair (perfil-btn-danger) — também ghost mas com tinta vermelha sutil */
+[data-theme="dark"] #s-perfil .perfil-btn-danger {
+  background:rgba(248,113,113,.06) !important;
+  border:1px solid rgba(248,113,113,.28) !important;
+  color:#fca5a5 !important;
+  box-shadow:none !important;
+}
+[data-theme="dark"] #s-perfil .perfil-btn-danger:hover:not(:disabled) {
+  background:rgba(248,113,113,.14) !important;
+  border-color:rgba(248,113,113,.55) !important;
+  color:#fecaca !important;
+  box-shadow:0 1px 3px rgba(220,38,38,.18) !important;
+}
+
 /* Modal de apagar conta */
 .del-modal { position:fixed; inset:0; z-index:9999; display:none; align-items:center; justify-content:center; padding:1rem; }
 .del-modal.open { display:flex; }
