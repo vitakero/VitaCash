@@ -1,202 +1,313 @@
-// ════════════════════════════════════════════════════════════════════
-//  STRIPE WEBHOOK — Ativação automática do plano Premium (e renovação)
-// ════════════════════════════════════════════════════════════════════
-//
-// Esta Edge Function escuta eventos do Stripe e:
-//   - Ativa o plano (ex: Premium) quando o cliente paga via Payment Link
-//   - Renova automaticamente quando o Stripe cobra mensalmente
-//   - Cancela quando a subscription é deletada (cliente cancelou ou
-//     pagamento falhou várias vezes)
-//
-// Eventos tratados:
-//   - checkout.session.completed  → primeira ativação
-//   - invoice.paid                → renovação mensal/anual
-//   - customer.subscription.deleted → cancelamento
-//
-// Pré-requisitos (variáveis de ambiente no Supabase):
-//   STRIPE_SECRET_KEY        → sk_test_xxx (test) ou sk_live_xxx (prod)
-//   STRIPE_WEBHOOK_SECRET    → whsec_xxx (do webhook no Stripe Dashboard)
-//   STRIPE_PRICE_PREMIUM     → price_xxx (price ID do Premium criado no Stripe)
-//   SUPABASE_URL             → https://asrecwsocneepipvfymx.supabase.co
-//   SUPABASE_SERVICE_ROLE_KEY → service role key (Project Settings → API)
-//
-// Veja README.md neste diretório para setup completo passo a passo.
-// ════════════════════════════════════════════════════════════════════
+import Stripe from 'https://esm.sh/stripe@14?target=deno'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-import { serve } from 'https://deno.land/std@0.224.0/http/server.ts';
-import Stripe from 'https://esm.sh/stripe@14.21.0?target=deno';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.7';
-
-const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY')!;
-const STRIPE_WEBHOOK_SECRET = Deno.env.get('STRIPE_WEBHOOK_SECRET')!;
-const STRIPE_PRICE_PREMIUM = Deno.env.get('STRIPE_PRICE_PREMIUM') || '';
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-
-const stripe = new Stripe(STRIPE_SECRET_KEY, {
+const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!, {
   apiVersion: '2024-06-20',
-  httpClient: Stripe.createFetchHttpClient(),
-});
+})
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+const supabase = createClient(
+  Deno.env.get('SUPABASE_URL')!,
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+)
 
-// Mapeia price_id → nome do plano. Adicione outros price IDs se quiser que
-// este webhook também trate Pro, Growth, etc.
-function planoFromPriceId(priceId: string): string | null {
-  if (priceId === STRIPE_PRICE_PREMIUM) return 'premium';
-  return null;
+const PLAN_MAP: Record<string, string> = {
+  'price_1TUWo3HkpdynZUBW6AVGmLeu': 'growth',
+  'price_1TUWxWHkpdynZUBW2DLLEnlE': 'pro',
+  'price_1TUX0UHkpdynZUBWS1WLFmE4': 'premium',
 }
 
-serve(async (req) => {
-  if (req.method !== 'POST') {
-    return new Response('Method not allowed', { status: 405 });
+const PLAN_PRICE: Record<string, string> = {
+  'growth':  'R$ 97/mês',
+  'pro':     'R$ 197/mês',
+  'premium': 'R$ 347/mês',
+}
+
+// ────────────────────────────────────────────────────────────────────
+// Encontra o user_id no Supabase a partir da subscription
+// 1º) tenta metadata.supabase_uid (vem do embedded checkout)
+// 2º) fallback: busca pelo email do customer no Stripe (Payment Link)
+// ────────────────────────────────────────────────────────────────────
+async function findUserId(sub: Stripe.Subscription): Promise<string | null> {
+  const uid = sub.metadata?.supabase_uid
+  if (uid) return uid
+
+  // Fallback: busca o email do customer e procura no profiles
+  if (typeof sub.customer === 'string') {
+    try {
+      const customer = await stripe.customers.retrieve(sub.customer)
+      if ('email' in customer && customer.email) {
+        const email = customer.email.toLowerCase()
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('email', email)
+          .single()
+        if (profile?.id) {
+          console.log(`Fallback por email: ${email} → uid=${profile.id}`)
+          return profile.id
+        } else {
+          console.warn(`Email ${email} pagou mas não tem cadastro no VitaCash`)
+        }
+      }
+    } catch (err) {
+      console.error('Erro buscando customer no Stripe:', err.message)
+    }
   }
+  return null
+}
 
-  const signature = req.headers.get('stripe-signature');
-  if (!signature) {
-    return new Response('Missing stripe-signature header', { status: 400 });
+async function enviarEmailBoasVindas(email: string, nome: string, plano: string) {
+  const resendKey = Deno.env.get('RESEND_API_KEY')
+  if (!resendKey) { console.warn('RESEND_API_KEY não configurada'); return }
+
+  const planoNome  = plano.toUpperCase()
+  const planoPrico = PLAN_PRICE[plano] ?? ''
+
+  const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Bem-vindo ao VitaCash</title>
+</head>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:'Helvetica Neue',Arial,sans-serif;">
+
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9;padding:48px 0;">
+<tr><td align="center">
+
+  <table width="540" cellpadding="0" cellspacing="0" style="max-width:540px;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.10);">
+
+    <!-- HEADER -->
+    <tr>
+      <td style="background:linear-gradient(135deg,#155f47 0%,#1a7a5e 50%,#1d9e75 100%);padding:36px 36px 32px;text-align:center;">
+        <div style="font-size:26px;font-weight:800;letter-spacing:-.3px;margin-bottom:8px;">
+          <span style="color:#ffffff;">Vita</span><span style="color:#4ade80;">Cash</span>
+        </div>
+        <div style="font-size:9px;font-weight:700;color:#4ade80;letter-spacing:2.5px;text-transform:uppercase;">Diagnóstico Financeiro Inteligente</div>
+      </td>
+    </tr>
+
+    <!-- CORPO -->
+    <tr>
+      <td style="padding:36px 36px 28px;">
+
+        <p style="margin:0 0 6px;font-size:20px;font-weight:700;color:#111827;">Bem-vindo ao VitaCash, ${nome}!</p>
+        <p style="margin:0 0 28px;font-size:14px;color:#6b7280;line-height:1.7;">Sua assinatura está ativa. Você já pode usar o diagnóstico financeiro mais completo do mercado.</p>
+
+        <!-- Plano card -->
+        <table cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:28px;">
+          <tr>
+            <td style="background:linear-gradient(135deg,#f0fdf7 0%,#ecfdf5 100%);border:1px solid #a7f3d0;border-radius:10px;padding:20px 24px;box-shadow:0 2px 8px rgba(29,158,117,.08);">
+              <div style="font-size:10px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;">Seu plano ativo</div>
+              <div style="font-size:26px;font-weight:800;color:#064e3b;letter-spacing:-.3px;margin-bottom:4px;">${planoNome}</div>
+              <div style="font-size:13px;color:#6b7280;">${planoPrico}</div>
+            </td>
+          </tr>
+        </table>
+
+        <!-- Passos -->
+        <div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:14px;">O que fazer agora</div>
+        <table cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:28px;">
+          <tr>
+            <td style="padding:13px 0;border-bottom:1px solid #f1f5f9;">
+              <table cellpadding="0" cellspacing="0"><tr>
+                <td style="width:28px;height:28px;background:#ecfdf5;border-radius:50%;text-align:center;vertical-align:middle;">
+                  <span style="font-size:12px;font-weight:700;color:#059669;">1</span>
+                </td>
+                <td style="padding-left:12px;font-size:13px;color:#374151;line-height:1.5;">Acesse o painel e clique em <strong style="color:#111827;">Nova análise</strong></td>
+              </tr></table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:13px 0;border-bottom:1px solid #f1f5f9;">
+              <table cellpadding="0" cellspacing="0"><tr>
+                <td style="width:28px;height:28px;background:#ecfdf5;border-radius:50%;text-align:center;vertical-align:middle;">
+                  <span style="font-size:12px;font-weight:700;color:#059669;">2</span>
+                </td>
+                <td style="padding-left:12px;font-size:13px;color:#374151;line-height:1.5;">Faça upload da sua <strong style="color:#111827;">DRE</strong> e <strong style="color:#111827;">Balanço Patrimonial</strong></td>
+              </tr></table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:13px 0;">
+              <table cellpadding="0" cellspacing="0"><tr>
+                <td style="width:28px;height:28px;background:#ecfdf5;border-radius:50%;text-align:center;vertical-align:middle;">
+                  <span style="font-size:12px;font-weight:700;color:#059669;">3</span>
+                </td>
+                <td style="padding-left:12px;font-size:13px;color:#374151;line-height:1.5;">Receba seu <strong style="color:#111827;">diagnóstico financeiro completo</strong> em segundos</td>
+              </tr></table>
+            </td>
+          </tr>
+        </table>
+
+        <!-- Botão -->
+        <table cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:28px;">
+          <tr>
+            <td align="center">
+              <a href="https://vita-cash.vercel.app" style="display:inline-block;background:#1d9e75;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;padding:14px 36px;border-radius:8px;letter-spacing:-.1px;box-shadow:0 4px 14px rgba(29,158,117,.35);">Acessar meu painel →</a>
+            </td>
+          </tr>
+        </table>
+
+        <!-- Info box -->
+        <table cellpadding="0" cellspacing="0" width="100%">
+          <tr>
+            <td style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px 18px;">
+              <p style="margin:0;font-size:12px;color:#64748b;line-height:1.7;">Dúvidas? Basta responder este e-mail — nossa equipe está disponível para ajudar.</p>
+            </td>
+          </tr>
+        </table>
+
+      </td>
+    </tr>
+
+    <!-- FOOTER -->
+    <tr>
+      <td style="padding:20px 36px 28px;border-top:1px solid #f1f5f9;text-align:center;">
+        <p style="margin:0 0 4px;font-size:11px;color:#94a3b8;">Este e-mail foi enviado porque você assinou o VitaCash.</p>
+        <p style="margin:0;font-size:11px;color:#cbd5e1;">© 2026 VitaCash &nbsp;·&nbsp; <a href="https://vita-cash.vercel.app" style="color:#94a3b8;text-decoration:none;">vita-cash.vercel.app</a></p>
+      </td>
+    </tr>
+
+  </table>
+
+</td></tr>
+</table>
+
+</body>
+</html>`
+
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${resendKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: 'VitaCash <onboarding@resend.dev>',
+      to: [email],
+      subject: `Bem-vindo ao VitaCash ${planoNome}! 🎉`,
+      html,
+    }),
+  })
+
+  if (res.ok) {
+    console.log(`Email de boas-vindas enviado para ${email}`)
+  } else {
+    const err = await res.text()
+    console.error(`Erro ao enviar email: ${err}`)
   }
+}
 
-  const body = await req.text();
-  let event: Stripe.Event;
+Deno.serve(async (req) => {
+  const signature = req.headers.get('stripe-signature')
+  const body = await req.text()
 
-  // 1. VERIFICA ASSINATURA — garante que o request veio mesmo do Stripe
+  let event: Stripe.Event
+
   try {
     event = await stripe.webhooks.constructEventAsync(
       body,
-      signature,
-      STRIPE_WEBHOOK_SECRET
-    );
+      signature!,
+      Deno.env.get('STRIPE_WEBHOOK_SECRET')!
+    )
   } catch (err) {
-    console.error('❌ Assinatura inválida:', err.message);
-    return new Response(`Webhook Error: ${err.message}`, { status: 400 });
+    console.error('Webhook signature inválida:', err.message)
+    return new Response(`Webhook Error: ${err.message}`, { status: 400 })
   }
-
-  console.log(`📨 Evento recebido: ${event.type} (${event.id})`);
 
   try {
     switch (event.type) {
-      // ─────────────────────────────────────────────────────────────
-      // PAGAMENTO INICIAL — cliente acabou de comprar via Payment Link
-      // ─────────────────────────────────────────────────────────────
-      case 'checkout.session.completed': {
-        const session = event.data.object as Stripe.Checkout.Session;
-        const email = (session.customer_details?.email || session.customer_email || '').toLowerCase();
-        if (!email) {
-          throw new Error('Email não encontrado na sessão de checkout');
-        }
 
-        // Identifica qual plano foi comprado pelo price_id
-        const lineItems = await stripe.checkout.sessions.listLineItems(session.id);
-        const priceId = lineItems.data[0]?.price?.id;
-        if (!priceId) {
-          console.log('⚠️  Line items sem price_id — ignorando');
-          break;
-        }
+      case 'customer.subscription.created':
+      case 'customer.subscription.updated': {
+        const sub = event.data.object as Stripe.Subscription
+        const priceId = sub.items.data[0]?.price.id
+        const plan = PLAN_MAP[priceId] ?? 'starter'
+        const isNova = event.type === 'customer.subscription.created'
 
-        const plano = planoFromPriceId(priceId);
-        if (!plano) {
-          console.log(`⚠️  Price ${priceId} não mapeado pra nenhum plano — ignorando`);
-          break;
-        }
+        // Identifica o user: metadata primeiro, depois email do customer
+        const uid = await findUserId(sub)
 
-        // Calcula período: 1 ano à frente se não tiver subscription
-        const subscriptionId = session.subscription as string | null;
-        let periodEnd: string;
-        if (subscriptionId) {
-          const sub = await stripe.subscriptions.retrieve(subscriptionId);
-          periodEnd = new Date(sub.current_period_end * 1000).toISOString();
+        console.log(`Evento: ${event.type} | uid=${uid} | plan=${plan} | status=${sub.status}`)
+
+        if (uid) {
+          const customerId = typeof sub.customer === 'string' ? sub.customer : null
+
+          const { error } = await supabase.from('profiles').update({
+            subscription_status: sub.status,
+            current_plan: plan,
+            current_period_end: sub.current_period_end
+              ? new Date(sub.current_period_end * 1000).toISOString()
+              : null,
+            stripe_customer_id: customerId,
+            stripe_subscription_id: sub.id,
+          }).eq('id', uid)
+          if (error) console.error('Erro ao atualizar profiles:', error)
+          else console.log(`Assinatura atualizada: uid=${uid} status=${sub.status} plan=${plan}`)
+
+          if (isNova && plan !== 'starter') {
+            const { data: profile, error: profileErr } = await supabase
+              .from('profiles')
+              .select('email, full_name')
+              .eq('id', uid)
+              .single()
+            console.log(`Profile: email=${profile?.email} erro=${JSON.stringify(profileErr)}`)
+            if (profile?.email) {
+              const nome = profile.full_name?.split(' ')[0] || 'Cliente'
+              await enviarEmailBoasVindas(profile.email, nome, plan)
+            } else {
+              console.warn('Email não encontrado no perfil.')
+            }
+          }
         } else {
-          const d = new Date();
-          d.setFullYear(d.getFullYear() + 1);
-          periodEnd = d.toISOString();
+          console.warn(`Pagamento recebido mas user não identificado. customer=${sub.customer}`)
         }
-
-        const { error } = await supabase
-          .from('profiles')
-          .update({
-            current_plan: plano,
-            subscription_status: 'active',
-            current_period_end: periodEnd,
-            stripe_customer_id: session.customer as string,
-            stripe_subscription_id: subscriptionId,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('email', email);
-
-        if (error) throw error;
-        console.log(`✅ Plano ${plano} ATIVADO para ${email}`);
-        break;
+        break
       }
 
-      // ─────────────────────────────────────────────────────────────
-      // RENOVAÇÃO — Stripe cobrou de novo (mês/ano seguinte)
-      // ─────────────────────────────────────────────────────────────
-      case 'invoice.paid': {
-        const invoice = event.data.object as Stripe.Invoice;
-        const customerId = invoice.customer as string;
-        const priceId = invoice.lines.data[0]?.price?.id;
-        if (!priceId) break;
-
-        const plano = planoFromPriceId(priceId);
-        if (!plano) break;
-
-        // Pega novo período da subscription
-        let periodEnd: string | null = null;
-        if (invoice.subscription) {
-          const sub = await stripe.subscriptions.retrieve(invoice.subscription as string);
-          periodEnd = new Date(sub.current_period_end * 1000).toISOString();
-        }
-
-        const { error } = await supabase
-          .from('profiles')
-          .update({
-            current_plan: plano,
-            subscription_status: 'active',
-            current_period_end: periodEnd,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('stripe_customer_id', customerId);
-
-        if (error) throw error;
-        console.log(`🔄 Plano ${plano} RENOVADO para customer ${customerId} até ${periodEnd}`);
-        break;
-      }
-
-      // ─────────────────────────────────────────────────────────────
-      // CANCELAMENTO — cliente cancelou ou cartão falhou várias vezes
-      // ─────────────────────────────────────────────────────────────
       case 'customer.subscription.deleted': {
-        const subscription = event.data.object as Stripe.Subscription;
-        const customerId = subscription.customer as string;
+        const sub = event.data.object as Stripe.Subscription
+        const uid = await findUserId(sub)
 
-        const { error } = await supabase
-          .from('profiles')
-          .update({
-            current_plan: 'starter',
+        if (uid) {
+          await supabase.from('profiles').update({
             subscription_status: 'canceled',
-            updated_at: new Date().toISOString(),
-          })
-          .eq('stripe_customer_id', customerId);
+            current_plan: 'starter',
+            current_period_end: null,
+          }).eq('id', uid)
+          console.log(`Assinatura cancelada: uid=${uid}`)
+        }
+        break
+      }
 
-        if (error) throw error;
-        console.log(`❌ Subscription CANCELADA para customer ${customerId} — voltou pra starter`);
-        break;
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object as Stripe.Invoice
+        const customerId = invoice.customer as string
+
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('stripe_customer_id', customerId)
+          .single()
+
+        if (profile) {
+          await supabase.from('profiles').update({
+            subscription_status: 'past_due',
+          }).eq('id', profile.id)
+          console.log(`Pagamento falhou: customer=${customerId}`)
+        }
+        break
       }
 
       default:
-        console.log(`ℹ️  Evento ${event.type} não tratado (ok, ignorando)`);
+        console.log(`Evento ignorado: ${event.type}`)
     }
-
-    return new Response(JSON.stringify({ received: true }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
   } catch (err) {
-    console.error('💥 Erro processando webhook:', err);
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    console.error('Erro no handler:', err)
   }
-});
+
+  return new Response(JSON.stringify({ received: true }), {
+    headers: { 'Content-Type': 'application/json' }
+  })
+})
