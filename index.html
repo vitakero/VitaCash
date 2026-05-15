@@ -441,33 +441,37 @@
   background:transparent !important;
 }
 
-/* ── Banners principais (ATIVO / PASSIVO + PL) — neutros com accent superior fino ── */
+/* ── Banners principais (ATIVO / PASSIVO + PL) — neutros, caps suaves ── */
 [data-theme="dark"] #tbp [style*="background:#2D8A5E" i] {
   background:rgba(255,255,255,.02) !important;
   color:var(--text2) !important;
-  border-top:2px solid rgba(16,185,129,.45) !important;
-  letter-spacing:1.4px !important;
+  border-top:1px solid rgba(110,231,183,.32) !important;
+  letter-spacing:.4px !important;
   font-weight:500 !important;
-  text-transform:uppercase !important;
-  font-size:11px !important;
+  text-transform:none !important;
+  font-size:11.5px !important;
 }
 [data-theme="dark"] #tbp [style*="background:#1A3A6B" i] {
   background:rgba(255,255,255,.02) !important;
   color:var(--text2) !important;
-  border-top:2px solid rgba(96,165,250,.40) !important;
-  letter-spacing:1.4px !important;
+  border-top:1px solid rgba(147,197,253,.30) !important;
+  letter-spacing:.4px !important;
   font-weight:500 !important;
-  text-transform:uppercase !important;
-  font-size:11px !important;
+  text-transform:none !important;
+  font-size:11.5px !important;
 }
-/* Sub-banners (ATIVO CIRCULANTE, PASSIVO CIRCULANTE, PATRIMÔNIO LÍQUIDO etc) — neutros */
+/* Sub-banners (ATIVO CIRCULANTE, PASSIVO CIRCULANTE, PASSIVO NÃO CIRC, PATRIMÔNIO LÍQUIDO) — neutros */
 [data-theme="dark"] #tbp [style*="background:#1A5C3A" i],
-[data-theme="dark"] #tbp [style*="background:#1A4A8A" i] {
+[data-theme="dark"] #tbp [style*="background:#1A4A8A" i],
+[data-theme="dark"] #tbp [style*="background:#0F2A52" i],
+[data-theme="dark"] #tbp [style*="background:#0A2240" i],
+[data-theme="dark"] #tbp [style*="background:#3A5FA0" i] {
   background:rgba(255,255,255,.018) !important;
   color:var(--text2) !important;
-  letter-spacing:1.2px !important;
+  letter-spacing:.6px !important;
   font-weight:500 !important;
   font-size:10.5px !important;
+  text-transform:none !important;
   border-top:1px solid rgba(255,255,255,.04) !important;
   border-bottom:1px solid rgba(255,255,255,.04) !important;
 }
@@ -520,19 +524,19 @@
 [data-theme="dark"] #tbp [style*="color:#C0392B" i],
 [data-theme="dark"] #tbp [style*="color:#8A2A00" i] svg { color:#ef4444 !important; stroke:#ef4444 !important; }
 
-/* ── Barras de progresso: estilo Linear/Ramp — finas, matte ── */
+/* ── Barras de progresso: visíveis mas discretas, estilo Linear/Ramp ── */
 [data-theme="dark"] #tbp [style*="height:5px;background:#D0EEE0" i],
 [data-theme="dark"] #tbp [style*="height:5px;background:#C5D0E8" i] {
-  height:3px !important;
-  background:rgba(255,255,255,.06) !important;
+  height:4px !important;
+  background:rgba(255,255,255,.08) !important;
   border-radius:99px !important;
 }
 [data-theme="dark"] #tbp [style*="background:#5DCAA5" i] {
-  background:#10b981 !important;
+  background:#34d399 !important;
   box-shadow:none !important;
 }
 [data-theme="dark"] #tbp [style*="background:#2A6AB0" i]:not([style*="font"]) {
-  background:#3b82f6 !important;
+  background:#60a5fa !important;
   box-shadow:none !important;
 }
 /* Indicador vertical (chip lateral esquerdo) — afinar TODOS (verde claro, verde escuro, azul) */
@@ -554,20 +558,34 @@
   border-radius:99px !important;
   opacity:.85 !important;
 }
-/* Progress fill (verde/azul) — qualquer variação */
+/* Progress fill (verde/azul) — qualquer variação, tons mais sóbrios */
 [data-theme="dark"] #tbp [style*="height:100%"][style*="background:#5DCAA5" i],
 [data-theme="dark"] #tbp [style*="height:100%"][style*="background:#1A8A5A" i],
 [data-theme="dark"] #tbp [style*="height:100%"][style*="background:#1A6B4A" i],
 [data-theme="dark"] #tbp [style*="height:100%"][style*="background:#9FE1CB" i] {
-  background:#10b981 !important;
+  background:#34d399 !important;
   box-shadow:none !important;
 }
 [data-theme="dark"] #tbp [style*="height:100%"][style*="background:#2A6AB0" i],
 [data-theme="dark"] #tbp [style*="height:100%"][style*="background:#1A4A8A" i],
 [data-theme="dark"] #tbp [style*="height:100%"][style*="background:#7A90C0" i],
 [data-theme="dark"] #tbp [style*="height:100%"][style*="background:#B5D4F4" i] {
-  background:#3b82f6 !important;
+  background:#60a5fa !important;
   box-shadow:none !important;
+}
+
+/* ── Estoques: âmbar muito chamativo → discreto ── */
+[data-theme="dark"] #tbp [style*="background:#EF9F27" i] {
+  background:rgba(245,158,11,.55) !important;
+}
+[data-theme="dark"] #tbp [style*="color:#EF9F27" i],
+[data-theme="dark"] #tbp [style*="color:#7A5800" i] { color:#cbd5e1 !important; }
+[data-theme="dark"] #tbp [style*="color:#EF9F27" i] svg,
+[data-theme="dark"] #tbp [style*="color:#7A5800" i] svg { color:#cbd5e1 !important; stroke:#cbd5e1 !important; }
+
+/* ── Padding lateral nos cards — valores não ficam colados na borda ── */
+[data-theme="dark"] #tbp .bp-box {
+  padding:.95rem 1.5rem .95rem 1.25rem !important;
 }
 
 /* ── Ícones: stroke fino premium ── */
