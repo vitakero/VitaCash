@@ -6857,14 +6857,41 @@ async function confirmarApagarConta(){
   if(msg){ msg.textContent='Removendo seus dados...'; msg.className='del-modal-msg'; }
 
   try {
-    // 1. Apaga linha de profiles (dados pessoais)
+    // 1. PRIMEIRO: cancela a subscription no Stripe (se houver)
+    //    Evita assinatura "órfã" que continuaria cobrando após exclusão da conta
+    try {
+      var { data: { session: sessionForCancel } } = await sb.auth.getSession();
+      if(sessionForCancel){
+        var cancelRes = await fetch(
+          'https://asrecwsocneepipvfymx.supabase.co/functions/v1/cancel-stripe-subscription',
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': 'Bearer ' + sessionForCancel.access_token,
+              'apikey': SUPA_KEY,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+        var cancelData = await cancelRes.json().catch(function(){ return {}; });
+        if(cancelData.canceled){
+          console.log('Subscription Stripe cancelada:', cancelData.subscription_id);
+        } else {
+          console.log('Sem subscription pra cancelar:', cancelData.reason || cancelData.error || '');
+        }
+      }
+    } catch(e){
+      console.warn('Falha ao cancelar subscription Stripe (não bloqueia exclusão):', e);
+    }
+
+    // 2. Apaga linha de profiles (dados pessoais)
     var delProfile = await sb.from('profiles').delete().eq('id', currentUser.id);
     if(delProfile.error){
       console.warn('delete profiles:', delProfile.error);
       // Não bloqueia — segue tentando apagar o auth.user
     }
 
-    // 2. Chama RPC para apagar o usuário do auth.users
+    // 3. Chama RPC para apagar o usuário do auth.users
     //    (precisa da função SQL `delete_my_user` configurada no Supabase)
     var delUser = await sb.rpc('delete_my_user');
     if(delUser.error){
