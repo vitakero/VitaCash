@@ -7872,6 +7872,28 @@ let currentUser = null;
     return;
   }
 
+  // ── DEEP LINK: ?plano=premium (ou pro/growth) — fluxo cadastro+checkout ──
+  // Quando o link é compartilhado pelo WhatsApp (vendas consultivas), o cliente
+  // entra direto no fluxo: se não tiver conta, vai pro cadastro; após cadastrar,
+  // o verificarPlanoPendente() pega o flag e leva pro checkout do Stripe.
+  const planoFromUrl = params.get('plano') || params.get('plan');
+  if (planoFromUrl) {
+    const PRICE_MAP = {
+      'premium': 'price_1TUX0UHkpdynZUBWS1WLFmE4',
+      'pro':     'price_1TUWxWHkpdynZUBW2DLLEnlE',
+      'growth':  'price_1TUWo3HkpdynZUBW6AVGmLeu',
+    };
+    const priceId = PRICE_MAP[planoFromUrl.toLowerCase()];
+    if (priceId) {
+      // Limpa URL pra não disparar de novo em refresh
+      window.history.replaceState({}, '', window.location.pathname);
+      // iniciarCheckout sozinho já decide: logado → checkout direto;
+      // deslogado → cadastro (e após cadastro o pending plan é detectado)
+      iniciarCheckout(planoFromUrl.toLowerCase(), priceId);
+      return;
+    }
+  }
+
   // Restaura última tela visitada se usuário ainda está logado
   if (currentUser) {
     const telasSalvas = ['s-dash','s-escolher-plano','s-anl','s-nova-dre'];
