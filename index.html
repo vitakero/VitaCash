@@ -10930,7 +10930,7 @@ function exportarPDF() {
 
   html2pdf().set(opt).from(wrapper).save().then(function() {
     document.body.removeChild(wrapper);
-    btns.forEach(function(b) { b.innerHTML = '✅ PDF salvo!'; setTimeout(function() { b.innerHTML = b.dataset.orig; b.disabled = false; }, 2000); });
+    btns.forEach(function(b) { b.innerHTML = 'PDF salvo!'; setTimeout(function() { b.innerHTML = b.dataset.orig; b.disabled = false; }, 2000); });
   }).catch(function() {
     document.body.removeChild(wrapper);
     btns.forEach(function(b) { b.innerHTML = b.dataset.orig; b.disabled = false; });
