@@ -7876,7 +7876,7 @@ function lgOtpTrocarEmail(){
 <script>
 // ── SUPABASE ──────────────────────────────────────────────────────
 const SUPA_URL = 'https://asrecwsocneepipvfymx.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzcmVjd3NvY25lZXBpcHZmeW14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NzUzMTMsImV4cCI6MjA5MzA1MTMxM30.b_d06izv5S4SxA2UF-BjwB2lWCqOABCF7ODPLVtO1aA';
+const SUPA_KEY = 'sb_publishable_mPLOadOpzna9wpDKjtB1-w_OwjwRwVW';
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 let currentUser = null;
 
@@ -8003,7 +8003,7 @@ async function abrirTelaCheckout(planName, priceId) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + session.access_token,
-        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzcmVjd3NvY25lZXBpcHZmeW14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NzUzMTMsImV4cCI6MjA5MzA1MTMxM30.b_d06izv5S4SxA2UF-BjwB2lWCqOABCF7ODPLVtO1aA'
+        'apikey': 'sb_publishable_mPLOadOpzna9wpDKjtB1-w_OwjwRwVW'
       },
       body: JSON.stringify({ priceId: priceId, planName: planName, returnUrl: returnUrl })
     }
@@ -8044,7 +8044,7 @@ async function abrirPortal() {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + session.access_token,
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzcmVjd3NvY25lZXBpcHZmeW14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NzUzMTMsImV4cCI6MjA5MzA1MTMxM30.b_d06izv5S4SxA2UF-BjwB2lWCqOABCF7ODPLVtO1aA'
+          'apikey': 'sb_publishable_mPLOadOpzna9wpDKjtB1-w_OwjwRwVW'
         },
         body: JSON.stringify({ returnUrl: window.location.href })
       }
