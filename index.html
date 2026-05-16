@@ -1238,28 +1238,201 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
 .plano-progress-bar{width:120px;height:4px;background:var(--surface2);border-radius:99px;overflow:hidden;margin-top:4px;}
 .plano-progress-fill{height:100%;background:var(--green);border-radius:99px;transition:width .4s;}
 /* print */
+.print-cover { display: none; }
 @media print {
-  body { background: #fff !important; font-size: 11px !important; }
-  nav, #sidenav, .btn1, .btn2, button, .nav, .dash-layout > div:first-child,
-  .tag-file, input[type=range], .filtros, .fbtn, select { display: none !important; }
+  /* ── Configuração da página ── */
+  @page {
+    size: A4 portrait;
+    margin: 2cm 2.2cm 2cm 2.2cm;
+  }
+  @page :first {
+    margin: 0;
+  }
+
+  /* ── Reset base ── */
+  *, *::before, *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  body {
+    background: #fff !important;
+    color: #111 !important;
+    font-size: 10.5pt !important;
+    font-family: 'Helvetica Neue', Arial, sans-serif !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* ── Capa (primeira página) ── */
+  .print-cover {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 100vh;
+    padding: 0;
+    page-break-after: always;
+    background: #fff !important;
+  }
+  .print-cover-top {
+    background: linear-gradient(160deg, #0d3d2b 0%, #155f47 50%, #1d9e75 100%);
+    padding: 3.5cm 2.5cm 2cm;
+    color: #fff;
+  }
+  .print-cover-logo {
+    font-size: 36pt;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 6px;
+  }
+  .print-cover-logo span { color: #4ade80; }
+  .print-cover-sub {
+    font-size: 9pt;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.7);
+    margin-bottom: 3cm;
+  }
+  .print-cover-title {
+    font-size: 26pt;
+    font-weight: 300;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: .5cm;
+  }
+  .print-cover-title strong { font-weight: 800; }
+  .print-cover-body {
+    padding: 1.5cm 2.5cm 2cm;
+    flex: 1;
+  }
+  .print-cover-empresa {
+    font-size: 16pt;
+    font-weight: 700;
+    color: #111;
+    margin-bottom: 4px;
+  }
+  .print-cover-info {
+    font-size: 10pt;
+    color: #555;
+    margin-bottom: 1.5cm;
+    line-height: 1.8;
+  }
+  .print-cover-badge {
+    display: inline-block;
+    background: #f0fdf7;
+    border: 1px solid #86efac;
+    color: #15803d;
+    font-size: 8pt;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 99px;
+  }
+  .print-cover-footer {
+    padding: 1cm 2.5cm;
+    border-top: 2px solid #1d9e75;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .print-cover-footer-brand { font-size: 9pt; font-weight: 700; color: #1d9e75; }
+  .print-cover-footer-date { font-size: 9pt; color: #888; }
+
+  /* ── Cabeçalho nas páginas internas ── */
+  .print-header {
+    display: block !important;
+    padding-bottom: 8px;
+    border-bottom: 1.5px solid #1D9E75;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .print-header-brand { font-size: 14pt; font-weight: 800; }
+  .print-header-brand span { color: #1D9E75; }
+  .print-header-info { font-size: 8pt; color: #888; text-align: right; line-height: 1.6; }
+
+  /* ── Ocultar elementos do app ── */
+  nav, #sidenav, .nav, .dash-layout > div:first-child,
+  .tag-file, input, select, textarea,
+  .filtros, .fbtn, .help-icon, .tooltip,
+  .ind-cta, .cta-float, .dub-banner, .plano-progress,
+  .no-print, .modal, [class*="upgrade"],
+  .btn1, .btn2, button,
+  .empresa-switcher { display: none !important; }
+
+  /* ── Layout ── */
   .dash-layout { display: block !important; }
-  .screen { display: block !important; }
-  .screen:not(#s-dash) { display: none !important; }
-  .tc2 { display: block !important; page-break-inside: avoid; margin-bottom: 1.5rem; }
-  .tc2::before { content: attr(id); display: block; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #1D9E75; border-bottom: 2px solid #1D9E75; padding-bottom: 6px; margin-bottom: 12px; }
-  .ind-body { display: block !important; }
-  .dre-linha-body { display: block !important; }
+  .screen { display: none !important; }
+  #s-dash { display: block !important; }
+  .wrap { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+
+  /* ── Seções ── */
+  .tc2 {
+    display: block !important;
+    page-break-inside: avoid;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+  }
+  .ind-body, .dre-linha-body { display: block !important; }
   .tmc.open .tmbd, .tmbd { display: block !important; }
-  .mg { grid-template-columns: repeat(4, 1fr) !important; }
-  .card, .mc, .ind-card, .cg-card { break-inside: avoid; }
-  .tooltip { display: none !important; }
-  .help-icon { display: none !important; }
-  .wrap { max-width: 100% !important; padding: 0 !important; }
-  .hdr { border-bottom: 1px solid #ccc !important; margin-bottom: 1rem !important; }
-  h2, .sl { color: #1D9E75 !important; }
-  .print-header { display: block !important; }
-  .no-print { display: none !important; }
-  @page { margin: 1.5cm; size: A4; }
+
+  /* ── Cards: remove background colorido, deixa clean ── */
+  .card, .mc, .ind-card, .cg-card,
+  [class*="card"], [class*="Card"] {
+    background: #fff !important;
+    border: 1px solid #ddd !important;
+    box-shadow: none !important;
+    border-radius: 4px !important;
+    break-inside: avoid;
+  }
+  /* Gradientes e fundos coloridos → branco */
+  [style*="background:linear-gradient"],
+  [style*="background: linear-gradient"],
+  [style*="background:#"] {
+    background: #fff !important;
+  }
+  /* Texto colorido → preto */
+  [style*="color:#6b7280"],
+  [style*="color: #6b7280"],
+  [style*="color:var(--text2)"],
+  [style*="color:var(--text3)"] {
+    color: #444 !important;
+  }
+
+  /* ── Grid de indicadores ── */
+  .mg { grid-template-columns: repeat(3, 1fr) !important; gap: 8px !important; }
+
+  /* ── Score de diagnóstico ── */
+  .nota-num { color: #111 !important; }
+
+  /* ── Títulos de seção ── */
+  h2, .sl, .hdr-title { color: #111 !important; font-size: 12pt !important; }
+  .at { color: #888 !important; font-size: 8pt !important; }
+
+  /* ── Barras do gráfico ── */
+  [class*="barra"], [class*="bar"] {
+    min-height: 6px !important;
+    border-radius: 3px !important;
+  }
+  [style*="background:#1d9e75"], [style*="background:#1D9E75"] {
+    background: #1d9e75 !important;
+  }
+  [style*="background:#0f172a"], [style*="background:#1e293b"] {
+    background: #334155 !important;
+  }
+
+  /* ── Overflow fix ── */
+  .wrap, #s-dash, .dash-content {
+    overflow: visible !important;
+    width: 100% !important;
+  }
+  * { max-width: 100% !important; overflow: visible !important; }
+
+  /* ── Hdr ── */
+  .hdr { display: none !important; }
 }
 </style>
 </head>
@@ -9237,12 +9410,55 @@ function imprimirRelatorio() {
   
   // Adicionar header de impressão
   const hdr = document.querySelector('.hdr');
-  let printHdr = document.getElementById('print-hdr');
+  // ── Capa profissional ──
+  var oldCover = document.getElementById('print-cover-page');
+  if (oldCover) oldCover.remove();
+
+  // Tenta pegar nome da empresa dinamicamente
+  var empresaNome = (document.querySelector('.empresa-atual .font-semibold, .empresa-atual [style*="font-weight:600"], .empresa-atual [style*="font-weight: 600"]') || {}).textContent
+    || (document.querySelector('[style*="G JOAO"]') || {}).textContent
+    || 'Empresa';
+  var dataEmissao = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+  var anoExercicio = new Date().getFullYear();
+
+  var cover = document.createElement('div');
+  cover.id = 'print-cover-page';
+  cover.className = 'print-cover';
+  cover.innerHTML = `
+    <div class="print-cover-top">
+      <div class="print-cover-logo">Vita<span>Cash</span></div>
+      <div class="print-cover-sub">Diagnóstico Financeiro Inteligente</div>
+      <div class="print-cover-title">Relatório<br><strong>Financeiro Completo</strong></div>
+    </div>
+    <div class="print-cover-body">
+      <div class="print-cover-empresa">${empresaNome}</div>
+      <div class="print-cover-info">
+        Exercício ${anoExercicio}<br>
+        Emitido em ${dataEmissao}
+      </div>
+      <div class="print-cover-badge">Confidencial</div>
+    </div>
+    <div class="print-cover-footer">
+      <div class="print-cover-footer-brand">VitaCash</div>
+      <div class="print-cover-footer-date">vita-cash.vercel.app</div>
+    </div>`;
+  document.querySelector('.wrap').prepend(cover);
+
+  // ── Cabeçalho nas páginas internas ──
+  var printHdr = document.getElementById('print-hdr');
   if (!printHdr) {
     printHdr = document.createElement('div');
     printHdr.id = 'print-hdr';
-    printHdr.className = 'print-header';
-    printHdr.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:8px;border-bottom:2px solid #1D9E75;margin-bottom:16px;"><div style="font-size:22px;font-weight:800;letter-spacing:-1px;">Vita<span style="color:#1D9E75">Cash</span></div><div style="font-size:11px;color:#888;text-align:right;">Relatório Financeiro Completo<br>G JOAO DOS SANTOS INDUSTRIA E COMERCIO<br>CNPJ: 12.988.127/0001-40 · Exercício 2022<br>Emitido em: ${new Date().toLocaleDateString('pt-BR')}</div></div>`;
+    printHdr.className = 'print-header no-cover';
+    printHdr.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:8px;border-bottom:1.5px solid #1D9E75;margin-bottom:20px;">
+        <div style="font-size:16px;font-weight:800;letter-spacing:-.5px;">Vita<span style="color:#1D9E75;">Cash</span></div>
+        <div style="font-size:9px;color:#888;text-align:right;line-height:1.7;">
+          Relatório Financeiro Completo &nbsp;·&nbsp; Confidencial<br>
+          ${empresaNome}<br>
+          Emitido em ${dataEmissao}
+        </div>
+      </div>`;
     document.querySelector('.wrap').prepend(printHdr);
   }
   
