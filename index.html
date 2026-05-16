@@ -1801,7 +1801,7 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
           <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#cbd5e1;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Acesso para contador</div>
           <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#cbd5e1;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Suporte prioritário</div>
         </div>
-        <button onclick="window.open('https://wa.me/5500000000000?text=Olá! Tenho interesse no plano Premium do VitaCash. Gostaria de saber mais sobre como funciona.','_blank')" style="width:100%;padding:13px;border-radius:10px;border:1px solid rgba(255,255,255,.10);background:#fff;color:#0f172a;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;letter-spacing:-.2px;" onmouseover="this.style.background='#fbbf24';this.style.color='#0f172a';this.style.borderColor='rgba(251,191,36,.5)'" onmouseout="this.style.background='#fff';this.style.color='#0f172a';this.style.borderColor='rgba(255,255,255,.10)'">Falar com consultor</button>
+        <button onclick="falarComConsultor()" style="width:100%;padding:13px;border-radius:10px;border:1px solid rgba(255,255,255,.10);background:#fff;color:#0f172a;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;letter-spacing:-.2px;" onmouseover="this.style.background='#fbbf24';this.style.color='#0f172a';this.style.borderColor='rgba(251,191,36,.5)'" onmouseout="this.style.background='#fff';this.style.color='#0f172a';this.style.borderColor='rgba(255,255,255,.10)'">Falar com consultor</button>
       </div>
 
     </div>
@@ -2941,6 +2941,13 @@ async function carregarPerfil(){
     themeToggle.checked = (document.documentElement.getAttribute('data-theme') === 'dark');
   }
 
+  // ── ADMIN: revela card Vendas Premium só para emails autorizados ──
+  var _ADMIN_EMAILS = ['caroseu2018@gmail.com'];
+  var _cardAdmin = document.getElementById('admin-vendas-card');
+  if(_cardAdmin){
+    _cardAdmin.style.display = _ADMIN_EMAILS.indexOf((currentUser.email||'').toLowerCase()) >= 0 ? 'block' : 'none';
+  }
+
   // ── Helper: formata data PT-BR curta (ex: 13 mai 2026) ──────────
   function fmtDateShort(d){
     try {
@@ -3175,6 +3182,112 @@ async function mudarSenhaPerfil(){
   } finally {
     if(btn){ btn.disabled=false; btn.textContent='Atualizar senha'; }
   }
+}
+
+// ── FALAR COM CONSULTOR ────────────────────────────────────────────
+var WA_CONSULTOR = 'https://wa.me/5584991277474?text=' + encodeURIComponent('Olá! Tenho interesse no plano Premium do VitaCash. Gostaria de saber mais sobre como funciona.');
+
+function falarComConsultor() {
+  if (typeof currentUser !== 'undefined' && currentUser) {
+    window.open(WA_CONSULTOR, '_blank');
+  } else {
+    localStorage.setItem('vc_pending_whatsapp', '1');
+    goLogin('cadastro');
+  }
+}
+
+function _checarPendingWhatsapp() {
+  if (localStorage.getItem('vc_pending_whatsapp')) {
+    localStorage.removeItem('vc_pending_whatsapp');
+    window.open(WA_CONSULTOR, '_blank');
+    return true;
+  }
+  return false;
+}
+
+// ── ADMIN: ENVIAR LINK DE PAGAMENTO PREMIUM ────────────────────────
+async function adminEnviarEmailPremium() {
+  if(typeof currentUser === 'undefined' || !currentUser) return;
+  var $ = function(id){ return document.getElementById(id); };
+  var nomeInp  = $('admin-vp-nome');
+  var emailInp = $('admin-vp-email');
+  var btn      = $('admin-vp-btn');
+  var msg      = $('admin-vp-msg');
+  var waBtnDiv = $('admin-vp-wa-btn');
+  var nome  = (nomeInp  && nomeInp.value  || '').trim();
+  var email = (emailInp && emailInp.value || '').trim().toLowerCase();
+
+  function showMsg(text, kind) {
+    if(!msg) return;
+    msg.textContent  = text;
+    msg.style.display = 'block';
+    if(kind === 'ok'){
+      msg.style.background = 'rgba(22,163,106,.10)';
+      msg.style.color = '#16a36a';
+      msg.style.border = '1px solid rgba(22,163,106,.25)';
+    } else if(kind === 'err'){
+      msg.style.background = 'rgba(220,38,38,.08)';
+      msg.style.color = '#dc2626';
+      msg.style.border = '1px solid rgba(220,38,38,.25)';
+    } else {
+      msg.style.background = 'var(--surface2)';
+      msg.style.color = 'var(--text2)';
+      msg.style.border = '1px solid var(--border2)';
+    }
+  }
+
+  if(!nome) { showMsg('Informe o nome do cliente.', 'err'); return; }
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showMsg('Email do cliente inválido.', 'err'); return; }
+
+  if(btn){ btn.disabled = true; btn.classList.add('is-loading'); }
+  if(waBtnDiv) waBtnDiv.style.display = 'none';
+  showMsg('Enviando email...', 'info');
+
+  try {
+    var { data: { session } } = await sb.auth.getSession();
+    if(!session){ showMsg('Sessão expirou. Faça login novamente.', 'err'); return; }
+
+    var res = await fetch(
+      'https://asrecwsocneepipvfymx.supabase.co/functions/v1/send-payment-email',
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + session.access_token,
+          'apikey': SUPA_KEY,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ nome: nome, email: email })
+      }
+    );
+    var data = await res.json().catch(function(){ return {}; });
+    if(!res.ok || !data.ok){
+      showMsg('Falha ao enviar: ' + (data.error || 'HTTP ' + res.status), 'err');
+      return;
+    }
+    showMsg('✓ Email enviado para ' + email, 'ok');
+    if(waBtnDiv) waBtnDiv.style.display = 'block';
+    if(nomeInp)  nomeInp.value  = '';
+    if(emailInp) emailInp.value = '';
+    var telInp = $('admin-vp-tel');
+    if(telInp) telInp.value = '';
+  } catch(err) {
+    console.error('adminEnviarEmailPremium:', err);
+    showMsg('Erro inesperado: ' + (err.message || 'tente novamente'), 'err');
+  } finally {
+    if(btn){ btn.disabled = false; btn.classList.remove('is-loading'); }
+  }
+}
+
+function adminAbrirWhatsApp() {
+  var nomeInp = document.getElementById('admin-vp-nome-enviado');
+  var telInp  = document.getElementById('admin-vp-tel-enviado');
+  var nome    = (nomeInp && nomeInp.value || '').trim();
+  var tel     = (telInp  && telInp.value  || '').replace(/\D/g,'');
+  var primeiroNome = nome.split(' ')[0] || '';
+  var saudacao = primeiroNome ? ('Olá, ' + primeiroNome + '! ') : 'Olá! ';
+  var waMsg = saudacao + 'Segue o link para ativar seu plano Premium VitaCash (R$ 347/mês):\n\nhttps://vita-cash.vercel.app/?plano=premium\n\nQualquer dúvida é só me chamar!';
+  var base = tel ? ('https://wa.me/55' + tel) : 'https://wa.me/';
+  window.open(base + '?text=' + encodeURIComponent(waMsg), '_blank');
 }
 </script>
 
@@ -6039,6 +6152,56 @@ async function mudarSenhaPerfil(){
     </div>
   </div>
 
+  <!-- CARD: Admin — Enviar link de pagamento Premium (só caroseu2018@gmail.com) -->
+  <div class="perfil-card" id="admin-vendas-card" style="display:none;">
+    <div class="perfil-card-title">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+      Vendas Premium — Enviar link de pagamento
+    </div>
+    <div style="font-size:12.5px;color:var(--text2);margin-bottom:1rem;line-height:1.5;">Preencha os dados do cliente e clique em enviar. O email com o link de pagamento Premium vai direto pra caixa de entrada dele.</div>
+
+    <div class="perfil-grid" style="grid-template-columns:1fr;gap:.75rem;">
+      <div class="perfil-field">
+        <label class="perfil-label" style="font-size:11.5px;color:var(--text2);margin-bottom:4px;display:block;">Nome do cliente</label>
+        <input type="text" class="perfil-input" id="admin-vp-nome" placeholder="Ex: João Silva" autocomplete="off"/>
+      </div>
+      <div class="perfil-field">
+        <label class="perfil-label" style="font-size:11.5px;color:var(--text2);margin-bottom:4px;display:block;">Email do cliente</label>
+        <input type="email" class="perfil-input" id="admin-vp-email" placeholder="cliente@email.com" autocomplete="off"/>
+      </div>
+      <div class="perfil-field">
+        <label class="perfil-label" style="font-size:11.5px;color:var(--text2);margin-bottom:4px;display:block;">WhatsApp do cliente <span style="font-weight:400;opacity:.6;">(opcional — pra abrir conversa direto)</span></label>
+        <input type="tel" class="perfil-input" id="admin-vp-tel" placeholder="84991234567" autocomplete="off"/>
+      </div>
+    </div>
+
+    <div id="admin-vp-msg" style="display:none;font-size:12px;padding:8px 12px;border-radius:8px;margin-top:.75rem;"></div>
+
+    <!-- Campos ocultos que guardam nome/tel após envio para o botão de WhatsApp usar -->
+    <input type="hidden" id="admin-vp-nome-enviado"/>
+    <input type="hidden" id="admin-vp-tel-enviado"/>
+
+    <div id="admin-vp-wa-btn" style="display:none;margin-top:.5rem;">
+      <button type="button" onclick="adminAbrirWhatsApp()" style="width:100%;padding:10px;border-radius:9px;border:none;background:#25D366;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.117 1.528 5.845L0 24l6.337-1.505A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.651-.502-5.178-1.381l-.371-.22-3.762.893.946-3.666-.242-.381A9.937 9.937 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+        Abrir no WhatsApp (opcional)
+      </button>
+    </div>
+
+    <button type="button" class="perfil-btn" id="admin-vp-btn" onclick="
+      var n=document.getElementById('admin-vp-nome');
+      var t=document.getElementById('admin-vp-tel');
+      var hn=document.getElementById('admin-vp-nome-enviado');
+      var ht=document.getElementById('admin-vp-tel-enviado');
+      if(hn) hn.value=(n&&n.value||'');
+      if(ht) ht.value=(t&&t.value||'');
+      adminEnviarEmailPremium();
+    " style="margin-top:.75rem;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+      Enviar email com link Premium
+    </button>
+  </div>
+
   <!-- CARD: Sair -->
   <div class="perfil-card" style="text-align:center;">
     <div style="font-size:13px;color:var(--text2);margin-bottom:.75rem;">Quer encerrar a sessão neste navegador?</div>
@@ -8382,6 +8545,7 @@ async function lgConfirmarCadastro(planName, priceId) {
       localStorage.removeItem('vc_pending_price');
       await mostrarCheckoutNaConfirmacao(planName, priceId);
     } else {
+      _checarPendingWhatsapp();
       go('s-escolher-plano');
     }
     return;
@@ -8441,6 +8605,7 @@ async function lgConfirmarCadastro(planName, priceId) {
     localStorage.removeItem('vc_pending_price');
     await mostrarCheckoutNaConfirmacao(planName, priceId);
   } else {
+    _checarPendingWhatsapp();
     go('s-escolher-plano');
   }
 }
@@ -8502,6 +8667,7 @@ async function lgEntrar() {
   const _temPlanoPendente = localStorage.getItem('vc_pending_plan');
   await verificarPlanoPendente();
   if (!_temPlanoPendente) {
+    _checarPendingWhatsapp();
     await irParaDash();
   }
 }
@@ -10401,7 +10567,7 @@ function okComecarAgora(){
           <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#cbd5e1;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Acesso para contador</div>
           <div style="display:flex;gap:9px;align-items:center;font-size:13px;color:#cbd5e1;"><svg width="15" height="15" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Suporte prioritário</div>
         </div>
-        <button onclick="window.open('https://wa.me/5500000000000?text=Olá! Tenho interesse no plano Premium do VitaCash. Gostaria de saber mais sobre como funciona.','_blank')" style="width:100%;padding:13px;border-radius:10px;border:1px solid rgba(255,255,255,.10);background:#fff;color:#0f172a;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;letter-spacing:-.2px;" onmouseover="this.style.background='#fbbf24';this.style.color='#0f172a';this.style.borderColor='rgba(251,191,36,.5)'" onmouseout="this.style.background='#fff';this.style.color='#0f172a';this.style.borderColor='rgba(255,255,255,.10)'">Falar com consultor</button>
+        <button onclick="falarComConsultor()" style="width:100%;padding:13px;border-radius:10px;border:1px solid rgba(255,255,255,.10);background:#fff;color:#0f172a;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;letter-spacing:-.2px;" onmouseover="this.style.background='#fbbf24';this.style.color='#0f172a';this.style.borderColor='rgba(251,191,36,.5)'" onmouseout="this.style.background='#fff';this.style.color='#0f172a';this.style.borderColor='rgba(255,255,255,.10)'">Falar com consultor</button>
       </div>
 
     </div>
@@ -10478,7 +10644,7 @@ function okComecarAgora(){
         <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Suporte prioritário</div>
       </div>
     </div>
-    <button onclick="document.getElementById('modal-premium-upgrade').style.display='none';window.open('https://wa.me/5500000000000?text=Olá! Tenho interesse no plano Premium do VitaCash. Gostaria de saber mais sobre como funciona.','_blank')" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--green);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Falar com consultor →</button>
+    <button onclick="document.getElementById('modal-premium-upgrade').style.display='none';falarComConsultor()" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--green);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Falar com consultor →</button>
     <div style="font-size:11px;color:var(--text3);margin-top:.5rem;">R$ 347/mês · 14 dias grátis</div>
   </div>
 </div>
