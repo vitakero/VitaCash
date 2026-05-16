@@ -11162,9 +11162,20 @@ function exportarPDF() {
   document.querySelectorAll('.ind-card').forEach(function(card) {
     var head = card.querySelector('.ind-head'); if (!head) return;
     var status = head.querySelector('.ind-status');
+    // Lê só valor e média, ignorando chips (que ficam grudados no textContent)
+    var valsEl = head.querySelector('.ind-vals');
+    var valsTexto = '';
+    if (valsEl) {
+      var parts = [];
+      valsEl.querySelectorAll('.ind-val, .ind-media').forEach(function(el) {
+        var t = el.textContent.trim();
+        if (t) parts.push(t);
+      });
+      valsTexto = parts.join('  ·  ');
+    }
     indicadoresData.push({
       nome : (head.querySelector('.ind-nome') || {}).textContent || '',
-      vals : (head.querySelector('.ind-vals') || {}).textContent || '',
+      vals : valsTexto,
       ruim : status && status.classList.contains('ruim'),
       bom  : status && status.classList.contains('bom')
     });
@@ -11225,11 +11236,18 @@ function exportarPDF() {
     { text: cnpj,        fontSize:10, color:'#a7f3d0', alignment:'center', margin:[0,0,0,6] },
     { text: 'Exercício ' + anoRef + '  ·  Emitido em ' + dataEmissao, fontSize:9, color:'#86efac', alignment:'center', margin:[0,0,0,44] },
     {
-      table:{ widths:['auto'], body:[[{
-        text:'CONFIDENCIAL', fontSize:8, bold:true, color:GD,
-        fillColor:GA, border:[false,false,false,false], margin:[18,7,18,7]
-      }]] },
-      alignment:'center',
+      columns:[
+        { width:'*', text:'' },
+        {
+          width:'auto',
+          table:{ widths:['auto'], body:[[{
+            text:'CONFIDENCIAL', fontSize:8, bold:true, color:GD,
+            fillColor:GA, border:[false,false,false,false], margin:[18,7,18,7]
+          }]] },
+          layout:'noBorders'
+        },
+        { width:'*', text:'' }
+      ],
       pageBreak:'after'
     }
   ];
@@ -11294,7 +11312,7 @@ function exportarPDF() {
     { text:'Você vs. média do setor', fontSize:10, bold:true, color:DK, margin:[0,0,0,12] }
   ];
   barrasData.forEach(function(b) { s1.push(barraSetorial(b)); });
-  s1.push({ text:'  ⏐ linha vertical = média do setor', fontSize:7, color:GR, margin:[0,-4,0,0] });
+  s1.push({ text:'  | linha vertical = media do setor', fontSize:7, color:GR, margin:[0,-4,0,0] });
 
   // ── Seção 02: DRE ────────────────────────────────────────────────
   var s2 = [
@@ -11338,7 +11356,7 @@ function exportarPDF() {
   indicadoresData.forEach(function(ind, i) {
     var cor  = ind.ruim ? RD : (ind.bom ? G : AM);
     var bg   = ind.ruim ? '#fef2f2' : (ind.bom ? GL : '#fffbeb');
-    var label= ind.ruim ? '↓ Atenção' : (ind.bom ? '↑ Ponto forte' : '→ Observar');
+    var label= ind.ruim ? '[!] Atencao' : (ind.bom ? '[+] Ponto forte' : '[-] Observar');
     s3.push({
       table:{ widths:[5,'*'], body:[[
         { border:[false,false,false,false], fillColor:cor, text:'', margin:[0,0,0,0] },
@@ -11392,13 +11410,13 @@ function exportarPDF() {
           stack:[
             { text:'ROE', fontSize:8, bold:true, color:GR },
             { text:'25,3%', fontSize:22, bold:true, color:G, margin:[0,4,0,4] },
-            { text:'▲ acima da Selic (13,75% a.a.)', fontSize:7, color:G }
+            { text:'+ acima da Selic (13,75% a.a.)', fontSize:7, color:G }
           ], margin:[16,14,16,14] },
         { border:[true,true,true,true], borderColor:[BD,BD,BD,BD], fillColor:GL,
           stack:[
             { text:'ROI', fontSize:8, bold:true, color:GR },
             { text:'17,4%', fontSize:22, bold:true, color:G, margin:[0,4,0,4] },
-            { text:'▲ acima da média do setor',      fontSize:7, color:G }
+            { text:'+ acima da media do setor',      fontSize:7, color:G }
           ], margin:[16,14,16,14] }
       ]]},
       margin:[0,0,0,20]
