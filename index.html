@@ -11098,59 +11098,380 @@ document.addEventListener('click', function(e) {
 });
 
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 <script>
 function exportarPDF() {
-  var content = document.querySelector('.tc2.on') || document.querySelector('.tc2.active') || document.querySelector('.tc2');
-  if (!content) return;
+  if (typeof pdfMake === 'undefined') {
+    alert('Aguarde o carregamento do gerador de PDF e tente novamente.');
+    return;
+  }
 
-  // Nomes das abas
-  var tabNames = { tg:'Visao-Geral', ta:'Acoes', tcg:'Capital-de-Giro', tend:'Endividamento', td:'DRE', tbp:'Balanco-Patrimonial', te:'Estrategias' };
-  var tabId = content.id || 'relatorio';
-  var tabName = tabNames[tabId] || 'Relatorio';
-  var dataHoje = new Date().toLocaleDateString('pt-BR');
+  // ── Lê dados do DOM ──────────────────────────────────────────────
+  var empresaEl = document.querySelector('.empresa-atual');
+  var empresaNome = 'Empresa';
+  var cnpj = '';
+  if (empresaEl) {
+    var nomeEl = empresaEl.querySelector('[style*="font-weight:600"],[style*="font-weight: 600"]');
+    if (nomeEl) empresaNome = nomeEl.textContent.trim();
+    var cnpjEl = empresaEl.querySelector('[style*="font-size:10px"]');
+    if (cnpjEl) cnpj = cnpjEl.textContent.trim();
+  }
 
-  // Cria wrapper temporário com header
-  var wrapper = document.createElement('div');
-  wrapper.style.cssText = 'background:#fff;padding:1.5rem;';
-  wrapper.innerHTML = '<div style="text-align:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #1D9E75;"><div style="font-size:22px;font-weight:700;color:#1D9E75;margin-bottom:4px;">VitaCash — Relatório Financeiro</div><div style="font-size:13px;color:#666;">G JOAO DOS SANTOS · ' + tabName.replace(/-/g,' ') + ' · ' + dataHoje + '</div></div>';
+  var nota      = (document.querySelector('.nota-num')  || {}).textContent || '—';
+  var notaDesc  = (document.querySelector('.nota-desc') || {}).textContent || '';
 
-  // Clona o conteúdo da aba
-  var clone = content.cloneNode(true);
-  // Remove botões de PDF e overlays do clone
-  clone.querySelectorAll('.pdf-tab-btn, .plan-overlay, .plan-lock-overlay').forEach(function(el) { el.remove(); });
-  // Remove blur do clone
-  clone.querySelectorAll('.mg-section-pro').forEach(function(el) {
-    el.style.filter = 'none';
-    el.style.pointerEvents = 'auto';
-    var after = el.querySelector('.plan-lock-overlay');
-    if (after) after.remove();
+  // DRE
+  var dreData = [];
+  ['l1','l2','l3','l4','l5','l6','l7','l8','l9','l10','l11'].forEach(function(id) {
+    var el   = document.getElementById(id); if (!el) return;
+    var head = el.querySelector('.dre-linha-head'); if (!head) return;
+    dreData.push({
+      nome  : (head.querySelector('.linha-nome')  || {}).textContent || '',
+      sub   : (head.querySelector('.linha-sub')   || {}).textContent || '',
+      valor : (head.querySelector('.linha-valor') || {}).textContent || '',
+      pct   : (head.querySelector('.linha-pct')   || {}).textContent || '',
+      pos   : !!head.querySelector('.linha-valor.pos'),
+      neg   : !!head.querySelector('.linha-valor.neg'),
+      dest  : el.classList.contains('destaque')
+    });
   });
-  clone.style.display = 'block';
 
-  wrapper.appendChild(clone);
-  document.body.appendChild(wrapper);
+  // Barras comparativas
+  var barrasData = [];
+  document.querySelectorAll('.br2').forEach(function(br) {
+    var bh = br.querySelector('.bh'); if (!bh) return;
+    var bf = br.querySelector('.bf');
+    var bb = br.querySelector('.bb');
+    var bfStyle = bf ? bf.getAttribute('style') : '';
+    var bbStyle = bb ? bb.getAttribute('style') : '';
+    var wMatch  = bfStyle ? bfStyle.match(/width\s*:\s*([\d.]+)%/) : null;
+    var lMatch  = bbStyle ? bbStyle.match(/left\s*:\s*([\d.]+)%/)  : null;
+    var isGreen = bfStyle && (bfStyle.indexOf('5DCAA5') >= 0 || bfStyle.indexOf('green') >= 0);
+    barrasData.push({
+      nome    : (bh.querySelector('.bn') || {}).textContent || '',
+      media   : (bh.querySelector('.bm') || {}).textContent || '',
+      barPct  : wMatch  ? parseFloat(wMatch[1])  : 50,
+      mediaPct: lMatch  ? parseFloat(lMatch[1])  : 50,
+      isGreen : isGreen
+    });
+  });
 
-  // Feedback visual no botão
-  var btns = document.querySelectorAll('.pdf-tab-btn button, #btn-export-pdf button');
-  btns.forEach(function(b) { b.dataset.orig = b.innerHTML; b.innerHTML = '⏳ Gerando PDF...'; b.disabled = true; });
+  // Indicadores
+  var indicadoresData = [];
+  document.querySelectorAll('.ind-card').forEach(function(card) {
+    var head = card.querySelector('.ind-head'); if (!head) return;
+    var status = head.querySelector('.ind-status');
+    indicadoresData.push({
+      nome : (head.querySelector('.ind-nome') || {}).textContent || '',
+      vals : (head.querySelector('.ind-vals') || {}).textContent || '',
+      ruim : status && status.classList.contains('ruim'),
+      bom  : status && status.classList.contains('bom')
+    });
+  });
 
-  var opt = {
-    margin: [10, 8, 10, 8],
-    filename: 'VitaCash-' + tabName + '-' + dataHoje.replace(/\//g,'-') + '.pdf',
-    image: { type: 'jpeg', quality: 0.95 },
-    html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+  // Capital de giro
+  var cgv    = (document.getElementById('cgv')   || {}).textContent || 'R$ 351 mil';
+  var cgst   = (document.getElementById('cgst')  || {}).textContent || '';
+  var cgsub  = (document.getElementById('cgsub') || {}).textContent || '';
+
+  var dataEmissao = new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
+  var anoRef = '2022';
+
+  // ── Paleta ────────────────────────────────────────────────────────
+  var G  = '#1D9E75', GD = '#155f47', GL = '#E1F5EE', GA = '#4ade80';
+  var RD = '#dc2626', AM = '#d97706';
+  var DK = '#111827', GR = '#6b7280', LT = '#f9fafb', BD = '#e5e7eb', WH = '#ffffff';
+
+  // ── Helper: barra setorial ────────────────────────────────────────
+  function barraSetorial(b) {
+    var maxW = 435;
+    var barW = Math.round(Math.min(b.barPct / 100, 1) * maxW);
+    var medW = Math.round(Math.min(b.mediaPct / 100, 1) * maxW);
+    var cor  = b.isGreen ? G : RD;
+    return {
+      stack: [
+        { columns: [
+          { text: b.nome,  fontSize: 8, bold: true, color: DK, width: '*' },
+          { text: b.media, fontSize: 7, color: GR, alignment: 'right', width: 'auto' }
+        ], margin: [0,0,0,3] },
+        { canvas: [
+          { type:'rect', x:0,    y:0, w:maxW, h:6, r:3, color:'#f0f0f0' },
+          { type:'rect', x:0,    y:0, w:barW, h:6, r:3, color:cor },
+          { type:'line', x1:medW, y1:-2, x2:medW, y2:10, lineWidth:1.5, lineColor:'#374151' }
+        ]},
+      ],
+      margin: [0,0,0,9]
+    };
+  }
+
+  // ── Capa ──────────────────────────────────────────────────────────
+  var capa = [
+    { text: '', margin:[0,90,0,0] },
+    {
+      columns: [
+        { text:'Vita', fontSize:52, bold:true, color:WH, width:'auto' },
+        { text:'Cash', fontSize:52, bold:true, color:GA, width:'auto' }
+      ],
+      columnGap: 0, alignment:'center', margin:[0,0,0,8]
+    },
+    { text:'DIAGNÓSTICO FINANCEIRO INTELIGENTE', fontSize:8, color:GA, alignment:'center',
+      margin:[0,0,0,52], characterSpacing:2 },
+    { canvas:[{ type:'line', x1:60, y1:0, x2:455, y2:0, lineWidth:0.5, lineColor:GA }] },
+    { text:'RELATÓRIO', fontSize:30, color:WH, bold:false, alignment:'center', margin:[0,28,0,4] },
+    { text:'FINANCEIRO COMPLETO', fontSize:30, color:WH, bold:true, alignment:'center', margin:[0,0,0,50] },
+    { canvas:[{ type:'line', x1:60, y1:0, x2:455, y2:0, lineWidth:0.5, lineColor:GA }] },
+    { text: empresaNome, fontSize:18, color:WH, bold:true, alignment:'center', margin:[0,36,0,8] },
+    { text: cnpj,        fontSize:10, color:'#a7f3d0', alignment:'center', margin:[0,0,0,6] },
+    { text: 'Exercício ' + anoRef + '  ·  Emitido em ' + dataEmissao, fontSize:9, color:'#86efac', alignment:'center', margin:[0,0,0,44] },
+    {
+      table:{ widths:['auto'], body:[[{
+        text:'CONFIDENCIAL', fontSize:8, bold:true, color:GD,
+        fillColor:GA, border:[false,false,false,false], margin:[18,7,18,7]
+      }]] },
+      alignment:'center',
+      pageBreak:'after'
+    }
+  ];
+
+  // ── Seção 01: Diagnóstico ─────────────────────────────────────────
+  var s1 = [
+    { canvas:[{ type:'rect', x:0, y:0, w:515, h:2, color:G }], margin:[0,0,0,14] },
+    { text:'01  DIAGNÓSTICO FINANCEIRO', fontSize:9, color:GR, characterSpacing:0.8, margin:[0,0,0,16] },
+
+    // Score card
+    {
+      table:{ widths:['*',120], body:[[
+        {
+          border:[false,false,false,false], fillColor:GD,
+          stack:[
+            { text: nota, fontSize:60, bold:true, color:WH, lineHeight:1, margin:[0,4,0,0] },
+            { text:'Muito saudável', fontSize:14, color:GA, bold:true, margin:[0,4,0,10] },
+            { text: notaDesc.replace(/\s+/g,' ').substring(0,180), fontSize:8, color:'#a7f3d0', lineHeight:1.6 }
+          ],
+          margin:[20,20,16,20]
+        },
+        {
+          border:[false,false,false,false], fillColor:GL,
+          stack:[
+            { text:'TOP 15%',    fontSize:22, bold:true, color:G,  alignment:'center', margin:[0,8,0,4]  },
+            { text:'do setor',   fontSize:8,  color:GR,            alignment:'center', margin:[0,0,0,16] },
+            { canvas:[{ type:'line', x1:0, y1:0, x2:90, y2:0, lineWidth:0.5, lineColor:BD }] },
+            { text:'R$ 1,25 mi', fontSize:17, bold:true, color:DK, alignment:'center', margin:[0,14,0,4]  },
+            { text:'ainda na mesa', fontSize:8, color:GR,          alignment:'center'                    }
+          ],
+          margin:[8,0,8,0]
+        }
+      ]]},
+      margin:[0,0,0,20]
+    },
+
+    // Métricas
+    { text:'Indicadores-chave', fontSize:10, bold:true, color:DK, margin:[0,0,0,10] },
+    {
+      table:{ widths:['*','*','*','*'], body:[[
+        { border:[true,true,true,true], borderColor:[BD,BD,BD,BD], fillColor:LT,
+          stack:[{ text:'Receita bruta', fontSize:7, color:GR },
+                 { text:'R$ 52,6 mi',   fontSize:13, bold:true, color:DK, margin:[0,3,0,0] }],
+          margin:[10,10,10,10] },
+        { border:[true,true,true,true], borderColor:[BD,BD,BD,BD], fillColor:LT,
+          stack:[{ text:'Lucro líquido', fontSize:7, color:GR },
+                 { text:'R$ 1,70 mi',   fontSize:13, bold:true, color:G, margin:[0,3,0,0] }],
+          margin:[10,10,10,10] },
+        { border:[true,true,true,true], borderColor:[BD,BD,BD,BD], fillColor:LT,
+          stack:[{ text:'Margem bruta', fontSize:7, color:GR },
+                 { text:'21,7%',        fontSize:13, bold:true, color:G, margin:[0,3,0,0] }],
+          margin:[10,10,10,10] },
+        { border:[true,true,true,true], borderColor:[BD,BD,BD,BD], fillColor:LT,
+          stack:[{ text:'Margem líquida', fontSize:7, color:GR },
+                 { text:'3,7%',           fontSize:13, bold:true, color:AM, margin:[0,3,0,0] }],
+          margin:[10,10,10,10] }
+      ]]},
+      margin:[0,0,0,20]
+    },
+
+    // Barras comparativas
+    { text:'Você vs. média do setor', fontSize:10, bold:true, color:DK, margin:[0,0,0,12] }
+  ];
+  barrasData.forEach(function(b) { s1.push(barraSetorial(b)); });
+  s1.push({ text:'  ⏐ linha vertical = média do setor', fontSize:7, color:GR, margin:[0,-4,0,0] });
+
+  // ── Seção 02: DRE ────────────────────────────────────────────────
+  var s2 = [
+    { text:'', pageBreak:'before' },
+    { canvas:[{ type:'rect', x:0, y:0, w:515, h:2, color:G }], margin:[0,0,0,14] },
+    { text:'02  DEMONSTRATIVO DO RESULTADO DO EXERCÍCIO (DRE)', fontSize:9, color:GR, characterSpacing:0.8, margin:[0,0,0,16] }
+  ];
+
+  var dreRows = [[
+    { text:'Linha',    fontSize:8, bold:true, color:WH, fillColor:GD, border:[false,false,false,false], margin:[10,7,10,7] },
+    { text:'Valor',    fontSize:8, bold:true, color:WH, fillColor:GD, border:[false,false,false,false], alignment:'right', margin:[8,7,8,7] },
+    { text:'% Receita',fontSize:8, bold:true, color:WH, fillColor:GD, border:[false,false,false,false], alignment:'right', margin:[8,7,8,7] }
+  ]];
+  dreData.forEach(function(row, i) {
+    var bg  = row.dest ? GL : (i % 2 === 0 ? WH : LT);
+    var vc  = row.pos ? G : (row.neg ? RD : DK);
+    dreRows.push([
+      { stack:[
+          { text: row.nome.trim(), fontSize:8, bold:row.dest, color:DK },
+          { text: row.sub.trim(),  fontSize:6, color:GR, margin:[0,1,0,0] }
+        ],
+        fillColor:bg, border:[false,false,false,true], borderColor:['','','',BD], margin:[10,6,8,6] },
+      { text: row.valor.trim(), fontSize:8, bold:row.dest, color:vc, alignment:'right',
+        fillColor:bg, border:[false,false,false,true], borderColor:['','','',BD], margin:[8,6,8,6] },
+      { text: row.pct.trim(),   fontSize:7, color:GR, alignment:'right',
+        fillColor:bg, border:[false,false,false,true], borderColor:['','','',BD], margin:[8,6,8,6] }
+    ]);
+  });
+  s2.push({
+    table:{ widths:['*',130,80], body:dreRows },
+    layout:{ hLineWidth:function(){return 0.4;}, hLineColor:function(){return BD;}, vLineWidth:function(){return 0;} }
+  });
+
+  // ── Seção 03: Plano de Ação ──────────────────────────────────────
+  var s3 = [
+    { text:'', pageBreak:'before' },
+    { canvas:[{ type:'rect', x:0, y:0, w:515, h:2, color:G }], margin:[0,0,0,14] },
+    { text:'03  PLANO DE AÇÃO', fontSize:9, color:GR, characterSpacing:0.8, margin:[0,0,0,6] },
+    { text:'Oportunidades identificadas — R$ 2,1 mi disponíveis para recuperar', fontSize:8, color:GR, margin:[0,0,0,18] }
+  ];
+  indicadoresData.forEach(function(ind, i) {
+    var cor  = ind.ruim ? RD : (ind.bom ? G : AM);
+    var bg   = ind.ruim ? '#fef2f2' : (ind.bom ? GL : '#fffbeb');
+    var label= ind.ruim ? '↓ Atenção' : (ind.bom ? '↑ Ponto forte' : '→ Observar');
+    s3.push({
+      table:{ widths:[5,'*'], body:[[
+        { border:[false,false,false,false], fillColor:cor, text:'', margin:[0,0,0,0] },
+        { border:[false,false,false,false], fillColor:bg,
+          stack:[
+            { columns:[
+              { text:(i+1)+'.  '+ind.nome.trim(), fontSize:8, bold:true, color:DK, width:'*' },
+              { text:label, fontSize:7, color:cor, bold:true, width:'auto' }
+            ]},
+            { text: ind.vals.trim(), fontSize:7, color:GR, margin:[0,3,0,0] }
+          ],
+          margin:[10,8,10,8]
+        }
+      ]]},
+      margin:[0,0,0,6]
+    });
+  });
+
+  // ── Seção 04: Valuation & KPIs ──────────────────────────────────
+  var s4 = [
+    { text:'', pageBreak:'before' },
+    { canvas:[{ type:'rect', x:0, y:0, w:515, h:2, color:G }], margin:[0,0,0,14] },
+    { text:'04  VALUATION E CAPITAL DE GIRO', fontSize:9, color:GR, characterSpacing:0.8, margin:[0,0,0,18] },
+
+    // Card valuation
+    {
+      table:{ widths:['*','*'], body:[[
+        { border:[true,true,true,true], borderColor:[BD,BD,BD,BD], fillColor:GL,
+          stack:[
+            { text:'Valor estimado da empresa', fontSize:7, color:GR, margin:[0,0,0,5] },
+            { text:'R$ 14,4 mi',               fontSize:28, bold:true, color:G, margin:[0,0,0,4] },
+            { text:'média de 4 métodos de valuation', fontSize:7, color:GR, margin:[0,0,0,8] },
+            { text:'Faixa: R$ 10,1 mi – R$ 18,4 mi', fontSize:7, color:G }
+          ], margin:[16,16,16,16] },
+        { border:[true,true,true,true], borderColor:[BD,BD,BD,BD], fillColor:LT,
+          stack:[
+            { text:'Por método', fontSize:7, bold:true, color:GR, margin:[0,0,0,10] },
+            { columns:[{ text:'P/BV (patrimônio)', fontSize:8, color:GR },{ text:'R$ 13,5 mi', fontSize:8, bold:true, color:DK, alignment:'right' }] },
+            { columns:[{ text:'P/L (lucros)',      fontSize:8, color:GR },{ text:'R$ 17,0 mi', fontSize:8, bold:true, color:DK, alignment:'right' }], margin:[0,5,0,0] },
+            { columns:[{ text:'EV/EBITDA',         fontSize:8, color:GR },{ text:'R$ 20,3 mi', fontSize:8, bold:true, color:DK, alignment:'right' }], margin:[0,5,0,0] },
+            { columns:[{ text:'PSR (receita)',      fontSize:8, color:GR },{ text:'R$ 18,4 mi', fontSize:8, bold:true, color:DK, alignment:'right' }], margin:[0,5,0,0] }
+          ], margin:[16,16,16,16] }
+      ]]},
+      margin:[0,0,0,20]
+    },
+
+    // ROE / ROI
+    {
+      table:{ widths:['*','*'], body:[[
+        { border:[true,true,true,true], borderColor:[BD,BD,BD,BD], fillColor:GL,
+          stack:[
+            { text:'ROE', fontSize:8, bold:true, color:GR },
+            { text:'25,3%', fontSize:22, bold:true, color:G, margin:[0,4,0,4] },
+            { text:'▲ acima da Selic (13,75% a.a.)', fontSize:7, color:G }
+          ], margin:[16,14,16,14] },
+        { border:[true,true,true,true], borderColor:[BD,BD,BD,BD], fillColor:GL,
+          stack:[
+            { text:'ROI', fontSize:8, bold:true, color:GR },
+            { text:'17,4%', fontSize:22, bold:true, color:G, margin:[0,4,0,4] },
+            { text:'▲ acima da média do setor',      fontSize:7, color:G }
+          ], margin:[16,14,16,14] }
+      ]]},
+      margin:[0,0,0,20]
+    },
+
+    // Capital de giro
+    { text:'Capital de Giro', fontSize:10, bold:true, color:DK, margin:[0,0,0,10] },
+    {
+      table:{ widths:['*'], body:[[
+        { border:[true,true,true,true], borderColor:[BD,BD,BD,BD], fillColor:LT,
+          stack:[
+            { columns:[
+              { text: cgv, fontSize:18, bold:true, color:G, width:'auto' },
+              { text:'NCG — Necessidade de Capital de Giro', fontSize:8, color:GR, width:'*', margin:[12,4,0,0] }
+            ]},
+            { text: cgsub.replace(/\s+/g,' ').trim(), fontSize:8, color:GR, margin:[0,8,0,0], lineHeight:1.5 }
+          ],
+          margin:[16,14,16,14]
+        }
+      ]]},
+      margin:[0,0,0,20]
+    },
+
+    // Disclaimer
+    { text:'Este é um valuation estimado por múltiplos de mercado. O valor real depende de fatores como localização, carteira de clientes, contratos, potencial de crescimento e condições de negociação. Para uma venda ou captação real, consulte um especialista em M&A.', fontSize:7, color:'#94a3b8', lineHeight:1.5, italics:true }
+  ];
+
+  // ── Documento final ───────────────────────────────────────────────
+  var docDef = {
+    pageSize   : 'A4',
+    pageMargins: [40, 60, 40, 46],
+
+    background: function(pg) {
+      if (pg === 1) return { canvas:[{ type:'rect', x:0, y:0, w:595.28, h:841.89, color:GD }] };
+      return {};
+    },
+
+    header: function(pg, total) {
+      if (pg === 1) return {};
+      return {
+        columns:[
+          { text:[{ text:'Vita', bold:true, color:DK, fontSize:10 },{ text:'Cash', bold:true, color:G, fontSize:10 }], margin:[40,18,0,0] },
+          { text: empresaNome + '  ·  p. ' + pg + '/' + total, fontSize:7, color:GR, alignment:'right', margin:[0,20,40,0] }
+        ]
+      };
+    },
+
+    footer: function(pg) {
+      if (pg === 1) return {};
+      return { text:'vita-cash.vercel.app  ·  Gerado em ' + dataEmissao + '  ·  Confidencial', fontSize:6, color:'#94a3b8', alignment:'center', margin:[40,6,40,0] };
+    },
+
+    content: [].concat(capa, s1, s2, s3, s4),
+
+    defaultStyle: { font:'Roboto', fontSize:9, color:DK }
   };
 
-  html2pdf().set(opt).from(wrapper).save().then(function() {
-    document.body.removeChild(wrapper);
-    btns.forEach(function(b) { b.innerHTML = 'PDF salvo!'; setTimeout(function() { b.innerHTML = b.dataset.orig; b.disabled = false; }, 2000); });
-  }).catch(function() {
-    document.body.removeChild(wrapper);
-    btns.forEach(function(b) { b.innerHTML = b.dataset.orig; b.disabled = false; });
-  });
+  // ── Feedback nos botões ──────────────────────────────────────────
+  var btns = document.querySelectorAll('.pdf-tab-btn button, #btn-export-pdf button');
+  btns.forEach(function(b){ b.dataset.orig = b.innerHTML; b.innerHTML = '⏳ Gerando PDF...'; b.disabled = true; });
+
+  try {
+    pdfMake.createPdf(docDef).download(
+      'VitaCash-Relatorio-' + empresaNome.replace(/\s+/g,'-').substring(0,20) + '.pdf',
+      function() {
+        btns.forEach(function(b){ b.innerHTML = 'PDF salvo!'; setTimeout(function(){ b.innerHTML = b.dataset.orig; b.disabled = false; }, 2500); });
+      }
+    );
+  } catch(e) {
+    console.error('PDFMake error:', e);
+    btns.forEach(function(b){ b.innerHTML = b.dataset.orig; b.disabled = false; });
+    alert('Erro ao gerar PDF. Verifique o console para mais detalhes.');
+  }
 }
 </script>
 
