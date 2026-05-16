@@ -234,11 +234,20 @@ Deno.serve(async (req) => {
         if (uid) {
           const customerId = typeof sub.customer === 'string' ? sub.customer : null
 
+          // current_period_end mudou de localização nas versões mais recentes
+          // da Stripe API. Lê dos 2 lugares pra ser compatível com todas as versões:
+          // - antiga (≤ 2024-12-18): sub.current_period_end
+          // - nova  (≥ 2025-03-31):  sub.items.data[0].current_period_end
+          const periodEndUnix =
+            (sub as any).current_period_end ||
+            (sub.items?.data?.[0] as any)?.current_period_end ||
+            null
+
           const { error } = await supabase.from('profiles').update({
             subscription_status: sub.status,
             current_plan: plan,
-            current_period_end: sub.current_period_end
-              ? new Date(sub.current_period_end * 1000).toISOString()
+            current_period_end: periodEndUnix
+              ? new Date(periodEndUnix * 1000).toISOString()
               : null,
             stripe_customer_id: customerId,
             stripe_subscription_id: sub.id,
