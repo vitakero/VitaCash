@@ -11515,13 +11515,13 @@ function exportarPDF() {
         stack:[
           { text:row.nome.trim(), fontSize:8, bold:row.dest, color:INK },
           { text:row.sub.trim(),  fontSize:6, color:MUTED, margin:[0,1,0,0] }
-        ], margin:[10,11,8,11] },
+        ], margin:[10,6,8,6] },
       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:bgEmp,
-        text:row.valor.trim(), fontSize:8, bold:row.dest, color:tc, alignment:'right', margin:[8,8,8,8] },
+        text:row.valor.trim(), fontSize:8, bold:row.dest, color:tc, alignment:'right', margin:[8,6,8,6] },
       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:bg,
-        text:row.pct.trim(), fontSize:7, color:STEEL, alignment:'right', margin:[8,8,8,8] },
+        text:row.pct.trim(), fontSize:7, color:STEEL, alignment:'right', margin:[8,6,8,6] },
       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:bg,
-        text:dreRefs[i]||'—', fontSize:7, color:STEEL, alignment:'right', margin:[8,8,8,8] }
+        text:dreRefs[i]||'—', fontSize:7, color:STEEL, alignment:'right', margin:[8,6,8,6] }
     ]);
   });
 
