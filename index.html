@@ -11336,7 +11336,7 @@ function exportarPDF() {
         border:[true,false,false,false], borderColor:[ACC,'','',''],
         text:'A empresa G. João dos Santos apresenta fundamentos financeiros consistentes para o segmento de comércio atacadista, sustentados por crescimento de receita de 14,5% acima da média setorial e posição de liquidez privilegiada (R$ 5,48 milhões em caixa). O diagnóstico evidencia, contudo, ineficiências estruturais nas despesas operacionais que restringem a conversão de receita em resultado líquido, representando um potencial de R$ 2,1 milhões anuais não capturado. A companhia posiciona-se no quartil superior de saúde financeira do segmento, com potencial de elevar a margem líquida de 3,7% para 6,0% mediante execução do plano de redução de despesas detalhado neste relatório.',
         fontSize:9, color:STEEL, lineHeight:1.75, margin:[12,0,0,0]
-      }]]}, layout:'noBorders', margin:[0,0,0,32]
+      }]]}, layout:'noBorders', margin:[0,0,0,20]
     },
 
     { text:'INDICADORES CONSOLIDADOS — EXERCÍCIO '+anoRef, fontSize:6, color:MUTED, characterSpacing:1.2, margin:[0,0,0,10] },
@@ -11347,26 +11347,26 @@ function exportarPDF() {
             { text:'ÍNDICE DE SAÚDE FINANCEIRA', fontSize:6, color:MUTED, characterSpacing:0.8 },
             { text:nota+' / 10', fontSize:22, color:ACC, bold:true, margin:[0,6,0,3] },
             { text:'Percentil 85 — setor atacadista', fontSize:7, color:MUTED }
-          ], margin:[0,0,16,28] },
+          ], margin:[0,0,16,18] },
         { border:[false,false,true,false], borderColor:['','','',GHOST,''],
           stack:[
             { text:'RECEITA BRUTA', fontSize:6, color:MUTED, characterSpacing:0.8 },
             { text:'R$ 52,6 mi', fontSize:19, color:ACC, margin:[0,6,0,3] },
             { text:'+14,5% vs. exercício anterior', fontSize:7, color:MUTED }
-          ], margin:[16,0,16,28] },
+          ], margin:[16,0,16,18] },
         { border:[false,false,true,false], borderColor:['','','',GHOST,''],
           stack:[
             { text:'LUCRO LÍQUIDO', fontSize:6, color:MUTED, characterSpacing:0.8 },
             { text:'R$ 1,70 mi', fontSize:19, color:ACC, margin:[0,6,0,3] },
             { text:'Margem líquida: 3,7%', fontSize:7, color:MUTED }
-          ], margin:[16,0,16,28] },
+          ], margin:[16,0,16,18] },
         { border:[false,false,false,false],
           stack:[
             { text:'VALUATION ESTIMADO', fontSize:6, color:MUTED, characterSpacing:0.8 },
             { text:'R$ 14,4 mi', fontSize:19, color:ACC, margin:[0,6,0,3] },
             { text:'Média de 4 métodos — capital fechado', fontSize:7, color:MUTED }
-          ], margin:[16,0,0,28] }
-      ]]}, margin:[0,0,0,24]
+          ], margin:[16,0,0,18] }
+      ]]}, margin:[0,0,0,14]
     },
 
     { columns:[
@@ -11385,7 +11385,7 @@ function exportarPDF() {
           riskLine('Ciclo de caixa negativo como alavanca','Ciclo de -3 dias permite exigir descontos antecipados de fornecedores — vantagem estrutural subutilizada')
         ]
       }
-    ], margin:[0,0,0,24] },
+    ], margin:[0,0,0,14] },
 
     { text:'PRIORIDADES IMEDIATAS', fontSize:6, color:MUTED, characterSpacing:1.2, margin:[0,0,0,12] },
     {
@@ -11413,7 +11413,7 @@ function exportarPDF() {
              { text:'Volume de R$ 36 mi/ano confere poder de barganha — cada 1% negociado = +R$ 460 mil de lucro bruto', fontSize:7, color:MUTED, margin:[0,2,0,0] }
            ], margin:[10,11,8,11] },
          { border:[false,false,false,false], text:'Médio prazo', fontSize:7, color:MUTED, alignment:'right', margin:[0,12,0,8] }]
-      ]}, margin:[0,0,0,8]
+      ]}, margin:[0,0,0,0]
     },
 
     { text:'PRINCIPAIS CONCLUSÕES', fontSize:6, color:MUTED, characterSpacing:1.2, margin:[0,0,0,12] },
@@ -11457,49 +11457,49 @@ function exportarPDF() {
           ]}, layout:'noBorders' }
         ]
       }
-    ], margin:[0,0,0,34] },
+    ], margin:[0,0,0,20] },
 
     { text:'PREMISSAS E BENCHMARKS POR INDICADOR', fontSize:6, color:MUTED, characterSpacing:1.2, margin:[0,0,0,10] },
     {
       table:{ widths:[95,'*',52,42,48,48], body:[
         [tblHdr('Indicador','left',[10,7,8,7]), tblHdr('Definição','left',[8,7,8,7]), tblHdr('Empresa','center',[4,7,4,7]), tblHdr('Mínimo','center',[4,7,4,7]), tblHdr('Mediana','center',[4,7,4,7]), tblHdr('Máximo','center',[4,7,4,7])],
         [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Margem líquida', fontSize:7, color:STEEL, margin:[10,7,8,7] },
-         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Lucro líquido / Receita bruta', fontSize:7, color:STEEL, margin:[8,13,8,13] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Lucro líquido / Receita bruta', fontSize:7, color:STEEL, margin:[8,8,8,8] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'3,7%', fontSize:7, color:ACCD, bold:true, alignment:'center', margin:[4,10,4,10] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'1,2%', fontSize:7, color:STEEL, alignment:'center', margin:[4,10,4,10] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'3,5%', fontSize:7, color:STEEL, alignment:'center', margin:[4,10,4,10] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'6,8%', fontSize:7, color:STEEL, alignment:'center', margin:[4,10,4,10] }],
         [{ border:[false,false,false,true], borderColor:['','','',GHOST], text:'Margem bruta', fontSize:7, color:STEEL, margin:[10,7,8,7] },
-         { border:[false,false,false,true], borderColor:['','','',GHOST], text:'Lucro bruto / Receita bruta', fontSize:7, color:STEEL, margin:[8,13,8,13] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], text:'Lucro bruto / Receita bruta', fontSize:7, color:STEEL, margin:[8,8,8,8] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'21,7%', fontSize:7, color:ACCD, bold:true, alignment:'center', margin:[4,10,4,10] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], text:'14%', fontSize:7, color:STEEL, alignment:'center', margin:[4,10,4,10] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], text:'20%', fontSize:7, color:STEEL, alignment:'center', margin:[4,10,4,10] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], text:'28%', fontSize:7, color:STEEL, alignment:'center', margin:[4,10,4,10] }],
         [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Despesas operacionais', fontSize:7, color:STEEL, margin:[10,7,8,7] },
-         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Total de despesas / Receita (menor é melhor)', fontSize:7, color:STEEL, margin:[8,13,8,13] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Total de despesas / Receita (menor é melhor)', fontSize:7, color:STEEL, margin:[8,8,8,8] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'15,4%', fontSize:7, color:ACCD, bold:true, alignment:'center', margin:[4,10,4,10] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'24%', fontSize:7, color:STEEL, alignment:'center', margin:[4,10,4,10] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'18%', fontSize:7, color:STEEL, alignment:'center', margin:[4,10,4,10] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'13%', fontSize:7, color:STEEL, alignment:'center', margin:[4,10,4,10] }],
         [{ border:[false,false,false,true], borderColor:['','','',GHOST], text:'ROE', fontSize:7, color:STEEL, margin:[10,7,8,7] },
-         { border:[false,false,false,true], borderColor:['','','',GHOST], text:'Lucro líquido / PL  |  Ref. Selic: 13,75% a.a.', fontSize:7, color:STEEL, margin:[8,13,8,13] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], text:'Lucro líquido / PL  |  Ref. Selic: 13,75% a.a.', fontSize:7, color:STEEL, margin:[8,8,8,8] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'25,3%', fontSize:7, color:ACCD, bold:true, alignment:'center', margin:[4,10,4,10] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], text:'8%', fontSize:7, color:STEEL, alignment:'center', margin:[4,10,4,10] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], text:'15%', fontSize:7, color:STEEL, alignment:'center', margin:[4,10,4,10] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], text:'28%', fontSize:7, color:STEEL, alignment:'center', margin:[4,10,4,10] }],
         [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Ciclo de caixa', fontSize:7, color:STEEL, margin:[10,7,8,7] },
-         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'PMR + PME - PMP. Ciclo negativo = recebe antes de pagar.', fontSize:7, color:STEEL, margin:[8,13,8,13] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'PMR + PME - PMP. Ciclo negativo = recebe antes de pagar.', fontSize:7, color:STEEL, margin:[8,8,8,8] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'-3 dias', fontSize:7, color:ACCD, bold:true, alignment:'center', margin:[4,10,4,10] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'—', fontSize:7, color:STEEL, alignment:'center', margin:[4,10,4,10] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'15 dias', fontSize:7, color:STEEL, alignment:'center', margin:[4,10,4,10] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'—', fontSize:7, color:STEEL, alignment:'center', margin:[4,10,4,10] }],
         [{ border:[false,false,false,false], text:'Valuation', fontSize:7, color:STEEL, margin:[10,7,8,7] },
-         { border:[false,false,false,false], text:'Média: P/BV, P/L, EV/EBITDA, PSR. Prêmio de iliquidez (15-25%).', fontSize:7, color:STEEL, margin:[8,13,8,13] },
+         { border:[false,false,false,false], text:'Média: P/BV, P/L, EV/EBITDA, PSR. Prêmio de iliquidez (15-25%).', fontSize:7, color:STEEL, margin:[8,8,8,8] },
          { border:[false,false,false,false], fillColor:ACCL, text:'R$ 14,4 mi', fontSize:7, color:ACCD, bold:true, alignment:'center', margin:[4,10,4,10] },
          { border:[false,false,false,false], text:'—', fontSize:7, color:STEEL, alignment:'center', margin:[4,10,4,10] },
          { border:[false,false,false,false], text:'—', fontSize:7, color:STEEL, alignment:'center', margin:[4,10,4,10] },
          { border:[false,false,false,false], text:'—', fontSize:7, color:STEEL, alignment:'center', margin:[4,10,4,10] }]
-      ]}, margin:[0,0,0,26]
+      ]}, margin:[0,0,0,14]
     },
 
     { text:'POSICIONAMENTO SETORIAL — QUADRO COMPARATIVO', fontSize:6, color:MUTED, characterSpacing:1.2, margin:[0,0,0,10] },
@@ -11559,13 +11559,13 @@ function exportarPDF() {
         stack:[
           { text:row.nome.trim(), fontSize:8, bold:row.dest, color:INK },
           { text:row.sub.trim(),  fontSize:6, color:MUTED, margin:[0,1,0,0] }
-        ], margin:[10,10,8,10] },
+        ], margin:[10,7,8,7] },
       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:bgEmp,
-        text:row.valor.trim(), fontSize:8, bold:row.dest, color:tc, alignment:'right', margin:[8,10,8,10] },
+        text:row.valor.trim(), fontSize:8, bold:row.dest, color:tc, alignment:'right', margin:[8,7,8,7] },
       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:bg,
-        text:row.pct.trim(), fontSize:7, color:STEEL, alignment:'right', margin:[8,10,8,10] },
+        text:row.pct.trim(), fontSize:7, color:STEEL, alignment:'right', margin:[8,7,8,7] },
       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:bg,
-        text:dreRefs[i]||'—', fontSize:7, color:STEEL, alignment:'right', margin:[8,10,8,10] }
+        text:dreRefs[i]||'—', fontSize:7, color:STEEL, alignment:'right', margin:[8,7,8,7] }
     ]);
   });
 
@@ -11573,14 +11573,14 @@ function exportarPDF() {
     {
       table:{ widths:['*',120,68,100], body:dreRows },
       layout:{ hLineWidth:function(){return 0.4;}, hLineColor:function(){return GHOST;}, vLineWidth:function(){return 0;} },
-      margin:[0,0,0,24]
+      margin:[0,0,0,16]
     },
     { text:'LEITURA EXECUTIVA', fontSize:6, color:MUTED, characterSpacing:1.2, margin:[0,0,0,12] },
     {
       table:{ widths:['*'], body:[[{
         border:[true,false,false,false], borderColor:[GHOST,'','',''],
         text:'A estrutura de resultado revela uma empresa com receita dinâmica e margem bruta saudável (21,7%), porém com significativa compressão nas margens operacional (6,3%) e líquida (3,7%) em função do peso das despesas com vendas (25,2% da receita). A companhia apresenta cobertura de juros de 2,1x — estrutura de dívida adequada — e ROE de 25,3%, superando a Selic em 11,5 p.p. e evidenciando criação de valor para os sócios. O potencial de retorno poderia ser substancialmente ampliado com a correção das ineficiências de despesa identificadas, elevando o lucro líquido de R$ 1,70 mi para até R$ 2,95 mi com a mesma base de receita.',
-        fontSize:8, color:STEEL, lineHeight:1.85, margin:[12,0,0,0]
+        fontSize:8, color:STEEL, lineHeight:1.65, margin:[12,0,0,0]
       }]]}, layout:'noBorders'
     }
   ]);
@@ -11712,7 +11712,7 @@ function exportarPDF() {
         border:[true,false,false,false], borderColor:[ACC,'','',''],
         text:'A empresa G. João dos Santos posiciona-se no quartil superior do setor de comércio atacadista em saúde financeira (8,4/10), sustentada por crescimento de receita robusto, ciclo de caixa negativo e endividamento controlado. O principal limitador do resultado é a estrutura de despesas operacionais — que consome 93% do lucro bruto e comprime a margem líquida para 3,7%, abaixo do potencial de 6–7% para empresas com perfil de receita e eficiência operacional equivalentes. A execução disciplinada do plano detalhado neste relatório tem potencial de adicionar até R$ 2,1 milhões de resultado líquido anual sem incremento de receita, mediante ajustes estruturais nas despesas e renegociação de contratos com fornecedores.',
         fontSize:9, color:STEEL, lineHeight:1.75, margin:[14,0,0,0]
-      }]]}, layout:'noBorders', margin:[0,0,0,18]
+      }]]}, layout:'noBorders', margin:[0,0,0,12]
     },
 
     { columns:[
@@ -11742,7 +11742,7 @@ function exportarPDF() {
           { text:'elevando margem líquida para 6% com a mesma estrutura de receita atual', fontSize:7, color:MUTED, lineHeight:1.4 }
         ]
       }
-    ], margin:[0,0,0,20] },
+    ], margin:[0,0,0,14] },
 
     { text:'PRÓXIMOS PASSOS RECOMENDADOS', fontSize:6, color:MUTED, characterSpacing:1.2, margin:[0,0,0,12] },
     {
@@ -11784,20 +11784,20 @@ function exportarPDF() {
              { text:'Migrar de comissão fixa para variável atrelada à margem de contribuição — alinha incentivos e melhora estrutura de custos', fontSize:7, color:MUTED, margin:[0,1,0,0] }
            ], margin:[8,9,8,9] },
          { border:[false,false,false,false], text:'Ganho estrutural de margem', fontSize:7, color:MUTED, alignment:'right', margin:[8,9,8,9] }]
-      ]}, margin:[0,0,0,16]
+      ]}, margin:[0,0,0,10]
     },
 
     { text:'LIMITAÇÕES DA ANÁLISE', fontSize:6, color:MUTED, characterSpacing:1.2, margin:[0,0,0,10] },
     {
       table:{ widths:[14,'*'], body:[
         [{ border:[false,false,false,false], text:'—', fontSize:8, color:MUTED, margin:[0,4,8,4] },
-         { border:[false,false,false,false], text:'Esta análise tem como base exclusiva os demonstrativos contábeis fornecidos pela empresa, sem verificação independente ou auditoria dos dados. Variações no plano de contas, reclassificações contábeis ou inconsistências nos registros podem afetar os indicadores calculados.', fontSize:7, color:MUTED, lineHeight:1.6, margin:[0,4,0,4] }],
+         { border:[false,false,false,false], text:'Esta análise tem como base exclusiva os demonstrativos contábeis fornecidos pela empresa, sem verificação independente ou auditoria dos dados. Variações no plano de contas, reclassificações contábeis ou inconsistências nos registros podem afetar os indicadores calculados.', fontSize:7, color:MUTED, lineHeight:1.45, margin:[0,4,0,4] }],
         [{ border:[false,false,false,false], text:'—', fontSize:8, color:MUTED, margin:[0,4,8,4] },
-         { border:[false,false,false,false], text:'Os benchmarks setoriais são estimativas estatísticas baseadas em amostra e não garantem representatividade para empresas com modelo de negócio, regime tributário ou estrutura de capital distintos. O segmento de comércio atacadista apresenta alta heterogeneidade interna.', fontSize:7, color:MUTED, lineHeight:1.6, margin:[0,4,0,4] }],
+         { border:[false,false,false,false], text:'Os benchmarks setoriais são estimativas estatísticas baseadas em amostra e não garantem representatividade para empresas com modelo de negócio, regime tributário ou estrutura de capital distintos. O segmento de comércio atacadista apresenta alta heterogeneidade interna.', fontSize:7, color:MUTED, lineHeight:1.45, margin:[0,4,0,4] }],
         [{ border:[false,false,false,false], text:'—', fontSize:8, color:MUTED, margin:[0,4,8,4] },
-         { border:[false,false,false,false], text:'As projeções de impacto financeiro são estimativas baseadas em premissas declaradas e não constituem garantia de resultado. A execução efetiva depende de fatores operacionais, comerciais e de gestão que extrapolam o escopo desta análise.', fontSize:7, color:MUTED, lineHeight:1.6, margin:[0,4,0,4] }],
+         { border:[false,false,false,false], text:'As projeções de impacto financeiro são estimativas baseadas em premissas declaradas e não constituem garantia de resultado. A execução efetiva depende de fatores operacionais, comerciais e de gestão que extrapolam o escopo desta análise.', fontSize:7, color:MUTED, lineHeight:1.45, margin:[0,4,0,4] }],
         [{ border:[false,false,false,false], text:'—', fontSize:8, color:MUTED, margin:[0,4,8,4] },
-         { border:[false,false,false,false], text:'A estimativa de valuation é baseada em múltiplos de mercado e não substitui laudo de avaliação técnica elaborado por especialista em M&A para fins de transação, captação de recursos ou reestruturação societária.', fontSize:7, color:MUTED, lineHeight:1.6, margin:[0,4,0,4] }]
+         { border:[false,false,false,false], text:'A estimativa de valuation é baseada em múltiplos de mercado e não substitui laudo de avaliação técnica elaborado por especialista em M&A para fins de transação, captação de recursos ou reestruturação societária.', fontSize:7, color:MUTED, lineHeight:1.45, margin:[0,4,0,4] }]
       ]}, layout:'noBorders', margin:[0,0,0,16]
     },
 
