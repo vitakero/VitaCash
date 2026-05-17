@@ -11241,25 +11241,25 @@ function exportarPDF() {
     var bg = isOdd ? WHITE : PAPER;
     _barLinhas.push([
       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:bg,
-        text:nome, fontSize:7, color:STEEL, margin:[10,8,8,8] },
+        text:nome, fontSize:8, color:STEEL, margin:[10,14,8,14] },
       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL,
-        text:empresaVal, fontSize:8, bold:true, color:ACCD, alignment:'center', margin:[4,8,4,8] },
+        text:empresaVal, fontSize:9, bold:true, color:ACCD, alignment:'center', margin:[4,14,4,14] },
       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:bg,
-        text:medianaVal, fontSize:7, color:STEEL, alignment:'center', margin:[4,8,4,8] },
+        text:medianaVal, fontSize:8, color:STEEL, alignment:'center', margin:[4,14,4,14] },
       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:bg,
         stack:[
           { canvas:[
-            { type:'rect', x:0,   y:0, w:maxW,    h:6, r:2, color:ACCL },
-            { type:'rect', x:q1W, y:1, w:q3W-q1W, h:4,      color:ACCM },
-            { type:'rect', x:0,   y:0, w:barW,    h:6, r:2, color:ACC },
-            { type:'line', x1:medW, y1:-3, x2:medW, y2:10, lineWidth:1.5, lineColor:ACCD }
+            { type:'rect', x:0,   y:0, w:maxW,    h:7, r:2, color:ACCL },
+            { type:'rect', x:q1W, y:1, w:q3W-q1W, h:5,      color:ACCM },
+            { type:'rect', x:0,   y:0, w:barW,    h:7, r:2, color:ACC },
+            { type:'line', x1:medW, y1:-4, x2:medW, y2:12, lineWidth:1.5, lineColor:ACCD }
           ]},
           { table:{ widths:[q1W, q3W-q1W, maxW-q3W], body:[[
             { border:[false,false,false,false], text:'Min', fontSize:5, color:MUTED },
             { border:[false,false,false,false], text:'Mediana', fontSize:5, color:ACCD, bold:true, alignment:'center' },
             { border:[false,false,false,false], text:'Max', fontSize:5, color:MUTED, alignment:'right' }
-          ]]}, layout:'noBorders', margin:[0,2,0,0] }
-        ], margin:[8,6,8,4] }
+          ]]}, layout:'noBorders', margin:[0,3,0,0] }
+        ], margin:[8,10,8,6] }
     ]);
     return null; // renderizado depois via _barTabela
   }
@@ -11553,30 +11553,30 @@ function exportarPDF() {
     table:{ widths:['*',68,90,70], body:[
       [tblHdr('Indicador'), tblHdr('Empresa','center',[4,7,4,7]), tblHdr('Referencia setorial','center',[4,7,4,7]), tblHdr('Avaliacao','center',[4,7,4,7])],
 
-      [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Ciclo de caixa', fontSize:7, color:STEEL, margin:[10,5,8,5] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'-3 dias', fontSize:7, bold:true, color:ACCD, alignment:'center', margin:[4,5,4,5] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Referencia: 15 dias', fontSize:7, color:STEEL, alignment:'center', margin:[4,5,4,5] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Excelente', fontSize:7, color:ACC, alignment:'center', margin:[4,5,4,5] }],
+      [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Ciclo de caixa', fontSize:8, color:STEEL, margin:[10,10,8,10] },
+       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'-3 dias', fontSize:8, bold:true, color:ACCD, alignment:'center', margin:[4,10,4,10] },
+       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Referencia: 15 dias', fontSize:8, color:STEEL, alignment:'center', margin:[4,10,4,10] },
+       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Excelente', fontSize:8, color:ACC, alignment:'center', margin:[4,10,4,10] }],
 
-      [{ border:[false,false,false,true], borderColor:['','','',GHOST], text:'Giro do ativo', fontSize:7, color:STEEL, margin:[10,5,8,5] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'4,71x', fontSize:7, bold:true, color:ACCD, alignment:'center', margin:[4,5,4,5] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], text:'Mediana: 2,5x', fontSize:7, color:STEEL, alignment:'center', margin:[4,5,4,5] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Top 25% do setor', fontSize:7, color:ACC, alignment:'center', margin:[4,5,4,5] }],
+      [{ border:[false,false,false,true], borderColor:['','','',GHOST], text:'Giro do ativo', fontSize:8, color:STEEL, margin:[10,10,8,10] },
+       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'4,71x', fontSize:8, bold:true, color:ACCD, alignment:'center', margin:[4,10,4,10] },
+       { border:[false,false,false,true], borderColor:['','','',GHOST], text:'Mediana: 2,5x', fontSize:8, color:STEEL, alignment:'center', margin:[4,10,4,10] },
+       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Top 25% do setor', fontSize:8, color:ACC, alignment:'center', margin:[4,10,4,10] }],
 
-      [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Endividamento total', fontSize:7, color:STEEL, margin:[10,5,8,5] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'31,2%', fontSize:7, bold:true, color:ACCD, alignment:'center', margin:[4,5,4,5] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Limite saudavel: 60%', fontSize:7, color:STEEL, alignment:'center', margin:[4,5,4,5] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Posicao solida', fontSize:7, color:ACC, alignment:'center', margin:[4,5,4,5] }],
+      [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Endividamento total', fontSize:8, color:STEEL, margin:[10,10,8,10] },
+       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'31,2%', fontSize:8, bold:true, color:ACCD, alignment:'center', margin:[4,10,4,10] },
+       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Limite saudavel: 60%', fontSize:8, color:STEEL, alignment:'center', margin:[4,10,4,10] },
+       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Posicao solida', fontSize:8, color:ACC, alignment:'center', margin:[4,10,4,10] }],
 
-      [{ border:[false,false,false,true], borderColor:['','','',GHOST], text:'Liquidez imediata', fontSize:7, color:STEEL, margin:[10,5,8,5] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'1,83x', fontSize:7, bold:true, color:ACCD, alignment:'center', margin:[4,5,4,5] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], text:'Minimo: 1,0x', fontSize:7, color:STEEL, alignment:'center', margin:[4,5,4,5] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Confortavel', fontSize:7, color:ACC, alignment:'center', margin:[4,5,4,5] }],
+      [{ border:[false,false,false,true], borderColor:['','','',GHOST], text:'Liquidez imediata', fontSize:8, color:STEEL, margin:[10,10,8,10] },
+       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'1,83x', fontSize:8, bold:true, color:ACCD, alignment:'center', margin:[4,10,4,10] },
+       { border:[false,false,false,true], borderColor:['','','',GHOST], text:'Minimo: 1,0x', fontSize:8, color:STEEL, alignment:'center', margin:[4,10,4,10] },
+       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Confortavel', fontSize:8, color:ACC, alignment:'center', margin:[4,10,4,10] }],
 
-      [{ border:[false,false,false,false], text:'Cobertura de juros', fontSize:7, color:STEEL, margin:[10,5,8,5] },
-       { border:[false,false,false,false], fillColor:ACCL, text:'2,1x', fontSize:7, bold:true, color:ACCD, alignment:'center', margin:[4,5,4,5] },
-       { border:[false,false,false,false], text:'Faixa ideal: 2-3x', fontSize:7, color:STEEL, alignment:'center', margin:[4,5,4,5] },
-       { border:[false,false,false,false], fillColor:ACCL, text:'Adequado', fontSize:7, color:ACC, alignment:'center', margin:[4,5,4,5] }]
+      [{ border:[false,false,false,false], text:'Cobertura de juros', fontSize:8, color:STEEL, margin:[10,10,8,10] },
+       { border:[false,false,false,false], fillColor:ACCL, text:'2,1x', fontSize:8, bold:true, color:ACCD, alignment:'center', margin:[4,10,4,10] },
+       { border:[false,false,false,false], text:'Faixa ideal: 2-3x', fontSize:8, color:STEEL, alignment:'center', margin:[4,10,4,10] },
+       { border:[false,false,false,false], fillColor:ACCL, text:'Adequado', fontSize:8, color:ACC, alignment:'center', margin:[4,10,4,10] }]
     ]}, margin:[0,0,0,0]
   });
 
