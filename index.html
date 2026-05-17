@@ -11590,13 +11590,13 @@ function exportarPDF() {
     var tag = isRuim ? 'Critico' : (isBom ? 'Vantagem competitiva' : 'Monitorar');
     pgPlan.push({
       table:{ widths:[26,'*',90], body:[[
-        { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:isRuim ? PALE : WHITE, text:(i+1).toString(), fontSize:11, bold:true, color:isRuim ? ACCD : ACCM, alignment:'center', margin:[0,9,0,0] },
+        { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:isRuim ? PALE : WHITE, text:(i+1).toString(), fontSize:11, bold:true, color:ACC, alignment:'center', margin:[0,9,0,0] },
         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:isRuim ? PALE : WHITE,
           stack:[
             { text:ind.nome.trim(), fontSize:8, bold:true, color:INK, margin:[0,0,0,2] },
             { text:ind.vals||'', fontSize:7, color:MUTED }
           ], margin:[8,8,8,8] },
-        { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:isRuim ? PALE : WHITE, text:tag, fontSize:7, color:isRuim ? ACCD : ACCM, alignment:'right', margin:[0,12,0,0] }
+        { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:isRuim ? PALE : WHITE, text:tag, fontSize:7, color:isRuim ? ACCD : ACC, alignment:'right', margin:[0,12,0,0] }
       ]]}, margin:[0,0,0,4]
     });
   });
