@@ -11260,14 +11260,12 @@ function exportarPDF() {
             { type:'rect', x:0,   y:0, w:barW,    h:8, r:3, color:ACC },
             { type:'line', x1:medW, y1:-4, x2:medW, y2:13, lineWidth:2, lineColor:ACCD }
           ]},
-          // linha 4: labels Minimo / Mediana / Maximo
-          { columns:[
-            { text:'Minimo', fontSize:5, color:MUTED, width:q1W },
-            { text:'', width:'*' },
-            { text:'Mediana', fontSize:5, color:ACCD, bold:true, width:'auto', alignment:'center', margin:[-14,0,0,0] },
-            { text:'', width:'*' },
-            { text:'Maximo', fontSize:5, color:MUTED, width:'auto', alignment:'right' }
-          ], margin:[0,3,0,0] }
+          // linha 4: labels fixos alinhados com a barra (total = maxW = 290)
+          { table:{ widths:[q1W, q3W-q1W, maxW-q3W], body:[[
+            { border:[false,false,false,false], text:'Minimo', fontSize:5, color:MUTED },
+            { border:[false,false,false,false], text:'Mediana', fontSize:5, color:ACCD, bold:true, alignment:'center' },
+            { border:[false,false,false,false], text:'Maximo', fontSize:5, color:MUTED, alignment:'right' }
+          ]]}, layout:'noBorders', margin:[0,3,0,0] }
         ], margin:[0,10,0,10]
       }]]}, layout:'noBorders', margin:[0,0,0,6]
     };
