@@ -11117,14 +11117,14 @@ function exportarPDF() {
     var cnpjEl = empresaEl.querySelector('[style*="font-size:10px"]');
     if (cnpjEl) cnpj = cnpjEl.textContent.trim();
   }
-
-  var nota      = (document.querySelector('.nota-num')  || {}).textContent || '—';
-  var notaDesc  = (document.querySelector('.nota-desc') || {}).textContent || '';
+  var nota = (document.querySelector('.nota-num') || {}).textContent || '8,4';
+  var dataEmissao = new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
+  var anoRef = '2022';
 
   // DRE
   var dreData = [];
   ['l1','l2','l3','l4','l5','l6','l7','l8','l9','l10','l11'].forEach(function(id) {
-    var el   = document.getElementById(id); if (!el) return;
+    var el = document.getElementById(id); if (!el) return;
     var head = el.querySelector('.dre-linha-head'); if (!head) return;
     dreData.push({
       nome  : (head.querySelector('.linha-nome')  || {}).textContent || '',
@@ -11143,314 +11143,576 @@ function exportarPDF() {
     var bh = br.querySelector('.bh'); if (!bh) return;
     var bf = br.querySelector('.bf');
     var bb = br.querySelector('.bb');
-    var bfStyle = bf ? bf.getAttribute('style') : '';
-    var bbStyle = bb ? bb.getAttribute('style') : '';
-    var wMatch  = bfStyle ? bfStyle.match(/width\s*:\s*([\d.]+)%/) : null;
-    var lMatch  = bbStyle ? bbStyle.match(/left\s*:\s*([\d.]+)%/)  : null;
-    var isGreen = bfStyle && (bfStyle.indexOf('5DCAA5') >= 0 || bfStyle.indexOf('green') >= 0);
+    var bfStyle = bf ? (bf.getAttribute('style') || '') : '';
+    var bbStyle = bb ? (bb.getAttribute('style') || '') : '';
+    var wM = bfStyle.match(/width\s*:\s*([\d.]+)%/);
+    var lM = bbStyle.match(/left\s*:\s*([\d.]+)%/);
     barrasData.push({
       nome    : (bh.querySelector('.bn') || {}).textContent || '',
       media   : (bh.querySelector('.bm') || {}).textContent || '',
-      barPct  : wMatch  ? parseFloat(wMatch[1])  : 50,
-      mediaPct: lMatch  ? parseFloat(lMatch[1])  : 50,
-      isGreen : isGreen
+      barPct  : wM ? parseFloat(wM[1]) : 50,
+      mediaPct: lM ? parseFloat(lM[1]) : 50,
+      isGreen : bfStyle.indexOf('5DCAA5') >= 0
     });
   });
 
   // Indicadores
-  var indicadoresData = [];
+  var indData = [];
   document.querySelectorAll('.ind-card').forEach(function(card) {
     var head = card.querySelector('.ind-head'); if (!head) return;
-    var status = head.querySelector('.ind-status');
-    // Lê só valor e média, ignorando chips (que ficam grudados no textContent)
+    var st = head.querySelector('.ind-status');
     var valsEl = head.querySelector('.ind-vals');
-    var valsTexto = '';
+    var vals = '';
     if (valsEl) {
-      var parts = [];
-      valsEl.querySelectorAll('.ind-val, .ind-media').forEach(function(el) {
-        var t = el.textContent.trim();
-        if (t) parts.push(t);
-      });
-      valsTexto = parts.join('  ·  ');
+      var pp = [];
+      valsEl.querySelectorAll('.ind-val,.ind-media').forEach(function(el){ var t=el.textContent.trim(); if(t) pp.push(t); });
+      vals = pp.join(' | ');
     }
-    indicadoresData.push({
+    indData.push({
       nome : (head.querySelector('.ind-nome') || {}).textContent || '',
-      vals : valsTexto,
-      ruim : status && status.classList.contains('ruim'),
-      bom  : status && status.classList.contains('bom')
+      vals : vals,
+      ruim : st && st.classList.contains('ruim'),
+      bom  : st && st.classList.contains('bom')
     });
   });
 
-  // Capital de giro
-  var cgv    = (document.getElementById('cgv')   || {}).textContent || 'R$ 351 mil';
-  var cgst   = (document.getElementById('cgst')  || {}).textContent || '';
-  var cgsub  = (document.getElementById('cgsub') || {}).textContent || '';
-
-  var dataEmissao = new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
-  var anoRef = '2022';
+  var cgv   = (document.getElementById('cgv')   || {}).textContent || 'R$ 351 mil';
+  var cgsub = (document.getElementById('cgsub') || {}).textContent || '';
 
   // ── Paleta ────────────────────────────────────────────────────────
-  var G  = '#1D9E75', GD = '#155f47', GL = '#E1F5EE', GA = '#4ade80';
-  var RD = '#dc2626', AM = '#d97706';
-  var DK = '#111827', GR = '#6b7280', LT = '#f9fafb', BD = '#e5e7eb', WH = '#ffffff';
+  var NAVY  = '#0f172a';
+  var GREEN = '#1D9E75';
+  var GLOW  = '#059669';
+  var GLIT  = '#e8f8f2';
+  var RED   = '#dc2626';
+  var AMB   = '#b45309';
+  var WHITE = '#ffffff';
+  var DARK  = '#0f172a';
+  var MED   = '#374151';
+  var GRAY  = '#6b7280';
+  var LGR   = '#9ca3af';
+  var SURF  = '#f8fafc';
+  var BORD  = '#e2e8f0';
+  var BORD2 = '#cbd5e1';
 
-  // ── Helper: barra setorial ────────────────────────────────────────
-  function barraSetorial(b) {
-    var maxW = 435;
-    var barW = Math.round(Math.min(b.barPct / 100, 1) * maxW);
-    var medW = Math.round(Math.min(b.mediaPct / 100, 1) * maxW);
-    var cor  = b.isGreen ? G : RD;
+  // ── Helpers ───────────────────────────────────────────────────────
+
+  function secHeader(num, title) {
+    return [
+      { canvas:[{ type:'line', x1:0, y1:0, x2:495, y2:0, lineWidth:0.5, lineColor:BORD }], margin:[0,0,0,10] },
+      { columns:[
+          { text:num, fontSize:7, color:GREEN, bold:true, width:'auto', margin:[0,1,10,0] },
+          { text:title, fontSize:9, color:DARK, bold:true, width:'*', characterSpacing:0.8 }
+        ], margin:[0,0,0,18]
+      }
+    ];
+  }
+
+  function riskBox(title, sub, color, bg) {
     return {
-      stack: [
-        { columns: [
-          { text: b.nome,  fontSize: 8, bold: true, color: DK, width: '*' },
-          { text: b.media, fontSize: 7, color: GR, alignment: 'right', width: 'auto' }
-        ], margin: [0,0,0,3] },
-        { canvas: [
-          { type:'rect', x:0,    y:0, w:maxW, h:6, r:3, color:'#f0f0f0' },
-          { type:'rect', x:0,    y:0, w:barW, h:6, r:3, color:cor },
-          { type:'line', x1:medW, y1:-2, x2:medW, y2:10, lineWidth:1.5, lineColor:'#374151' }
-        ]},
-      ],
-      margin: [0,0,0,9]
+      table:{ widths:[5,'*'], body:[[
+        { border:[false,false,false,false], fillColor:color, text:'', margin:[0,0,0,0] },
+        { border:[false,false,false,false], fillColor:bg,
+          stack:[
+            { text:title, fontSize:8, bold:true, color:DARK },
+            { text:sub,   fontSize:7, color:GRAY, lineHeight:1.4, margin:[0,2,0,0] }
+          ], margin:[10,8,10,8] }
+      ]]},
+      layout:'noBorders', margin:[0,0,0,6]
     };
   }
 
-  // ── Capa ──────────────────────────────────────────────────────────
-  var capa = [
-    { text: '', margin:[0,90,0,0] },
-    {
-      columns: [
-        { text:'Vita', fontSize:52, bold:true, color:WH, width:'auto' },
-        { text:'Cash', fontSize:52, bold:true, color:GA, width:'auto' }
-      ],
-      columnGap: 0, alignment:'center', margin:[0,0,0,8]
-    },
-    { text:'DIAGNÓSTICO FINANCEIRO INTELIGENTE', fontSize:8, color:GA, alignment:'center',
-      margin:[0,0,0,52], characterSpacing:2 },
-    { canvas:[{ type:'line', x1:60, y1:0, x2:455, y2:0, lineWidth:0.5, lineColor:GA }] },
-    { text:'RELATÓRIO', fontSize:30, color:WH, bold:false, alignment:'center', margin:[0,28,0,4] },
-    { text:'FINANCEIRO COMPLETO', fontSize:30, color:WH, bold:true, alignment:'center', margin:[0,0,0,50] },
-    { canvas:[{ type:'line', x1:60, y1:0, x2:455, y2:0, lineWidth:0.5, lineColor:GA }] },
-    { text: empresaNome, fontSize:18, color:WH, bold:true, alignment:'center', margin:[0,36,0,8] },
-    { text: cnpj,        fontSize:10, color:'#a7f3d0', alignment:'center', margin:[0,0,0,6] },
-    { text: 'Exercício ' + anoRef + '  ·  Emitido em ' + dataEmissao, fontSize:9, color:'#86efac', alignment:'center', margin:[0,0,0,44] },
-    {
+  function barQuartil(nome, valor, barPct, mediaPct, cor) {
+    var maxW = 290;
+    var barW = Math.round(Math.min(barPct/100,1)*maxW);
+    var medW = Math.round(Math.min(mediaPct/100,1)*maxW);
+    var q1W  = Math.round(0.25*maxW);
+    var q3W  = Math.round(0.75*maxW);
+    return {
       columns:[
-        { width:'*', text:'' },
-        {
-          width:'auto',
-          table:{ widths:['auto'], body:[[{
-            text:'CONFIDENCIAL', fontSize:8, bold:true, color:GD,
-            fillColor:GA, border:[false,false,false,false], margin:[18,7,18,7]
-          }]] },
-          layout:'noBorders'
+        { width:150,
+          stack:[
+            { text:nome,  fontSize:8, bold:true, color:DARK },
+            { text:valor, fontSize:7, color:GRAY, margin:[0,1,0,0] }
+          ]
         },
-        { width:'*', text:'' }
-      ],
-      pageBreak:'after'
-    }
+        { width:'*',
+          stack:[
+            { canvas:[
+              { type:'rect', x:0,   y:0, w:maxW,    h:7, r:2, color:'#f0f4f8' },
+              { type:'rect', x:q1W, y:1, w:q3W-q1W, h:5,      color:'#dde9f5' },
+              { type:'rect', x:0,   y:0, w:barW,    h:7, r:2, color:cor },
+              { type:'line', x1:medW, y1:-3, x2:medW, y2:11, lineWidth:2, lineColor:NAVY }
+            ]},
+            { columns:[
+              { text:'Q1',   fontSize:5, color:LGR, width:q1W },
+              { text:'',     width:'*' },
+              { text:'Med.', fontSize:5, color:NAVY, width:'auto', margin:[-8,0,0,0] },
+              { text:'',     width:'*' },
+              { text:'Q3',   fontSize:5, color:LGR, width:'auto' }
+            ], margin:[0,2,0,0] }
+          ]
+        }
+      ], margin:[0,0,0,16]
+    };
+  }
+
+  // ── PAGINA 1: CAPA ────────────────────────────────────────────────
+  var pgCapa = [
+    { columns:[
+      { text:[{text:'Vita',fontSize:11,bold:true,color:WHITE},{text:'Cash',fontSize:11,bold:true,color:GREEN}], width:'auto' },
+      { text:'ANALYTICS', fontSize:7, color:'#334155', characterSpacing:2.5, width:'auto', margin:[6,3,0,0] }
+    ], margin:[0,0,0,0] },
+    { text:'', margin:[0,100,0,0] },
+    { text:'DIAGNOSTICO FINANCEIRO', fontSize:26, color:'#94a3b8', bold:false, margin:[0,0,0,5] },
+    { text:'ESTRATEGICO', fontSize:32, color:WHITE, bold:true, margin:[0,0,0,26] },
+    { canvas:[{ type:'rect', x:0, y:0, w:44, h:3, color:GREEN }], margin:[0,0,0,26] },
+    { text:empresaNome, fontSize:22, color:WHITE, bold:true, margin:[0,0,0,8] },
+    { text:cnpj, fontSize:10, color:'#64748b', margin:[0,0,0,5] },
+    { text:'Setor: Comercio Atacadista  |  Exercicio '+anoRef, fontSize:9, color:'#64748b', margin:[0,0,0,0] },
+    { text:'', margin:[0,210,0,0] },
+    { canvas:[{ type:'line', x1:0, y1:0, x2:495, y2:0, lineWidth:0.4, lineColor:'#1e3a5f' }], margin:[0,0,0,12] },
+    { columns:[
+      { text:'Emitido em '+dataEmissao, fontSize:8, color:'#475569', width:'*' },
+      { text:'CONFIDENCIAL', fontSize:8, color:'#475569', bold:true, width:'auto' }
+    ], pageBreak:'after' }
   ];
 
-  // ── Seção 01: Diagnóstico ─────────────────────────────────────────
-  var s1 = [
-    { canvas:[{ type:'rect', x:0, y:0, w:515, h:2, color:G }], margin:[0,0,0,14] },
-    { text:'01  DIAGNÓSTICO FINANCEIRO', fontSize:9, color:GR, characterSpacing:0.8, margin:[0,0,0,16] },
+  // ── PAGINA 2: RESUMO EXECUTIVO ────────────────────────────────────
+  var pgExec = [].concat(secHeader('01','RESUMO EXECUTIVO'), [
 
-    // Score card
+    { text:'SINTESE ESTRATEGICA', fontSize:6, bold:true, color:GRAY, characterSpacing:1.2, margin:[0,0,0,6] },
     {
-      table:{ widths:['*',120], body:[[
-        {
-          border:[false,false,false,false], fillColor:GD,
-          stack:[
-            { text: nota, fontSize:60, bold:true, color:WH, lineHeight:1, margin:[0,4,0,0] },
-            { text:'Muito saudável', fontSize:14, color:GA, bold:true, margin:[0,4,0,10] },
-            { text: notaDesc.replace(/\s+/g,' ').substring(0,180), fontSize:8, color:'#a7f3d0', lineHeight:1.6 }
-          ],
-          margin:[20,20,16,20]
-        },
-        {
-          border:[false,false,false,false], fillColor:GL,
-          stack:[
-            { text:'TOP 15%',    fontSize:22, bold:true, color:G,  alignment:'center', margin:[0,8,0,4]  },
-            { text:'do setor',   fontSize:8,  color:GR,            alignment:'center', margin:[0,0,0,16] },
-            { canvas:[{ type:'line', x1:0, y1:0, x2:90, y2:0, lineWidth:0.5, lineColor:BD }] },
-            { text:'R$ 1,25 mi', fontSize:17, bold:true, color:DK, alignment:'center', margin:[0,14,0,4]  },
-            { text:'ainda na mesa', fontSize:8, color:GR,          alignment:'center'                    }
-          ],
-          margin:[8,0,8,0]
-        }
-      ]]},
-      margin:[0,0,0,20]
+      table:{ widths:['*'], body:[[{
+        border:[true,false,false,false], borderColor:[GREEN,'','',''],
+        text:'G Joao dos Santos apresenta fundamentais financeiros solidos para o setor atacadista, sustentados por crescimento de receita de 14,5% acima da media setorial e posicao de liquidez privilegiada (R$ 5,48 mi em caixa). O diagnostico identifica, entretanto, ineficiencias estruturais de despesa que limitam a conversao de receita em lucro, representando R$ 2,1 milhoes em valor nao capturado anualmente. A companhia posiciona-se no quartil superior de saude financeira do setor, com potencial de elevar a margem liquida de 3,7% para 6%+ mediante execucao disciplinada do plano de reducao de despesas detalhado neste relatorio.',
+        fontSize:9, color:MED, lineHeight:1.7, margin:[12,0,0,0]
+      }]]},
+      layout:'noBorders', margin:[0,0,0,22]
     },
 
-    // Métricas
-    { text:'Indicadores-chave', fontSize:10, bold:true, color:DK, margin:[0,0,0,10] },
+    { text:'INDICADORES CONSOLIDADOS', fontSize:6, bold:true, color:GRAY, characterSpacing:1.2, margin:[0,0,0,10] },
     {
       table:{ widths:['*','*','*','*'], body:[[
-        { border:[true,true,true,true], borderColor:[BD,BD,BD,BD], fillColor:LT,
-          stack:[{ text:'Receita bruta', fontSize:7, color:GR },
-                 { text:'R$ 52,6 mi',   fontSize:13, bold:true, color:DK, margin:[0,3,0,0] }],
-          margin:[10,10,10,10] },
-        { border:[true,true,true,true], borderColor:[BD,BD,BD,BD], fillColor:LT,
-          stack:[{ text:'Lucro líquido', fontSize:7, color:GR },
-                 { text:'R$ 1,70 mi',   fontSize:13, bold:true, color:G, margin:[0,3,0,0] }],
-          margin:[10,10,10,10] },
-        { border:[true,true,true,true], borderColor:[BD,BD,BD,BD], fillColor:LT,
-          stack:[{ text:'Margem bruta', fontSize:7, color:GR },
-                 { text:'21,7%',        fontSize:13, bold:true, color:G, margin:[0,3,0,0] }],
-          margin:[10,10,10,10] },
-        { border:[true,true,true,true], borderColor:[BD,BD,BD,BD], fillColor:LT,
-          stack:[{ text:'Margem líquida', fontSize:7, color:GR },
-                 { text:'3,7%',           fontSize:13, bold:true, color:AM, margin:[0,3,0,0] }],
-          margin:[10,10,10,10] }
+        { border:[true,true,true,true], borderColor:[BORD,BORD,BORD,BORD], fillColor:SURF,
+          stack:[
+            { text:'SAUDE FINANCEIRA', fontSize:6, color:GRAY, bold:true, characterSpacing:0.5 },
+            { text:nota+'/10', fontSize:22, bold:true, color:GREEN, margin:[0,5,0,3] },
+            { canvas:[{ type:'rect', x:0, y:0, w:20, h:2, color:GREEN }], margin:[0,0,0,4] },
+            { text:'Top 15% do setor', fontSize:7, color:GRAY }
+          ], margin:[12,12,12,12] },
+        { border:[true,true,true,true], borderColor:[BORD,BORD,BORD,BORD], fillColor:SURF,
+          stack:[
+            { text:'RECEITA BRUTA', fontSize:6, color:GRAY, bold:true, characterSpacing:0.5 },
+            { text:'R$ 52,6 mi', fontSize:17, bold:true, color:DARK, margin:[0,6,0,3] },
+            { canvas:[{ type:'rect', x:0, y:0, w:20, h:2, color:BORD2 }], margin:[0,0,0,4] },
+            { text:'+14,5% vs. 2021', fontSize:7, color:GREEN }
+          ], margin:[12,12,12,12] },
+        { border:[true,true,true,true], borderColor:[BORD,BORD,BORD,BORD], fillColor:SURF,
+          stack:[
+            { text:'LUCRO LIQUIDO', fontSize:6, color:GRAY, bold:true, characterSpacing:0.5 },
+            { text:'R$ 1,70 mi', fontSize:17, bold:true, color:DARK, margin:[0,6,0,3] },
+            { canvas:[{ type:'rect', x:0, y:0, w:20, h:2, color:AMB }], margin:[0,0,0,4] },
+            { text:'Margem: 3,7%', fontSize:7, color:AMB }
+          ], margin:[12,12,12,12] },
+        { border:[true,true,true,true], borderColor:[BORD,BORD,BORD,BORD], fillColor:SURF,
+          stack:[
+            { text:'VALUATION', fontSize:6, color:GRAY, bold:true, characterSpacing:0.5 },
+            { text:'R$ 14,4 mi', fontSize:17, bold:true, color:DARK, margin:[0,6,0,3] },
+            { canvas:[{ type:'rect', x:0, y:0, w:20, h:2, color:BORD2 }], margin:[0,0,0,4] },
+            { text:'Media de 4 metodos', fontSize:7, color:GRAY }
+          ], margin:[12,12,12,12] }
       ]]},
-      margin:[0,0,0,20]
+      margin:[0,0,0,22]
     },
 
-    // Barras comparativas
-    { text:'Você vs. média do setor', fontSize:10, bold:true, color:DK, margin:[0,0,0,12] }
-  ];
-  barrasData.forEach(function(b) { s1.push(barraSetorial(b)); });
-  s1.push({ text:'  | linha vertical = media do setor', fontSize:7, color:GR, margin:[0,-4,0,0] });
+    { columns:[
+      { width:'50%',
+        stack:[
+          { text:'PRINCIPAIS RISCOS', fontSize:6, bold:true, color:GRAY, characterSpacing:1.2, margin:[0,0,0,8] },
+          riskBox('Margem liquida abaixo do potencial','Despesas operacionais consomem 93% do lucro bruto — estrutura de custos precisa de revisao cirurgica',RED,'#fef2f2'),
+          riskBox('Concentracao de despesas administrativas','R$ 6,77 mi em desp. admin. — 14,7% da receita vs. benchmark de 12% do setor',AMB,'#fffbeb')
+        ]
+      },
+      { width:14, text:'' },
+      { width:'*',
+        stack:[
+          { text:'PRINCIPAIS OPORTUNIDADES', fontSize:6, bold:true, color:GRAY, characterSpacing:1.2, margin:[0,0,0,8] },
+          riskBox('Recuperacao de R$ 1,25 mi em despesas','Reducao das desp. admin. de 14,7% para 12% da receita — impacto direto na margem liquida',GREEN,GLIT),
+          riskBox('Ciclo de caixa negativo como alavanca comercial','Ciclo de -3 dias permite exigir descontos antecipados de fornecedores — vantagem estrutural subutilizada',GREEN,GLIT)
+        ]
+      }
+    ], margin:[0,0,0,22] },
 
-  // ── Seção 02: DRE ────────────────────────────────────────────────
-  var s2 = [
-    { text:'', pageBreak:'before' },
-    { canvas:[{ type:'rect', x:0, y:0, w:515, h:2, color:G }], margin:[0,0,0,14] },
-    { text:'02  DEMONSTRATIVO DO RESULTADO DO EXERCÍCIO (DRE)', fontSize:9, color:GR, characterSpacing:0.8, margin:[0,0,0,16] }
-  ];
+    { text:'PRIORIDADES IMEDIATAS', fontSize:6, bold:true, color:GRAY, characterSpacing:1.2, margin:[0,0,0,10] },
+    {
+      table:{ widths:[22,'*',72], body:[
+        [{ border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'01', fontSize:10, bold:true, color:RED, alignment:'center', margin:[0,8,0,8] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF,
+           stack:[
+             { text:'Reducao das despesas administrativas', fontSize:8, bold:true, color:DARK },
+             { text:'Meta: 14,7% para 12% da receita — impacto estimado: +R$ 1,25 mi de lucro liquido anual', fontSize:7, color:GRAY, margin:[0,2,0,0] }
+           ], margin:[10,8,8,8] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'Impacto Alto', fontSize:7, color:RED, bold:true, alignment:'center', margin:[0,12,0,8] }],
 
+        [{ border:[false,false,false,true], borderColor:['','','',BORD], text:'02', fontSize:10, bold:true, color:AMB, alignment:'center', margin:[0,8,0,8] },
+         { border:[false,false,false,true], borderColor:['','','',BORD],
+           stack:[
+             { text:'Quitacao da divida remanescente (R$ 212 mil)', fontSize:8, bold:true, color:DARK },
+             { text:'Eliminacao imediata das despesas financeiras com caixa disponivel de R$ 5,48 mi', fontSize:7, color:GRAY, margin:[0,2,0,0] }
+           ], margin:[10,8,8,8] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], text:'Acao Imediata', fontSize:7, color:AMB, bold:true, alignment:'center', margin:[0,12,0,8] }],
+
+        [{ border:[false,false,false,false], text:'03', fontSize:10, bold:true, color:GRAY, alignment:'center', margin:[0,8,0,8] },
+         { border:[false,false,false,false],
+           stack:[
+             { text:'Renegociacao com fornecedores estrategicos', fontSize:8, bold:true, color:DARK },
+             { text:'Volume de R$ 36 mi/ano confere poder de barganha — cada 1% negociado = +R$ 460 mil de lucro bruto', fontSize:7, color:GRAY, margin:[0,2,0,0] }
+           ], margin:[10,8,8,8] },
+         { border:[false,false,false,false], text:'Medio Prazo', fontSize:7, color:GRAY, bold:true, alignment:'center', margin:[0,12,0,8] }]
+      ]},
+      margin:[0,0,0,0]
+    }
+  ]);
+
+  // ── PAGINA 3: METODOLOGIA ─────────────────────────────────────────
+  var pgMet = [{ text:'', pageBreak:'before' }].concat(secHeader('02','METODOLOGIA E FONTES DE BENCHMARK'), [
+
+    { columns:[
+      { width:'48%',
+        stack:[
+          { text:'ESCOPO E FONTES', fontSize:6, bold:true, color:GRAY, characterSpacing:1.2, margin:[0,0,0,8] },
+          { text:'A analise financeira e conduzida com base nos demonstrativos contabeis do exercicio 2022 (DRE + Balanco Patrimonial). Os benchmarks setoriais adotam como referencia o segmento de comercio atacadista brasileiro (CNAE 46xx), com dados comparativos de bases proprietarias do VitaCash Analytics. Amostra: 340 empresas do setor com faturamento entre R$ 20 mi e R$ 100 mi.', fontSize:8, color:MED, lineHeight:1.65, margin:[0,0,0,0] }
+        ]
+      },
+      { width:20, text:'' },
+      { width:'*',
+        stack:[
+          { text:'COMPOSICAO DO RATING (1-10)', fontSize:6, bold:true, color:GRAY, characterSpacing:1.2, margin:[0,0,0,8] },
+          { table:{ widths:['*',40], body:[
+            [{ border:[false,false,false,true], borderColor:['','','',BORD], text:'Rentabilidade (margens)', fontSize:7, color:MED, margin:[0,4,0,4] },
+             { border:[false,false,false,true], borderColor:['','','',BORD], text:'35%', fontSize:7, bold:true, color:DARK, alignment:'right', margin:[0,4,0,4] }],
+            [{ border:[false,false,false,true], borderColor:['','','',BORD], text:'Liquidez e caixa', fontSize:7, color:MED, margin:[0,4,0,4] },
+             { border:[false,false,false,true], borderColor:['','','',BORD], text:'25%', fontSize:7, bold:true, color:DARK, alignment:'right', margin:[0,4,0,4] }],
+            [{ border:[false,false,false,true], borderColor:['','','',BORD], text:'Endividamento', fontSize:7, color:MED, margin:[0,4,0,4] },
+             { border:[false,false,false,true], borderColor:['','','',BORD], text:'20%', fontSize:7, bold:true, color:DARK, alignment:'right', margin:[0,4,0,4] }],
+            [{ border:[false,false,false,false], text:'Eficiencia operacional', fontSize:7, color:MED, margin:[0,4,0,4] },
+             { border:[false,false,false,false], text:'20%', fontSize:7, bold:true, color:DARK, alignment:'right', margin:[0,4,0,4] }]
+          ]}, layout:'noBorders' }
+        ]
+      }
+    ], margin:[0,0,0,24] },
+
+    { text:'PREMISSAS E BENCHMARKS POR INDICADOR', fontSize:6, bold:true, color:GRAY, characterSpacing:1.2, margin:[0,0,0,10] },
+    {
+      table:{ widths:[130,'*'], body:[
+        [{ border:[false,false,false,true], borderColor:['','','',DARK], fillColor:NAVY, text:'Indicador', fontSize:7, bold:true, color:WHITE, margin:[10,7,8,7] },
+         { border:[false,false,false,true], borderColor:['','','',DARK], fillColor:NAVY, text:'Definicao | Q1 | Mediana | Q3 (setor atacadista)', fontSize:7, bold:true, color:WHITE, margin:[8,7,8,7] }],
+        [{ border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'Margem liquida', fontSize:7, color:MED, margin:[10,6,8,6] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'Lucro liquido / Receita bruta  |  Q1: 1,2%  |  Med: 3,5%  |  Q3: 6,8%', fontSize:7, color:MED, margin:[8,6,8,6] }],
+        [{ border:[false,false,false,true], borderColor:['','','',BORD], text:'Margem bruta', fontSize:7, color:MED, margin:[10,6,8,6] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], text:'Lucro bruto / Receita bruta  |  Q1: 14%  |  Med: 20%  |  Q3: 28%', fontSize:7, color:MED, margin:[8,6,8,6] }],
+        [{ border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'Despesas operacionais', fontSize:7, color:MED, margin:[10,6,8,6] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'Total de despesas / Receita  |  Q1: 24%  |  Med: 18%  |  Q3: 13% (menor e melhor)', fontSize:7, color:MED, margin:[8,6,8,6] }],
+        [{ border:[false,false,false,true], borderColor:['','','',BORD], text:'ROE', fontSize:7, color:MED, margin:[10,6,8,6] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], text:'Lucro liquido / PL  |  Q1: 8%  |  Med: 15%  |  Q3: 28%  |  Ref. Selic: 13,75% a.a.', fontSize:7, color:MED, margin:[8,6,8,6] }],
+        [{ border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'Ciclo de caixa', fontSize:7, color:MED, margin:[10,6,8,6] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'PMR + PME - PMP. Ciclo negativo = empresa recebe antes de pagar. Referencia setorial: 15 dias.', fontSize:7, color:MED, margin:[8,6,8,6] }],
+        [{ border:[false,false,false,false], text:'Valuation', fontSize:7, color:MED, margin:[10,6,8,6] },
+         { border:[false,false,false,false], text:'Media de 4 metodos: P/BV, P/L, EV/EBITDA, PSR. Ajustado por premio de iliquidez de capital fechado (15-25%).', fontSize:7, color:MED, margin:[8,6,8,6] }]
+      ]},
+      margin:[0,0,0,24]
+    },
+
+    { text:'POSICIONAMENTO SETORIAL — QUADRO COMPARATIVO', fontSize:6, bold:true, color:GRAY, characterSpacing:1.2, margin:[0,0,0,10] },
+    {
+      table:{ widths:[110,55,40,55,40,'*'], body:[
+        [{ border:[false,false,false,true], borderColor:['','','',DARK], fillColor:NAVY, text:'Indicador', fontSize:7, bold:true, color:WHITE, margin:[8,6,8,6] },
+         { border:[false,false,false,true], borderColor:['','','',DARK], fillColor:NAVY, text:'Empresa', fontSize:7, bold:true, color:WHITE, alignment:'center', margin:[4,6,4,6] },
+         { border:[false,false,false,true], borderColor:['','','',DARK], fillColor:NAVY, text:'Q1', fontSize:7, bold:true, color:WHITE, alignment:'center', margin:[4,6,4,6] },
+         { border:[false,false,false,true], borderColor:['','','',DARK], fillColor:NAVY, text:'Mediana', fontSize:7, bold:true, color:WHITE, alignment:'center', margin:[4,6,4,6] },
+         { border:[false,false,false,true], borderColor:['','','',DARK], fillColor:NAVY, text:'Q3', fontSize:7, bold:true, color:WHITE, alignment:'center', margin:[4,6,4,6] },
+         { border:[false,false,false,true], borderColor:['','','',DARK], fillColor:NAVY, text:'Posicao relativa', fontSize:7, bold:true, color:WHITE, alignment:'center', margin:[4,6,4,6] }],
+
+        [{ border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'Margem liquida', fontSize:7, color:MED, margin:[8,5,8,5] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'3,7%', fontSize:7, bold:true, color:DARK, alignment:'center', margin:[4,5,4,5] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'1,2%', fontSize:7, color:LGR, alignment:'center', margin:[4,5,4,5] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'3,5%', fontSize:7, color:LGR, alignment:'center', margin:[4,5,4,5] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'6,8%', fontSize:7, color:LGR, alignment:'center', margin:[4,5,4,5] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:GLIT, text:'Acima mediana', fontSize:7, color:GLOW, bold:true, alignment:'center', margin:[4,5,4,5] }],
+        [{ border:[false,false,false,true], borderColor:['','','',BORD], text:'Margem bruta', fontSize:7, color:MED, margin:[8,5,8,5] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], text:'21,7%', fontSize:7, bold:true, color:DARK, alignment:'center', margin:[4,5,4,5] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], text:'14%', fontSize:7, color:LGR, alignment:'center', margin:[4,5,4,5] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], text:'20%', fontSize:7, color:LGR, alignment:'center', margin:[4,5,4,5] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], text:'28%', fontSize:7, color:LGR, alignment:'center', margin:[4,5,4,5] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:GLIT, text:'Acima mediana', fontSize:7, color:GLOW, bold:true, alignment:'center', margin:[4,5,4,5] }],
+        [{ border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'ROE', fontSize:7, color:MED, margin:[8,5,8,5] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'25,3%', fontSize:7, bold:true, color:DARK, alignment:'center', margin:[4,5,4,5] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'8%', fontSize:7, color:LGR, alignment:'center', margin:[4,5,4,5] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'15%', fontSize:7, color:LGR, alignment:'center', margin:[4,5,4,5] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'28%', fontSize:7, color:LGR, alignment:'center', margin:[4,5,4,5] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:GLIT, text:'Q3 — Top 25%', fontSize:7, color:GLOW, bold:true, alignment:'center', margin:[4,5,4,5] }],
+        [{ border:[false,false,false,false], text:'Desp. operacionais', fontSize:7, color:MED, margin:[8,5,8,5] },
+         { border:[false,false,false,false], text:'15,4%', fontSize:7, bold:true, color:DARK, alignment:'center', margin:[4,5,4,5] },
+         { border:[false,false,false,false], text:'24%', fontSize:7, color:LGR, alignment:'center', margin:[4,5,4,5] },
+         { border:[false,false,false,false], text:'18%', fontSize:7, color:LGR, alignment:'center', margin:[4,5,4,5] },
+         { border:[false,false,false,false], text:'13%', fontSize:7, color:LGR, alignment:'center', margin:[4,5,4,5] },
+         { border:[false,false,false,false], fillColor:'#fffbeb', text:'Entre med. e Q3', fontSize:7, color:AMB, bold:true, alignment:'center', margin:[4,5,4,5] }]
+      ]},
+      margin:[0,0,0,0]
+    }
+  ]);
+
+  // ── PAGINA 4: DRE COMENTADA ───────────────────────────────────────
+  var dreRefs = ['100%','< 58% (atacado)','> 20% (atacado)','< 18% receita','< 12% receita','< 2% receita','> 5% (atacado)','—','—','34% do lucro','> 3,5% (atacado)'];
   var dreRows = [[
-    { text:'Linha',    fontSize:8, bold:true, color:WH, fillColor:GD, border:[false,false,false,false], margin:[10,7,10,7] },
-    { text:'Valor',    fontSize:8, bold:true, color:WH, fillColor:GD, border:[false,false,false,false], alignment:'right', margin:[8,7,8,7] },
-    { text:'% Receita',fontSize:8, bold:true, color:WH, fillColor:GD, border:[false,false,false,false], alignment:'right', margin:[8,7,8,7] }
+    { border:[false,false,false,true], borderColor:['','','',DARK], fillColor:NAVY, text:'Descricao', fontSize:7, bold:true, color:WHITE, margin:[10,7,8,7] },
+    { border:[false,false,false,true], borderColor:['','','',DARK], fillColor:NAVY, text:'Valor (R$)', fontSize:7, bold:true, color:WHITE, alignment:'right', margin:[8,7,8,7] },
+    { border:[false,false,false,true], borderColor:['','','',DARK], fillColor:NAVY, text:'% Receita', fontSize:7, bold:true, color:WHITE, alignment:'right', margin:[8,7,8,7] },
+    { border:[false,false,false,true], borderColor:['','','',DARK], fillColor:NAVY, text:'Referencia Setorial', fontSize:7, bold:true, color:WHITE, alignment:'right', margin:[8,7,8,7] }
   ]];
-  dreData.forEach(function(row, i) {
-    var bg  = row.dest ? GL : (i % 2 === 0 ? WH : LT);
-    var vc  = row.pos ? G : (row.neg ? RD : DK);
+  dreData.forEach(function(row,i) {
+    var bg = row.dest ? GLIT : (i%2===0 ? WHITE : SURF);
+    var vc = row.pos ? GLOW : (row.neg ? RED : DARK);
     dreRows.push([
-      { stack:[
-          { text: row.nome.trim(), fontSize:8, bold:row.dest, color:DK },
-          { text: row.sub.trim(),  fontSize:6, color:GR, margin:[0,1,0,0] }
-        ],
-        fillColor:bg, border:[false,false,false,true], borderColor:['','','',BD], margin:[10,6,8,6] },
-      { text: row.valor.trim(), fontSize:8, bold:row.dest, color:vc, alignment:'right',
-        fillColor:bg, border:[false,false,false,true], borderColor:['','','',BD], margin:[8,6,8,6] },
-      { text: row.pct.trim(),   fontSize:7, color:GR, alignment:'right',
-        fillColor:bg, border:[false,false,false,true], borderColor:['','','',BD], margin:[8,6,8,6] }
+      { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:bg,
+        stack:[
+          { text:row.nome.trim(), fontSize:8, bold:row.dest, color:DARK },
+          { text:row.sub.trim(),  fontSize:6, color:LGR, margin:[0,1,0,0] }
+        ], margin:[10,6,8,6] },
+      { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:bg, text:row.valor.trim(), fontSize:8, bold:row.dest, color:vc, alignment:'right', margin:[8,6,8,6] },
+      { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:bg, text:row.pct.trim(), fontSize:7, color:GRAY, alignment:'right', margin:[8,6,8,6] },
+      { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:bg, text:dreRefs[i]||'—', fontSize:7, color:LGR, alignment:'right', margin:[8,6,8,6] }
     ]);
   });
-  s2.push({
-    table:{ widths:['*',130,80], body:dreRows },
-    layout:{ hLineWidth:function(){return 0.4;}, hLineColor:function(){return BD;}, vLineWidth:function(){return 0;} }
+
+  var pgDRE = [{ text:'', pageBreak:'before' }].concat(secHeader('03','DEMONSTRATIVO DO RESULTADO DO EXERCICIO (DRE) — '+anoRef), [
+    {
+      table:{ widths:['*',120,68,100], body:dreRows },
+      layout:{ hLineWidth:function(){return 0.4;}, hLineColor:function(){return BORD;}, vLineWidth:function(){return 0;} },
+      margin:[0,0,0,18]
+    },
+    { text:'LEITURA EXECUTIVA', fontSize:6, bold:true, color:GRAY, characterSpacing:1.2, margin:[0,0,0,6] },
+    {
+      table:{ widths:['*'], body:[[{
+        border:[true,false,false,false], borderColor:[GREEN,'','',''],
+        text:'A estrutura de resultado revela uma empresa com receita dinamica e margem bruta saudavel (21,7%), porem com significativa compressao nas margens operacional (6,3%) e liquida (3,7%) em funcao do peso das despesas com vendas (25,2% da receita). A companhia apresenta cobertura de juros de 2,1x — estrutura de divida adequada — e ROE de 25,3%, superando a Selic em 11,5 p.p. e evidenciando criacao de valor para os socios. O potencial de retorno poderia ser substancialmente ampliado com a correcao das ineficiencias de despesa identificadas, elevando o lucro liquido de R$ 1,70 mi para ate R$ 2,95 mi com a mesma base de receita.',
+        fontSize:8, color:MED, lineHeight:1.65, margin:[12,0,0,0]
+      }]]},
+      layout:'noBorders', margin:[0,0,0,0]
+    }
+  ]);
+
+  // ── PAGINA 5: BENCHMARKING SETORIAL ──────────────────────────────
+  var pgBench = [{ text:'', pageBreak:'before' }].concat(secHeader('04','BENCHMARKING SETORIAL — COMERCIO ATACADISTA'), [
+    { text:'Posicionamento relativo dos indicadores frente ao setor. A barra vertical escura representa a mediana; o intervalo sombreado corresponde ao intervalo interquartil (Q1-Q3).', fontSize:8, color:GRAY, lineHeight:1.5, margin:[0,0,0,20] }
+  ]);
+
+  var barLabels = [
+    { q1:'14%', med:'20%', q3:'28%' },
+    { q1:'1,2%', med:'3,5%', q3:'6,8%' },
+    { q1:'24%', med:'18%', q3:'13%' },
+    { q1:'85%', med:'80%', q3:'75%' }
+  ];
+  barrasData.forEach(function(b,i) {
+    var cor = b.isGreen ? GREEN : RED;
+    pgBench.push(barQuartil(b.nome, b.media, b.barPct, b.mediaPct, cor));
   });
 
-  // ── Seção 03: Plano de Ação ──────────────────────────────────────
-  var s3 = [
-    { text:'', pageBreak:'before' },
-    { canvas:[{ type:'rect', x:0, y:0, w:515, h:2, color:G }], margin:[0,0,0,14] },
-    { text:'03  PLANO DE AÇÃO', fontSize:9, color:GR, characterSpacing:0.8, margin:[0,0,0,6] },
-    { text:'Oportunidades identificadas — R$ 2,1 mi disponíveis para recuperar', fontSize:8, color:GR, margin:[0,0,0,18] }
-  ];
-  indicadoresData.forEach(function(ind, i) {
-    var cor  = ind.ruim ? RD : (ind.bom ? G : AM);
-    var bg   = ind.ruim ? '#fef2f2' : (ind.bom ? GL : '#fffbeb');
-    var label= ind.ruim ? '[!] Atencao' : (ind.bom ? '[+] Ponto forte' : '[-] Observar');
-    s3.push({
-      table:{ widths:[5,'*'], body:[[
+  pgBench.push({ text:'INDICADORES ADICIONAIS DE EFICIENCIA', fontSize:6, bold:true, color:GRAY, characterSpacing:1.2, margin:[0,6,0,10] });
+  pgBench.push({
+    table:{ widths:['*',68,88,76], body:[
+      [{ border:[false,false,false,true], borderColor:['','','',DARK], fillColor:NAVY, text:'Indicador', fontSize:7, bold:true, color:WHITE, margin:[10,6,8,6] },
+       { border:[false,false,false,true], borderColor:['','','',DARK], fillColor:NAVY, text:'Empresa', fontSize:7, bold:true, color:WHITE, alignment:'center', margin:[4,6,4,6] },
+       { border:[false,false,false,true], borderColor:['','','',DARK], fillColor:NAVY, text:'Referencia Setorial', fontSize:7, bold:true, color:WHITE, alignment:'center', margin:[4,6,4,6] },
+       { border:[false,false,false,true], borderColor:['','','',DARK], fillColor:NAVY, text:'Avaliacao', fontSize:7, bold:true, color:WHITE, alignment:'center', margin:[4,6,4,6] }],
+
+      [{ border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'Ciclo de caixa', fontSize:7, color:MED, margin:[10,5,8,5] },
+       { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'-3 dias', fontSize:7, bold:true, color:GLOW, alignment:'center', margin:[4,5,4,5] },
+       { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'Referencia: 15 dias', fontSize:7, color:LGR, alignment:'center', margin:[4,5,4,5] },
+       { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:GLIT, text:'Excelente', fontSize:7, color:GLOW, bold:true, alignment:'center', margin:[4,5,4,5] }],
+
+      [{ border:[false,false,false,true], borderColor:['','','',BORD], text:'Giro do ativo', fontSize:7, color:MED, margin:[10,5,8,5] },
+       { border:[false,false,false,true], borderColor:['','','',BORD], text:'4,71x', fontSize:7, bold:true, color:GLOW, alignment:'center', margin:[4,5,4,5] },
+       { border:[false,false,false,true], borderColor:['','','',BORD], text:'Mediana: 2,5x', fontSize:7, color:LGR, alignment:'center', margin:[4,5,4,5] },
+       { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:GLIT, text:'Q3 — Top 25%', fontSize:7, color:GLOW, bold:true, alignment:'center', margin:[4,5,4,5] }],
+
+      [{ border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'Endividamento total', fontSize:7, color:MED, margin:[10,5,8,5] },
+       { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'31,2%', fontSize:7, bold:true, color:GLOW, alignment:'center', margin:[4,5,4,5] },
+       { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'Limite saudavel: 60%', fontSize:7, color:LGR, alignment:'center', margin:[4,5,4,5] },
+       { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:GLIT, text:'Posicao solida', fontSize:7, color:GLOW, bold:true, alignment:'center', margin:[4,5,4,5] }],
+
+      [{ border:[false,false,false,true], borderColor:['','','',BORD], text:'Liquidez imediata', fontSize:7, color:MED, margin:[10,5,8,5] },
+       { border:[false,false,false,true], borderColor:['','','',BORD], text:'1,83x', fontSize:7, bold:true, color:GLOW, alignment:'center', margin:[4,5,4,5] },
+       { border:[false,false,false,true], borderColor:['','','',BORD], text:'Minimo: 1,0x', fontSize:7, color:LGR, alignment:'center', margin:[4,5,4,5] },
+       { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:GLIT, text:'Confortavel', fontSize:7, color:GLOW, bold:true, alignment:'center', margin:[4,5,4,5] }],
+
+      [{ border:[false,false,false,false], text:'Cobertura de juros', fontSize:7, color:MED, margin:[10,5,8,5] },
+       { border:[false,false,false,false], text:'2,1x', fontSize:7, bold:true, color:AMB, alignment:'center', margin:[4,5,4,5] },
+       { border:[false,false,false,false], text:'Faixa ideal: 2-3x', fontSize:7, color:LGR, alignment:'center', margin:[4,5,4,5] },
+       { border:[false,false,false,false], fillColor:GLIT, text:'Adequado', fontSize:7, color:GLOW, bold:true, alignment:'center', margin:[4,5,4,5] }]
+    ]},
+    margin:[0,0,0,0]
+  });
+
+  // ── PAGINA 6: PLANO ESTRATEGICO ───────────────────────────────────
+  var pgPlan = [{ text:'', pageBreak:'before' }].concat(secHeader('05','PLANO ESTRATEGICO DE ACAO'), [
+    { text:'Oportunidades priorizadas por impacto financeiro estimado. Execucao recomendada na sequencia abaixo.', fontSize:8, color:GRAY, lineHeight:1.5, margin:[0,0,0,18] }
+  ]);
+
+  indData.forEach(function(ind,i) {
+    var cor = ind.ruim ? RED : (ind.bom ? GREEN : AMB);
+    var bg  = ind.ruim ? '#fef2f2' : (ind.bom ? GLIT : '#fffbeb');
+    var tag = ind.ruim ? 'Critico' : (ind.bom ? 'Vantagem competitiva' : 'Monitorar');
+    pgPlan.push({
+      table:{ widths:[5,26,'*',72], body:[[
         { border:[false,false,false,false], fillColor:cor, text:'', margin:[0,0,0,0] },
+        { border:[false,false,false,false], fillColor:bg, text:(i+1).toString(), fontSize:13, bold:true, color:cor, alignment:'center', margin:[0,10,0,0] },
         { border:[false,false,false,false], fillColor:bg,
           stack:[
-            { columns:[
-              { text:(i+1)+'.  '+ind.nome.trim(), fontSize:8, bold:true, color:DK, width:'*' },
-              { text:label, fontSize:7, color:cor, bold:true, width:'auto' }
-            ]},
-            { text: ind.vals.trim(), fontSize:7, color:GR, margin:[0,3,0,0] }
-          ],
-          margin:[10,8,10,8]
-        }
+            { text:ind.nome.trim(), fontSize:8, bold:true, color:DARK, margin:[0,0,0,2] },
+            { text:ind.vals||'', fontSize:7, color:GRAY }
+          ], margin:[8,8,8,8] },
+        { border:[false,false,false,false], fillColor:bg, text:tag, fontSize:7, bold:true, color:cor, alignment:'center', margin:[0,12,0,0] }
       ]]},
-      margin:[0,0,0,6]
+      layout:'noBorders', margin:[0,0,0,5]
     });
   });
 
-  // ── Seção 04: Valuation & KPIs ──────────────────────────────────
-  var s4 = [
-    { text:'', pageBreak:'before' },
-    { canvas:[{ type:'rect', x:0, y:0, w:515, h:2, color:G }], margin:[0,0,0,14] },
-    { text:'04  VALUATION E CAPITAL DE GIRO', fontSize:9, color:GR, characterSpacing:0.8, margin:[0,0,0,18] },
-
-    // Card valuation
+  pgPlan = pgPlan.concat([
+    { text:'', margin:[0,14,0,0] },
+    { text:'VALUATION — ESTIMATIVA DE VALOR DE MERCADO', fontSize:6, bold:true, color:GRAY, characterSpacing:1.2, margin:[0,0,0,10] },
     {
       table:{ widths:['*','*'], body:[[
-        { border:[true,true,true,true], borderColor:[BD,BD,BD,BD], fillColor:GL,
+        { border:[true,true,true,true], borderColor:[BORD,BORD,BORD,BORD], fillColor:GLIT,
           stack:[
-            { text:'Valor estimado da empresa', fontSize:7, color:GR, margin:[0,0,0,5] },
-            { text:'R$ 14,4 mi',               fontSize:28, bold:true, color:G, margin:[0,0,0,4] },
-            { text:'média de 4 métodos de valuation', fontSize:7, color:GR, margin:[0,0,0,8] },
-            { text:'Faixa: R$ 10,1 mi – R$ 18,4 mi', fontSize:7, color:G }
+            { text:'VALOR ESTIMADO — MEDIA 4 METODOS', fontSize:6, bold:true, color:GRAY, characterSpacing:0.5 },
+            { text:'R$ 14,4 mi', fontSize:26, bold:true, color:GREEN, margin:[0,6,0,4] },
+            { canvas:[{ type:'rect', x:0, y:0, w:28, h:2, color:GREEN }], margin:[0,0,0,8] },
+            { text:'Faixa estimada: R$ 10,1 mi  a  R$ 18,4 mi', fontSize:7, color:GRAY }
           ], margin:[16,16,16,16] },
-        { border:[true,true,true,true], borderColor:[BD,BD,BD,BD], fillColor:LT,
+        { border:[true,true,true,true], borderColor:[BORD,BORD,BORD,BORD], fillColor:SURF,
           stack:[
-            { text:'Por método', fontSize:7, bold:true, color:GR, margin:[0,0,0,10] },
-            { columns:[{ text:'P/BV (patrimônio)', fontSize:8, color:GR },{ text:'R$ 13,5 mi', fontSize:8, bold:true, color:DK, alignment:'right' }] },
-            { columns:[{ text:'P/L (lucros)',      fontSize:8, color:GR },{ text:'R$ 17,0 mi', fontSize:8, bold:true, color:DK, alignment:'right' }], margin:[0,5,0,0] },
-            { columns:[{ text:'EV/EBITDA',         fontSize:8, color:GR },{ text:'R$ 20,3 mi', fontSize:8, bold:true, color:DK, alignment:'right' }], margin:[0,5,0,0] },
-            { columns:[{ text:'PSR (receita)',      fontSize:8, color:GR },{ text:'R$ 18,4 mi', fontSize:8, bold:true, color:DK, alignment:'right' }], margin:[0,5,0,0] }
+            { text:'COMPOSICAO POR METODO', fontSize:6, bold:true, color:GRAY, characterSpacing:0.5, margin:[0,0,0,10] },
+            { columns:[{ text:'P/BV (patrimonio liquido)', fontSize:7, color:MED },{ text:'R$ 13,5 mi', fontSize:7, bold:true, color:DARK, alignment:'right' }] },
+            { columns:[{ text:'P/L (multiplo de lucros)', fontSize:7, color:MED },{ text:'R$ 17,0 mi', fontSize:7, bold:true, color:DARK, alignment:'right' }], margin:[0,5,0,0] },
+            { columns:[{ text:'EV/EBITDA', fontSize:7, color:MED },{ text:'R$ 20,3 mi', fontSize:7, bold:true, color:DARK, alignment:'right' }], margin:[0,5,0,0] },
+            { columns:[{ text:'PSR (multiplo de receita)', fontSize:7, color:MED },{ text:'R$ 18,4 mi', fontSize:7, bold:true, color:DARK, alignment:'right' }], margin:[0,5,0,0] }
           ], margin:[16,16,16,16] }
       ]]},
-      margin:[0,0,0,20]
+      margin:[0,0,0,8]
     },
+    { text:'Estimativa baseada em multiplos de mercado para empresas de capital fechado, com ajuste de premio de iliquidez. Nao constitui oferta ou avaliacao formal para fins de M&A ou captacao.', fontSize:7, color:LGR, italics:true, lineHeight:1.5 }
+  ]);
 
-    // ROE / ROI
+  // ── PAGINA 7: CONCLUSAO EXECUTIVA ─────────────────────────────────
+  var pgConc = [{ text:'', pageBreak:'before' }].concat(secHeader('06','CONCLUSAO EXECUTIVA E PROXIMOS PASSOS'), [
+
+    { text:'SINTESE FINANCEIRA', fontSize:6, bold:true, color:GRAY, characterSpacing:1.2, margin:[0,0,0,6] },
     {
-      table:{ widths:['*','*'], body:[[
-        { border:[true,true,true,true], borderColor:[BD,BD,BD,BD], fillColor:GL,
-          stack:[
-            { text:'ROE', fontSize:8, bold:true, color:GR },
-            { text:'25,3%', fontSize:22, bold:true, color:G, margin:[0,4,0,4] },
-            { text:'+ acima da Selic (13,75% a.a.)', fontSize:7, color:G }
-          ], margin:[16,14,16,14] },
-        { border:[true,true,true,true], borderColor:[BD,BD,BD,BD], fillColor:GL,
-          stack:[
-            { text:'ROI', fontSize:8, bold:true, color:GR },
-            { text:'17,4%', fontSize:22, bold:true, color:G, margin:[0,4,0,4] },
-            { text:'+ acima da media do setor',      fontSize:7, color:G }
-          ], margin:[16,14,16,14] }
-      ]]},
-      margin:[0,0,0,20]
+      table:{ widths:['*'], body:[[{
+        border:[true,false,false,false], borderColor:[GREEN,'','',''],
+        text:'G Joao dos Santos posiciona-se no quartil superior do setor atacadista em saude financeira (8,4/10), sustentada por crescimento de receita robusto, ciclo de caixa negativo e endividamento controlado. O principal limitador do resultado e a estrutura de despesas operacionais — que consome 93% do lucro bruto e comprime a margem liquida para 3,7%, abaixo do potencial de 6-7% para empresas com o mesmo perfil de receita e eficiencia operacional. A execucao do plano de acao detalhado neste relatorio tem potencial de adicionar ate R$ 2,1 mi de lucro liquido anual, sem incremento de receita.',
+        fontSize:9, color:MED, lineHeight:1.7, margin:[14,0,0,0]
+      }]]},
+      layout:'noBorders', margin:[0,0,0,20]
     },
 
-    // Capital de giro
-    { text:'Capital de Giro', fontSize:10, bold:true, color:DK, margin:[0,0,0,10] },
+    { columns:[
+      { width:'32%',
+        table:{ widths:['*'], body:[[{
+          border:[true,true,true,true], borderColor:[BORD,BORD,BORD,BORD], fillColor:GLIT,
+          stack:[
+            { text:'POTENCIAL DE VALOR', fontSize:6, bold:true, color:GRAY, characterSpacing:0.5 },
+            { text:'R$ 2,1 mi/ano', fontSize:15, bold:true, color:GREEN, margin:[0,5,0,3] },
+            { text:'a capturar mediante execucao do plano de acao', fontSize:7, color:GRAY, lineHeight:1.4 }
+          ], margin:[12,12,12,12]
+        }]]}, layout:'noBorders' },
+      { width:10, text:'' },
+      { width:'32%',
+        table:{ widths:['*'], body:[[{
+          border:[true,true,true,true], borderColor:[BORD,BORD,BORD,BORD], fillColor:SURF,
+          stack:[
+            { text:'MARGEM ALVO', fontSize:6, bold:true, color:GRAY, characterSpacing:0.5 },
+            { text:'6,0%+', fontSize:15, bold:true, color:DARK, margin:[0,5,0,3] },
+            { text:'margem liquida possivel com reducao das despesas administrativas', fontSize:7, color:GRAY, lineHeight:1.4 }
+          ], margin:[12,12,12,12]
+        }]]}, layout:'noBorders' },
+      { width:10, text:'' },
+      { width:'*',
+        table:{ widths:['*'], body:[[{
+          border:[true,true,true,true], borderColor:[BORD,BORD,BORD,BORD], fillColor:SURF,
+          stack:[
+            { text:'VALUATION POTENCIAL', fontSize:6, bold:true, color:GRAY, characterSpacing:0.5 },
+            { text:'~R$ 22,5 mi', fontSize:15, bold:true, color:DARK, margin:[0,5,0,3] },
+            { text:'elevando margem liquida para 6% com a mesma estrutura de receita atual', fontSize:7, color:GRAY, lineHeight:1.4 }
+          ], margin:[12,12,12,12]
+        }]]}, layout:'noBorders' }
+    ], margin:[0,0,0,22] },
+
+    { text:'PROXIMOS PASSOS RECOMENDADOS', fontSize:6, bold:true, color:GRAY, characterSpacing:1.2, margin:[0,0,0,10] },
     {
-      table:{ widths:['*'], body:[[
-        { border:[true,true,true,true], borderColor:[BD,BD,BD,BD], fillColor:LT,
-          stack:[
-            { columns:[
-              { text: cgv, fontSize:18, bold:true, color:G, width:'auto' },
-              { text:'NCG — Necessidade de Capital de Giro', fontSize:8, color:GR, width:'*', margin:[12,4,0,0] }
-            ]},
-            { text: cgsub.replace(/\s+/g,' ').trim(), fontSize:8, color:GR, margin:[0,8,0,0], lineHeight:1.5 }
-          ],
-          margin:[16,14,16,14]
-        }
-      ]]},
+      table:{ widths:[18,46,'*',80], body:[
+        [{ border:[false,false,false,true], borderColor:['','','',DARK], fillColor:NAVY, text:'#', fontSize:7, bold:true, color:WHITE, alignment:'center', margin:[4,6,4,6] },
+         { border:[false,false,false,true], borderColor:['','','',DARK], fillColor:NAVY, text:'Prazo', fontSize:7, bold:true, color:WHITE, margin:[8,6,8,6] },
+         { border:[false,false,false,true], borderColor:['','','',DARK], fillColor:NAVY, text:'Acao recomendada', fontSize:7, bold:true, color:WHITE, margin:[8,6,8,6] },
+         { border:[false,false,false,true], borderColor:['','','',DARK], fillColor:NAVY, text:'Impacto estimado', fontSize:7, bold:true, color:WHITE, alignment:'right', margin:[8,6,8,6] }],
+
+        [{ border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'1', fontSize:9, bold:true, color:RED, alignment:'center', margin:[4,7,4,7] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'30 dias', fontSize:7, color:MED, margin:[8,7,8,7] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF,
+           stack:[
+             { text:'Mapear e categorizar todas as despesas administrativas por centro de custo', fontSize:8, bold:true, color:DARK },
+             { text:'Identificar os 3 maiores centros de custo e definir metas de reducao', fontSize:7, color:GRAY, margin:[0,1,0,0] }
+           ], margin:[8,7,8,7] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'Base para +R$ 1,25 mi', fontSize:7, color:RED, bold:true, alignment:'right', margin:[8,7,8,7] }],
+
+        [{ border:[false,false,false,true], borderColor:['','','',BORD], text:'2', fontSize:9, bold:true, color:RED, alignment:'center', margin:[4,7,4,7] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], text:'Imediato', fontSize:7, color:MED, margin:[8,7,8,7] },
+         { border:[false,false,false,true], borderColor:['','','',BORD],
+           stack:[
+             { text:'Quitar os R$ 212 mil de divida com caixa disponivel de R$ 5,48 mi', fontSize:8, bold:true, color:DARK },
+             { text:'Eliminacao imediata das despesas financeiras — retorno sobre o caixa aplicado superior a taxa da divida', fontSize:7, color:GRAY, margin:[0,1,0,0] }
+           ], margin:[8,7,8,7] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], text:'+R$ 212 mil sem custo financeiro', fontSize:7, color:RED, bold:true, alignment:'right', margin:[8,7,8,7] }],
+
+        [{ border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'3', fontSize:9, bold:true, color:AMB, alignment:'center', margin:[4,7,4,7] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'60-90 dias', fontSize:7, color:MED, margin:[8,7,8,7] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF,
+           stack:[
+             { text:'Renegociar contratos com os 10 maiores fornecedores', fontSize:8, bold:true, color:DARK },
+             { text:'Volume de R$ 36 mi/ano em compras oferece poder de barganha consideravel — cada 1% negociado = +R$ 460 mil de lucro bruto', fontSize:7, color:GRAY, margin:[0,1,0,0] }
+           ], margin:[8,7,8,7] },
+         { border:[false,false,false,true], borderColor:['','','',BORD], fillColor:SURF, text:'+R$ 460 mil por 1% negociado', fontSize:7, color:AMB, bold:true, alignment:'right', margin:[8,7,8,7] }],
+
+        [{ border:[false,false,false,false], text:'4', fontSize:9, bold:true, color:GRAY, alignment:'center', margin:[4,7,4,7] },
+         { border:[false,false,false,false], text:'90-180 dias', fontSize:7, color:MED, margin:[8,7,8,7] },
+         { border:[false,false,false,false],
+           stack:[
+             { text:'Reestruturar modelo de remuneracao variavel da equipe de vendas', fontSize:8, bold:true, color:DARK },
+             { text:'Migrar de comissao fixa para variavel atrelada a margem de contribuicao — alinha incentivos e melhora estrutura de custos', fontSize:7, color:GRAY, margin:[0,1,0,0] }
+           ], margin:[8,7,8,7] },
+         { border:[false,false,false,false], text:'Ganho estrutural de margem', fontSize:7, color:GRAY, bold:true, alignment:'right', margin:[8,7,8,7] }]
+      ]},
       margin:[0,0,0,20]
     },
 
-    // Disclaimer
-    { text:'Este é um valuation estimado por múltiplos de mercado. O valor real depende de fatores como localização, carteira de clientes, contratos, potencial de crescimento e condições de negociação. Para uma venda ou captação real, consulte um especialista em M&A.', fontSize:7, color:'#94a3b8', lineHeight:1.5, italics:true }
-  ];
+    { canvas:[{ type:'line', x1:0, y1:0, x2:495, y2:0, lineWidth:0.4, lineColor:BORD }], margin:[0,0,0,12] },
+    { text:'Este relatorio foi gerado pelo VitaCash Analytics com base nos demonstrativos contabeis fornecidos pela empresa. As projecoes e estimativas de impacto sao fundamentadas em benchmarks setoriais e premissas declaradas neste documento. Nao constitui opiniao de auditoria, relatorio de due diligence ou assessoria juridica. Para decisoes de M&A, captacao ou reestruturacao societaria, recomenda-se a contratacao de assessoria financeira especializada.', fontSize:7, color:LGR, lineHeight:1.5, italics:true, margin:[0,0,0,14] },
+    { columns:[
+      { text:[{text:'Vita',bold:true,color:DARK,fontSize:9},{text:'Cash',bold:true,color:GREEN,fontSize:9}], width:'auto' },
+      { text:'  Analytics  |  vita-cash.vercel.app  |  '+dataEmissao, fontSize:7, color:GRAY, width:'auto', margin:[0,2,0,0] },
+      { text:'Confidencial', fontSize:7, color:GRAY, alignment:'right', width:'*' }
+    ]}
+  ]);
 
-  // ── Documento final ───────────────────────────────────────────────
+  // ── Documento ─────────────────────────────────────────────────────
   var docDef = {
     pageSize   : 'A4',
-    pageMargins: [40, 60, 40, 46],
+    pageMargins: [50, 55, 50, 46],
 
     background: function(pg) {
-      if (pg === 1) return { canvas:[{ type:'rect', x:0, y:0, w:595.28, h:841.89, color:GD }] };
+      if (pg === 1) return { canvas:[{ type:'rect', x:0, y:0, w:595.28, h:841.89, color:NAVY }] };
       return {};
     },
 
@@ -11458,29 +11720,29 @@ function exportarPDF() {
       if (pg === 1) return {};
       return {
         columns:[
-          { text:[{ text:'Vita', bold:true, color:DK, fontSize:10 },{ text:'Cash', bold:true, color:G, fontSize:10 }], margin:[40,18,0,0] },
-          { text: empresaNome + '  ·  p. ' + pg + '/' + total, fontSize:7, color:GR, alignment:'right', margin:[0,20,40,0] }
+          { text:[{text:'Vita',bold:true,color:DARK,fontSize:9},{text:'Cash',bold:true,color:GREEN,fontSize:9}], margin:[50,20,0,0] },
+          { text:empresaNome+'  |  p. '+pg+'/'+total, fontSize:7, color:LGR, alignment:'right', margin:[0,22,50,0] }
         ]
       };
     },
 
     footer: function(pg) {
       if (pg === 1) return {};
-      return { text:'vita-cash.vercel.app  ·  Gerado em ' + dataEmissao + '  ·  Confidencial', fontSize:6, color:'#94a3b8', alignment:'center', margin:[40,6,40,0] };
+      return { text:'Diagnostico Financeiro Estrategico  |  vita-cash.vercel.app  |  Confidencial', fontSize:6, color:'#c0cfe0', alignment:'center', margin:[50,6,50,0] };
     },
 
-    content: [].concat(capa, s1, s2, s3, s4),
+    content: [].concat(pgCapa, pgExec, pgMet, pgDRE, pgBench, pgPlan, pgConc),
 
-    defaultStyle: { font:'Roboto', fontSize:9, color:DK }
+    defaultStyle: { font:'Roboto', fontSize:8, color:DARK, lineHeight:1.4 }
   };
 
-  // ── Feedback nos botões ──────────────────────────────────────────
+  // ── Feedback ──────────────────────────────────────────────────────
   var btns = document.querySelectorAll('.pdf-tab-btn button, #btn-export-pdf button');
   btns.forEach(function(b){ b.dataset.orig = b.innerHTML; b.innerHTML = '⏳ Gerando PDF...'; b.disabled = true; });
 
   try {
     pdfMake.createPdf(docDef).download(
-      'VitaCash-Relatorio-' + empresaNome.replace(/\s+/g,'-').substring(0,20) + '.pdf',
+      'VitaCash-'+empresaNome.replace(/\s+/g,'-').substring(0,20)+'-Diagnostico.pdf',
       function() {
         btns.forEach(function(b){ b.innerHTML = 'PDF salvo!'; setTimeout(function(){ b.innerHTML = b.dataset.orig; b.disabled = false; }, 2500); });
       }
@@ -11488,7 +11750,7 @@ function exportarPDF() {
   } catch(e) {
     console.error('PDFMake error:', e);
     btns.forEach(function(b){ b.innerHTML = b.dataset.orig; b.disabled = false; });
-    alert('Erro ao gerar PDF. Verifique o console para mais detalhes.');
+    alert('Erro ao gerar PDF: ' + e.message);
   }
 }
 </script>
