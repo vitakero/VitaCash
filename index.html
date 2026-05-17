@@ -11492,7 +11492,7 @@ function exportarPDF() {
          { border:[false,false,false,false], text:'24%', fontSize:7, color:STEEL, alignment:'center', margin:[4,5,4,5] },
          { border:[false,false,false,false], text:'18%', fontSize:7, color:STEEL, alignment:'center', margin:[4,5,4,5] },
          { border:[false,false,false,false], text:'13%', fontSize:7, color:STEEL, alignment:'center', margin:[4,5,4,5] },
-         { border:[false,false,false,false], fillColor:ACCL, text:'Entre mediana e Q3', fontSize:7, color:ACC, alignment:'center', margin:[4,5,4,5] }]
+         { border:[false,false,false,false], fillColor:ACCL, text:'Entre mediana e maximo', fontSize:7, color:ACC, alignment:'center', margin:[4,5,4,5] }]
       ]}, margin:[0,0,0,0]
     }
   ]);
@@ -11543,7 +11543,7 @@ function exportarPDF() {
 
   // ── PAGINA 5: BENCHMARKING ────────────────────────────────────────
   var pgBench = [{ text:'', pageBreak:'before' }].concat(secHeader('04','BENCHMARKING SETORIAL — COMERCIO ATACADISTA'), [
-    { text:'Posicionamento relativo dos indicadores. A barra vertical representa a mediana setorial; o intervalo sombreado corresponde ao intervalo interquartil (Q1-Q3).', fontSize:8, color:MUTED, lineHeight:1.5, margin:[0,0,0,10] }
+    { text:'Posicionamento relativo dos indicadores. A barra vertical representa a mediana setorial; o intervalo sombreado corresponde ao intervalo entre o minimo e o maximo do setor.', fontSize:8, color:MUTED, lineHeight:1.5, margin:[0,0,0,10] }
   ]);
   _barLinhas = [];
   barrasData.forEach(function(b) { barQuartil(b.nome, b.media, b.barPct, b.mediaPct); });
@@ -11561,7 +11561,7 @@ function exportarPDF() {
       [{ border:[false,false,false,true], borderColor:['','','',GHOST], text:'Giro do ativo', fontSize:7, color:STEEL, margin:[10,5,8,5] },
        { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'4,71x', fontSize:7, bold:true, color:ACCD, alignment:'center', margin:[4,5,4,5] },
        { border:[false,false,false,true], borderColor:['','','',GHOST], text:'Mediana: 2,5x', fontSize:7, color:STEEL, alignment:'center', margin:[4,5,4,5] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Q3 — Top 25%', fontSize:7, color:ACC, alignment:'center', margin:[4,5,4,5] }],
+       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Top 25% do setor', fontSize:7, color:ACC, alignment:'center', margin:[4,5,4,5] }],
 
       [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Endividamento total', fontSize:7, color:STEEL, margin:[10,5,8,5] },
        { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'31,2%', fontSize:7, bold:true, color:ACCD, alignment:'center', margin:[4,5,4,5] },
