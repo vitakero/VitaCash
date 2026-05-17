@@ -11325,19 +11325,21 @@ function exportarPDF() {
     { columns:[
       { text:'Emitido em '+dataEmissao, fontSize:9, color:'#6b7280', width:'*' },
       { text:'CONFIDENCIAL', fontSize:9, color:'#9ca3af', bold:true, characterSpacing:1, width:'auto' }
-    ], pageBreak:'after' }
+    ] }
   ];
 
   // ── PAGINA 2: RESUMO EXECUTIVO ────────────────────────────────────
-  var pgExec = [{ text:'', pageBreak:'before' }].concat(secHeader('01','RESUMO EXECUTIVO'), [
-
+  var pgExec = [{ text:'', pageBreak:'before' }, {
+    stack: [].concat(secHeader('01','RESUMO EXECUTIVO'), [
     {
       table:{ widths:['*'], body:[[{
         border:[true,false,false,false], borderColor:[ACC,'','',''],
         text:'A empresa G. João dos Santos apresenta fundamentos financeiros consistentes para o segmento de comércio atacadista, sustentados por crescimento de receita de 14,5% acima da média setorial e posição de liquidez privilegiada (R$ 5,48 milhões em caixa). O diagnóstico evidencia, contudo, ineficiências estruturais nas despesas operacionais que restringem a conversão de receita em resultado líquido, representando um potencial de R$ 2,1 milhões anuais não capturado. A companhia posiciona-se no quartil superior de saúde financeira do segmento, com potencial de elevar a margem líquida de 3,7% para 6,0% mediante execução do plano de redução de despesas detalhado neste relatório.',
         fontSize:10, color:STEEL, lineHeight:1.55, margin:[14,0,0,0]
       }]]}, layout:'noBorders', margin:[0,0,0,18]
-    },
+    }
+    ]), unbreakable: true
+  }].concat([
 
     { stack:[
     { text:'INDICADORES CONSOLIDADOS — EXERCÍCIO '+anoRef, fontSize:7, color:MUTED, characterSpacing:1.2, margin:[0,0,0,10] },
@@ -11440,9 +11442,8 @@ function exportarPDF() {
   ]);
 
   // ── PAGINA 3: METODOLOGIA ─────────────────────────────────────────
-  var pgMet = [].concat(secHeader('02','METODOLOGIA E FONTES DE BENCHMARK'), [
-
-    { stack:[
+  var pgMet = [{
+    stack: [].concat(secHeader('02','METODOLOGIA E FONTES DE BENCHMARK'), [
     { columns:[
       { width:'48%',
         stack:[
@@ -11467,7 +11468,8 @@ function exportarPDF() {
         ]
       }
     ], margin:[0,0,0,12] }
-    ], unbreakable:true },
+    ]), unbreakable: true
+  }].concat([
 
     { stack:[
     { text:'PREMISSAS E BENCHMARKS POR INDICADOR', fontSize:7, color:MUTED, characterSpacing:1.2, margin:[0,0,0,10] },
@@ -11585,14 +11587,15 @@ function exportarPDF() {
     ]);
   });
 
-  var pgDRE = [].concat(secHeader('03','DEMONSTRATIVO DO RESULTADO DO EXERCÍCIO (DRE) — '+anoRef), [
-    { stack:[
+  var pgDRE = [{
+    stack: [].concat(secHeader('03','DEMONSTRATIVO DO RESULTADO DO EXERCÍCIO (DRE) — '+anoRef), [
     {
       table:{ widths:['*',120,68,100], body:dreRows },
       layout:{ hLineWidth:function(){return 0.4;}, hLineColor:function(){return GHOST;}, vLineWidth:function(){return 0;} },
       margin:[0,0,0,10]
     }
-    ], unbreakable:true },
+    ]), unbreakable: true
+  }].concat([
     { stack:[
     { text:'LEITURA EXECUTIVA', fontSize:7, color:MUTED, characterSpacing:1.2, margin:[0,0,0,12] },
     {
@@ -11606,12 +11609,14 @@ function exportarPDF() {
   ]);
 
   // ── PAGINA 5: BENCHMARKING ────────────────────────────────────────
-  var pgBench = [].concat(secHeader('04','BENCHMARKING SETORIAL — COMÉRCIO ATACADISTA'), [
-    { text:'Posicionamento relativo dos indicadores. A barra vertical representa a mediana setorial; o intervalo sombreado corresponde ao intervalo entre o mínimo e o máximo do setor.', fontSize:9, color:MUTED, lineHeight:1.5, margin:[0,0,0,10] }
-  ]);
   _barLinhas = [];
   barrasData.forEach(function(b) { barQuartil(b.nome, b.media, b.barPct, b.mediaPct); });
-  pgBench.push({ stack:[ _barTabela() ], unbreakable:true });
+  var pgBench = [{
+    stack: [].concat(secHeader('04','BENCHMARKING SETORIAL — COMÉRCIO ATACADISTA'), [
+    { text:'Posicionamento relativo dos indicadores. A barra vertical representa a mediana setorial; o intervalo sombreado corresponde ao intervalo entre o mínimo e o máximo do setor.', fontSize:9, color:MUTED, lineHeight:1.5, margin:[0,0,0,10] },
+    _barTabela()
+    ]), unbreakable: true
+  }];
   pgBench.push({ stack:[
   { text:'INDICADORES ADICIONAIS DE EFICIÊNCIA OPERACIONAL', fontSize:7, color:MUTED, characterSpacing:1.2, margin:[0,8,0,12] },
   {
@@ -11647,8 +11652,8 @@ function exportarPDF() {
   ], unbreakable:true });
 
   // ── PAGINA 6: PLANO ESTRATEGICO ───────────────────────────────────
-  var pgPlan = [].concat(secHeader('05','PLANO DE AÇÃO ESTRUTURADO'), [
-    { stack:[
+  var pgPlan = [{
+    stack: [].concat(secHeader('05','PLANO DE AÇÃO ESTRUTURADO'), [
     { text:'Iniciativas priorizadas por impacto financeiro e viabilidade de execução. Os prazos são contados a partir da data de início da implementação.', fontSize:9, color:MUTED, lineHeight:1.5, margin:[0,0,0,20] },
     {
       table:{ widths:[22,30,'*',68,52,72], body:[
@@ -11703,8 +11708,8 @@ function exportarPDF() {
          { border:[false,false,false,false], text:'Margem contrib. por vendedor', fontSize:8, color:MUTED, margin:[4,14,4,14] }]
       ]}, margin:[0,0,0,20]
     }
-    ], unbreakable:true }
-  ]);
+    ]), unbreakable: true
+  }];
 
   pgPlan = pgPlan.concat([
     { stack:[
@@ -11731,9 +11736,8 @@ function exportarPDF() {
   ]);
 
   // ── PAGINA 7: CONCLUSAO ───────────────────────────────────────────
-  var pgConc = [].concat(secHeader('06','CONCLUSÃO EXECUTIVA E PRÓXIMOS PASSOS'), [
-
-    { stack:[
+  var pgConc = [{
+    stack: [].concat(secHeader('06','CONCLUSÃO EXECUTIVA E PRÓXIMOS PASSOS'), [
     {
       table:{ widths:['*'], body:[[{
         border:[true,false,false,false], borderColor:[ACC,'','',''],
@@ -11770,7 +11774,8 @@ function exportarPDF() {
         ]
       }
     ], margin:[0,0,0,14] }
-    ], unbreakable:true },
+    ]), unbreakable: true
+  }].concat([
 
     { stack:[
     { text:'PRÓXIMOS PASSOS RECOMENDADOS', fontSize:7, color:MUTED, characterSpacing:1.2, margin:[0,0,0,12] },
