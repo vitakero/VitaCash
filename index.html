@@ -11240,34 +11240,33 @@ function exportarPDF() {
       table:{ widths:['*'], body:[[{
         border:[false,false,false,true], borderColor:[GHOST,'','',''],
         stack:[
-          // linha 1: nome do indicador
-          { text:nome, fontSize:8, bold:true, color:INK, margin:[0,0,0,8] },
-          // linha 2: valores empresa + mediana lado a lado
+          // linha 1: nome + empresa + mediana em uma linha só
           { columns:[
+            { text:nome, fontSize:8, bold:true, color:INK, width:'*' },
             { stack:[
-              { text:'EMPRESA', fontSize:5, color:MUTED, characterSpacing:0.8, margin:[0,0,0,2] },
-              { text:empresaVal, fontSize:13, bold:true, color:ACC }
-            ], width:'auto' },
+              { text:'EMPRESA', fontSize:5, color:MUTED, characterSpacing:0.5 },
+              { text:empresaVal, fontSize:9, bold:true, color:ACC }
+            ], width:'auto', margin:[0,0,16,0] },
             medianaVal ? { stack:[
-              { text:'MEDIANA SETOR', fontSize:5, color:MUTED, characterSpacing:0.8, margin:[0,0,0,2] },
-              { text:medianaVal, fontSize:13, color:STEEL }
-            ], width:'auto', margin:[20,0,0,0] } : { text:'', width:'auto' }
-          ], margin:[0,0,0,10] },
-          // linha 3: barra visual
+              { text:'MEDIANA', fontSize:5, color:MUTED, characterSpacing:0.5 },
+              { text:medianaVal, fontSize:9, color:STEEL }
+            ], width:'auto' } : { text:'', width:'auto' }
+          ], margin:[0,0,0,6] },
+          // linha 2: barra visual
           { canvas:[
-            { type:'rect', x:0,   y:0, w:maxW,    h:8, r:3, color:ACCL },
-            { type:'rect', x:q1W, y:1, w:q3W-q1W, h:6,      color:ACCM },
-            { type:'rect', x:0,   y:0, w:barW,    h:8, r:3, color:ACC },
-            { type:'line', x1:medW, y1:-4, x2:medW, y2:13, lineWidth:2, lineColor:ACCD }
+            { type:'rect', x:0,   y:0, w:maxW,    h:6, r:2, color:ACCL },
+            { type:'rect', x:q1W, y:1, w:q3W-q1W, h:4,      color:ACCM },
+            { type:'rect', x:0,   y:0, w:barW,    h:6, r:2, color:ACC },
+            { type:'line', x1:medW, y1:-3, x2:medW, y2:10, lineWidth:1.5, lineColor:ACCD }
           ]},
-          // linha 4: labels fixos alinhados com a barra (total = maxW = 290)
+          // linha 3: labels fixos alinhados com a barra
           { table:{ widths:[q1W, q3W-q1W, maxW-q3W], body:[[
             { border:[false,false,false,false], text:'Minimo', fontSize:5, color:MUTED },
             { border:[false,false,false,false], text:'Mediana', fontSize:5, color:ACCD, bold:true, alignment:'center' },
             { border:[false,false,false,false], text:'Maximo', fontSize:5, color:MUTED, alignment:'right' }
-          ]]}, layout:'noBorders', margin:[0,3,0,0] }
-        ], margin:[0,10,0,10]
-      }]]}, layout:'noBorders', margin:[0,0,0,6]
+          ]]}, layout:'noBorders', margin:[0,2,0,0] }
+        ], margin:[0,6,0,6]
+      }]]}, layout:'noBorders', margin:[0,0,0,2]
     };
   }
 
@@ -11537,7 +11536,7 @@ function exportarPDF() {
 
   // ── PAGINA 5: BENCHMARKING ────────────────────────────────────────
   var pgBench = [{ text:'', pageBreak:'before' }].concat(secHeader('04','BENCHMARKING SETORIAL — COMERCIO ATACADISTA'), [
-    { text:'Posicionamento relativo dos indicadores. A barra vertical representa a mediana setorial; o intervalo sombreado corresponde ao intervalo interquartil (Q1-Q3).', fontSize:8, color:MUTED, lineHeight:1.5, margin:[0,0,0,22] }
+    { text:'Posicionamento relativo dos indicadores. A barra vertical representa a mediana setorial; o intervalo sombreado corresponde ao intervalo interquartil (Q1-Q3).', fontSize:8, color:MUTED, lineHeight:1.5, margin:[0,0,0,10] }
   ]);
   barrasData.forEach(function(b) {
     pgBench.push(barQuartil(b.nome, b.media, b.barPct, b.mediaPct));
