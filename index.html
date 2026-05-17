@@ -11232,32 +11232,44 @@ function exportarPDF() {
     var medW = Math.round(Math.min(mediaPct/100,1)*maxW);
     var q1W  = Math.round(0.25*maxW);
     var q3W  = Math.round(0.75*maxW);
+    // Separa "21,7%" e "Média: 20%" do campo valor
+    var partes      = valor.split('·');
+    var empresaVal  = partes[0] ? partes[0].trim() : valor;
+    var medianaVal  = partes[1] ? partes[1].replace(/M[eé]dia\s*[:\-]?\s*/i,'').trim() : '';
     return {
-      columns:[
-        { width:150,
-          stack:[
-            { text:nome,  fontSize:8, color:INK },
-            { text:valor, fontSize:7, color:MUTED, margin:[0,1,0,0] }
-          ]
-        },
-        { width:'*',
-          stack:[
-            { canvas:[
-              { type:'rect', x:0,   y:0, w:maxW,    h:6, r:2, color:ACCL },
-              { type:'rect', x:q1W, y:1, w:q3W-q1W, h:4,      color:ACCM },
-              { type:'rect', x:0,   y:0, w:barW,    h:6, r:2, color:ACC },
-              { type:'line', x1:medW, y1:-3, x2:medW, y2:10, lineWidth:1.5, lineColor:ACCD }
-            ]},
-            { columns:[
-              { text:'Q1',   fontSize:5, color:MUTED, width:q1W },
-              { text:'',     width:'*' },
-              { text:'Med.', fontSize:5, color:ACCD, width:'auto', margin:[-8,0,0,0] },
-              { text:'',     width:'*' },
-              { text:'Q3',   fontSize:5, color:MUTED, width:'auto' }
-            ], margin:[0,2,0,0] }
-          ]
-        }
-      ], margin:[0,0,0,18]
+      table:{ widths:['*'], body:[[{
+        border:[false,false,false,true], borderColor:[GHOST,'','',''],
+        stack:[
+          // linha 1: nome do indicador
+          { text:nome, fontSize:8, bold:true, color:INK, margin:[0,0,0,8] },
+          // linha 2: valores empresa + mediana lado a lado
+          { columns:[
+            { stack:[
+              { text:'EMPRESA', fontSize:5, color:MUTED, characterSpacing:0.8, margin:[0,0,0,2] },
+              { text:empresaVal, fontSize:13, bold:true, color:ACC }
+            ], width:'auto' },
+            medianaVal ? { stack:[
+              { text:'MEDIANA SETOR', fontSize:5, color:MUTED, characterSpacing:0.8, margin:[0,0,0,2] },
+              { text:medianaVal, fontSize:13, color:STEEL }
+            ], width:'auto', margin:[20,0,0,0] } : { text:'', width:'auto' }
+          ], margin:[0,0,0,10] },
+          // linha 3: barra visual
+          { canvas:[
+            { type:'rect', x:0,   y:0, w:maxW,    h:8, r:3, color:ACCL },
+            { type:'rect', x:q1W, y:1, w:q3W-q1W, h:6,      color:ACCM },
+            { type:'rect', x:0,   y:0, w:barW,    h:8, r:3, color:ACC },
+            { type:'line', x1:medW, y1:-4, x2:medW, y2:13, lineWidth:2, lineColor:ACCD }
+          ]},
+          // linha 4: labels Minimo / Mediana / Maximo
+          { columns:[
+            { text:'Minimo', fontSize:5, color:MUTED, width:q1W },
+            { text:'', width:'*' },
+            { text:'Mediana', fontSize:5, color:ACCD, bold:true, width:'auto', alignment:'center', margin:[-14,0,0,0] },
+            { text:'', width:'*' },
+            { text:'Maximo', fontSize:5, color:MUTED, width:'auto', alignment:'right' }
+          ], margin:[0,3,0,0] }
+        ], margin:[0,10,0,10]
+      }]]}, layout:'noBorders', margin:[0,0,0,6]
     };
   }
 
