@@ -11226,47 +11226,54 @@ function exportarPDF() {
     };
   }
 
+  // barrasData acumula linhas para a tabela unificada — renderizada depois do forEach
+  var _barLinhas = [];
   function barQuartil(nome, valor, barPct, mediaPct) {
-    var maxW = 290;
+    var maxW = 200;
     var barW = Math.round(Math.min(barPct/100,1)*maxW);
     var medW = Math.round(Math.min(mediaPct/100,1)*maxW);
     var q1W  = Math.round(0.25*maxW);
     var q3W  = Math.round(0.75*maxW);
-    // Separa "21,7%" e "Média: 20%" do campo valor
-    var partes      = valor.split('·');
-    var empresaVal  = partes[0] ? partes[0].trim() : valor;
-    var medianaVal  = partes[1] ? partes[1].replace(/M[eé]dia\s*[:\-]?\s*/i,'').trim() : '';
-    return {
-      table:{ widths:['*'], body:[[{
-        border:[false,false,false,true], borderColor:[GHOST,'','',''],
+    var partes     = valor.split('·');
+    var empresaVal = partes[0] ? partes[0].trim() : valor;
+    var medianaVal = partes[1] ? partes[1].replace(/M[eé]dia\s*[:\-]?\s*/i,'').trim() : '—';
+    var isOdd = _barLinhas.length % 2 === 0;
+    var bg = isOdd ? WHITE : PAPER;
+    _barLinhas.push([
+      { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:bg,
+        text:nome, fontSize:7, color:STEEL, margin:[10,8,8,8] },
+      { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL,
+        text:empresaVal, fontSize:8, bold:true, color:ACCD, alignment:'center', margin:[4,8,4,8] },
+      { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:bg,
+        text:medianaVal, fontSize:7, color:STEEL, alignment:'center', margin:[4,8,4,8] },
+      { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:bg,
         stack:[
-          // linha 1: nome + empresa + mediana em uma linha só
-          { columns:[
-            { text:nome, fontSize:8, bold:true, color:INK, width:'*' },
-            { stack:[
-              { text:'EMPRESA', fontSize:5, color:MUTED, characterSpacing:0.5 },
-              { text:empresaVal, fontSize:9, bold:true, color:ACC }
-            ], width:'auto', margin:[0,0,16,0] },
-            medianaVal ? { stack:[
-              { text:'MEDIANA', fontSize:5, color:MUTED, characterSpacing:0.5 },
-              { text:medianaVal, fontSize:9, color:STEEL }
-            ], width:'auto' } : { text:'', width:'auto' }
-          ], margin:[0,0,0,6] },
-          // linha 2: barra visual
           { canvas:[
             { type:'rect', x:0,   y:0, w:maxW,    h:6, r:2, color:ACCL },
             { type:'rect', x:q1W, y:1, w:q3W-q1W, h:4,      color:ACCM },
             { type:'rect', x:0,   y:0, w:barW,    h:6, r:2, color:ACC },
             { type:'line', x1:medW, y1:-3, x2:medW, y2:10, lineWidth:1.5, lineColor:ACCD }
           ]},
-          // linha 3: labels fixos alinhados com a barra
           { table:{ widths:[q1W, q3W-q1W, maxW-q3W], body:[[
-            { border:[false,false,false,false], text:'Minimo', fontSize:5, color:MUTED },
+            { border:[false,false,false,false], text:'Min', fontSize:5, color:MUTED },
             { border:[false,false,false,false], text:'Mediana', fontSize:5, color:ACCD, bold:true, alignment:'center' },
-            { border:[false,false,false,false], text:'Maximo', fontSize:5, color:MUTED, alignment:'right' }
+            { border:[false,false,false,false], text:'Max', fontSize:5, color:MUTED, alignment:'right' }
           ]]}, layout:'noBorders', margin:[0,2,0,0] }
-        ], margin:[0,6,0,6]
-      }]]}, layout:'noBorders', margin:[0,0,0,2]
+        ], margin:[8,6,8,4] }
+    ]);
+    return null; // renderizado depois via _barTabela
+  }
+  function _barTabela() {
+    if (!_barLinhas.length) return { text:'' };
+    var header = [
+      tblHdr('Indicador','left',[10,7,8,7]),
+      tblHdr('Empresa','center',[4,7,4,7]),
+      tblHdr('Mediana setor','center',[4,7,4,7]),
+      tblHdr('Posicao no setor','left',[8,7,8,7])
+    ];
+    return {
+      table:{ widths:['*',64,72,220], body:[header].concat(_barLinhas) },
+      margin:[0,0,0,16]
     };
   }
 
@@ -11538,9 +11545,9 @@ function exportarPDF() {
   var pgBench = [{ text:'', pageBreak:'before' }].concat(secHeader('04','BENCHMARKING SETORIAL — COMERCIO ATACADISTA'), [
     { text:'Posicionamento relativo dos indicadores. A barra vertical representa a mediana setorial; o intervalo sombreado corresponde ao intervalo interquartil (Q1-Q3).', fontSize:8, color:MUTED, lineHeight:1.5, margin:[0,0,0,10] }
   ]);
-  barrasData.forEach(function(b) {
-    pgBench.push(barQuartil(b.nome, b.media, b.barPct, b.mediaPct));
-  });
+  _barLinhas = [];
+  barrasData.forEach(function(b) { barQuartil(b.nome, b.media, b.barPct, b.mediaPct); });
+  pgBench.push(_barTabela());
   pgBench.push({ text:'INDICADORES ADICIONAIS DE EFICIENCIA OPERACIONAL', fontSize:6, color:MUTED, characterSpacing:1.2, margin:[0,8,0,12] });
   pgBench.push({
     table:{ widths:['*',68,90,70], body:[
