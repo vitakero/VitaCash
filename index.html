@@ -11559,13 +11559,13 @@ function exportarPDF() {
         stack:[
           { text:row.nome.trim(), fontSize:8, bold:row.dest, color:INK },
           { text:row.sub.trim(),  fontSize:6, color:MUTED, margin:[0,1,0,0] }
-        ], margin:[10,17,8,17] },
+        ], margin:[10,10,8,10] },
       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:bgEmp,
-        text:row.valor.trim(), fontSize:8, bold:row.dest, color:tc, alignment:'right', margin:[8,17,8,17] },
+        text:row.valor.trim(), fontSize:8, bold:row.dest, color:tc, alignment:'right', margin:[8,10,8,10] },
       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:bg,
-        text:row.pct.trim(), fontSize:7, color:STEEL, alignment:'right', margin:[8,17,8,17] },
+        text:row.pct.trim(), fontSize:7, color:STEEL, alignment:'right', margin:[8,10,8,10] },
       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:bg,
-        text:dreRefs[i]||'—', fontSize:7, color:STEEL, alignment:'right', margin:[8,17,8,17] }
+        text:dreRefs[i]||'—', fontSize:7, color:STEEL, alignment:'right', margin:[8,10,8,10] }
     ]);
   });
 
@@ -11597,30 +11597,30 @@ function exportarPDF() {
     table:{ widths:['*',68,90,70], body:[
       [tblHdr('Indicador'), tblHdr('Empresa','center',[4,7,4,7]), tblHdr('Referência setorial','center',[4,7,4,7]), tblHdr('Avaliação','center',[4,7,4,7])],
 
-      [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Ciclo de caixa', fontSize:8, color:STEEL, margin:[10,16,8,16] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'-3 dias', fontSize:8, bold:true, color:ACCD, alignment:'center', margin:[4,16,4,16] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Referência: 15 dias', fontSize:8, color:STEEL, alignment:'center', margin:[4,16,4,16] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Excelente', fontSize:8, color:ACC, alignment:'center', margin:[4,16,4,16] }],
+      [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Ciclo de caixa', fontSize:8, color:STEEL, margin:[10,10,8,10] },
+       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'-3 dias', fontSize:8, bold:true, color:ACCD, alignment:'center', margin:[4,10,4,10] },
+       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Referência: 15 dias', fontSize:8, color:STEEL, alignment:'center', margin:[4,10,4,10] },
+       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Excelente', fontSize:8, color:ACC, alignment:'center', margin:[4,10,4,10] }],
 
-      [{ border:[false,false,false,true], borderColor:['','','',GHOST], text:'Giro do ativo', fontSize:8, color:STEEL, margin:[10,16,8,16] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'4,71x', fontSize:8, bold:true, color:ACCD, alignment:'center', margin:[4,16,4,16] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], text:'Mediana: 2,5x', fontSize:8, color:STEEL, alignment:'center', margin:[4,16,4,16] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Top 25% do setor', fontSize:8, color:ACC, alignment:'center', margin:[4,16,4,16] }],
+      [{ border:[false,false,false,true], borderColor:['','','',GHOST], text:'Giro do ativo', fontSize:8, color:STEEL, margin:[10,10,8,10] },
+       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'4,71x', fontSize:8, bold:true, color:ACCD, alignment:'center', margin:[4,10,4,10] },
+       { border:[false,false,false,true], borderColor:['','','',GHOST], text:'Mediana: 2,5x', fontSize:8, color:STEEL, alignment:'center', margin:[4,10,4,10] },
+       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Top 25% do setor', fontSize:8, color:ACC, alignment:'center', margin:[4,10,4,10] }],
 
-      [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Endividamento total', fontSize:8, color:STEEL, margin:[10,16,8,16] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'31,2%', fontSize:8, bold:true, color:ACCD, alignment:'center', margin:[4,16,4,16] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Limite saudável: 60%', fontSize:8, color:STEEL, alignment:'center', margin:[4,16,4,16] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Posição sólida', fontSize:8, color:ACC, alignment:'center', margin:[4,16,4,16] }],
+      [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Endividamento total', fontSize:8, color:STEEL, margin:[10,10,8,10] },
+       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'31,2%', fontSize:8, bold:true, color:ACCD, alignment:'center', margin:[4,10,4,10] },
+       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Limite saudável: 60%', fontSize:8, color:STEEL, alignment:'center', margin:[4,10,4,10] },
+       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Posição sólida', fontSize:8, color:ACC, alignment:'center', margin:[4,10,4,10] }],
 
-      [{ border:[false,false,false,true], borderColor:['','','',GHOST], text:'Liquidez imediata', fontSize:8, color:STEEL, margin:[10,16,8,16] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'1,83x', fontSize:8, bold:true, color:ACCD, alignment:'center', margin:[4,16,4,16] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], text:'Mínimo: 1,0x', fontSize:8, color:STEEL, alignment:'center', margin:[4,16,4,16] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Confortável', fontSize:8, color:ACC, alignment:'center', margin:[4,16,4,16] }],
+      [{ border:[false,false,false,true], borderColor:['','','',GHOST], text:'Liquidez imediata', fontSize:8, color:STEEL, margin:[10,10,8,10] },
+       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'1,83x', fontSize:8, bold:true, color:ACCD, alignment:'center', margin:[4,10,4,10] },
+       { border:[false,false,false,true], borderColor:['','','',GHOST], text:'Mínimo: 1,0x', fontSize:8, color:STEEL, alignment:'center', margin:[4,10,4,10] },
+       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Confortável', fontSize:8, color:ACC, alignment:'center', margin:[4,10,4,10] }],
 
-      [{ border:[false,false,false,false], text:'Cobertura de juros', fontSize:8, color:STEEL, margin:[10,16,8,16] },
-       { border:[false,false,false,false], fillColor:ACCL, text:'2,1x', fontSize:8, bold:true, color:ACCD, alignment:'center', margin:[4,16,4,16] },
-       { border:[false,false,false,false], text:'Faixa ideal: 2-3x', fontSize:8, color:STEEL, alignment:'center', margin:[4,16,4,16] },
-       { border:[false,false,false,false], fillColor:ACCL, text:'Adequado', fontSize:8, color:ACC, alignment:'center', margin:[4,16,4,16] }]
+      [{ border:[false,false,false,false], text:'Cobertura de juros', fontSize:8, color:STEEL, margin:[10,10,8,10] },
+       { border:[false,false,false,false], fillColor:ACCL, text:'2,1x', fontSize:8, bold:true, color:ACCD, alignment:'center', margin:[4,10,4,10] },
+       { border:[false,false,false,false], text:'Faixa ideal: 2-3x', fontSize:8, color:STEEL, alignment:'center', margin:[4,10,4,10] },
+       { border:[false,false,false,false], fillColor:ACCL, text:'Adequado', fontSize:8, color:ACC, alignment:'center', margin:[4,10,4,10] }]
     ]}, margin:[0,0,0,0]
   });
 
