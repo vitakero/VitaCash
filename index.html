@@ -11692,8 +11692,8 @@ function exportarPDF() {
       if (pg === 1) return {};
       return {
         columns:[
-          { text:[{text:'Vita',bold:true,color:INK2,fontSize:8},{text:'Cash',bold:true,color:ACC,fontSize:8}], margin:[50,20,0,0] },
-          { text:empresaNome+'  |  p. '+pg+'/'+total, fontSize:7, color:LIGHT, alignment:'right', margin:[0,22,50,0] }
+          { text:[{text:'Vita',bold:true,color:INK2,fontSize:12},{text:'Cash',bold:true,color:ACC,fontSize:12}], margin:[50,18,0,0] },
+          { text:empresaNome+'  |  p. '+pg+'/'+total, fontSize:10, color:LIGHT, alignment:'right', margin:[0,21,50,0] }
         ]
       };
     },
