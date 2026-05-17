@@ -11405,15 +11405,15 @@ function exportarPDF() {
     { text:'PREMISSAS E BENCHMARKS POR INDICADOR', fontSize:6, color:MUTED, characterSpacing:1.2, margin:[0,0,0,10] },
     {
       table:{ widths:[130,'*'], body:[
-        [tblHdr('Indicador','left',[10,7,8,7]), tblHdr('Definicao  |  Q1  |  Mediana  |  Q3 (setor atacadista)','left',[8,7,8,7])],
+        [tblHdr('Indicador','left',[10,7,8,7]), tblHdr('Definicao  |  Minimo  |  Mediana  |  Maximo (setor atacadista)','left',[8,7,8,7])],
         [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Margem liquida', fontSize:7, color:STEEL, margin:[10,6,8,6] },
-         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Lucro liquido / Receita bruta  |  Q1: 1,2%  |  Med: 3,5%  |  Q3: 6,8%', fontSize:7, color:STEEL, margin:[8,6,8,6] }],
+         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Lucro liquido / Receita bruta  |  Min: 1,2%  |  Med: 3,5%  |  Max: 6,8%', fontSize:7, color:STEEL, margin:[8,6,8,6] }],
         [{ border:[false,false,false,true], borderColor:['','','',GHOST], text:'Margem bruta', fontSize:7, color:STEEL, margin:[10,6,8,6] },
-         { border:[false,false,false,true], borderColor:['','','',GHOST], text:'Lucro bruto / Receita bruta  |  Q1: 14%  |  Med: 20%  |  Q3: 28%', fontSize:7, color:STEEL, margin:[8,6,8,6] }],
+         { border:[false,false,false,true], borderColor:['','','',GHOST], text:'Lucro bruto / Receita bruta  |  Min: 14%  |  Med: 20%  |  Max: 28%', fontSize:7, color:STEEL, margin:[8,6,8,6] }],
         [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Despesas operacionais', fontSize:7, color:STEEL, margin:[10,6,8,6] },
-         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Total de despesas / Receita  |  Q1: 24%  |  Med: 18%  |  Q3: 13% (menor e melhor)', fontSize:7, color:STEEL, margin:[8,6,8,6] }],
+         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Total de despesas / Receita  |  Min: 24%  |  Med: 18%  |  Max: 13% (menor e melhor)', fontSize:7, color:STEEL, margin:[8,6,8,6] }],
         [{ border:[false,false,false,true], borderColor:['','','',GHOST], text:'ROE', fontSize:7, color:STEEL, margin:[10,6,8,6] },
-         { border:[false,false,false,true], borderColor:['','','',GHOST], text:'Lucro liquido / PL  |  Q1: 8%  |  Med: 15%  |  Q3: 28%  |  Ref. Selic: 13,75% a.a.', fontSize:7, color:STEEL, margin:[8,6,8,6] }],
+         { border:[false,false,false,true], borderColor:['','','',GHOST], text:'Lucro liquido / PL  |  Min: 8%  |  Med: 15%  |  Max: 28%  |  Ref. Selic: 13,75% a.a.', fontSize:7, color:STEEL, margin:[8,6,8,6] }],
         [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Ciclo de caixa', fontSize:7, color:STEEL, margin:[10,6,8,6] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'PMR + PME - PMP. Ciclo negativo = recebe antes de pagar. Referencia setorial: 15 dias.', fontSize:7, color:STEEL, margin:[8,6,8,6] }],
         [{ border:[false,false,false,false], text:'Valuation', fontSize:7, color:STEEL, margin:[10,6,8,6] },
@@ -11424,7 +11424,7 @@ function exportarPDF() {
     { text:'POSICIONAMENTO SETORIAL — QUADRO COMPARATIVO', fontSize:6, color:MUTED, characterSpacing:1.2, margin:[0,0,0,10] },
     {
       table:{ widths:[110,55,40,55,40,'*'], body:[
-        [tblHdr('Indicador'), tblHdr('Empresa','center',[4,7,4,7]), tblHdr('Q1','center',[4,7,4,7]), tblHdr('Mediana','center',[4,7,4,7]), tblHdr('Q3','center',[4,7,4,7]), tblHdr('Posicao relativa','center',[4,7,4,7])],
+        [tblHdr('Indicador'), tblHdr('Empresa','center',[4,7,4,7]), tblHdr('Minimo','center',[4,7,4,7]), tblHdr('Mediana','center',[4,7,4,7]), tblHdr('Maximo','center',[4,7,4,7]), tblHdr('Posicao relativa','center',[4,7,4,7])],
 
         [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Margem liquida', fontSize:7, color:STEEL, margin:[8,5,8,5] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'3,7%', fontSize:7, bold:true, color:INK, alignment:'center', margin:[4,5,4,5] },
