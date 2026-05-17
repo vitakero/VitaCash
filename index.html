@@ -11192,16 +11192,16 @@ function exportarPDF() {
   var COVER  = '#1a2332'; // navy escuro — capa
   var ACC    = '#1D9E75'; // verde primario VitaCash
   var ACCD   = '#085041'; // verde escuro VitaCash
-  var ACCM   = '#9ca3af'; // cinza medio
-  var ACCL   = '#f3f4f6'; // cinza claro
+  var ACCM   = '#9ca3af'; // cinza medio (bordas neutras)
+  var ACCL   = '#edf7f3'; // verde muito sutil — células empresa / highlights
 
   // ── Helpers ───────────────────────────────────────────────────────
 
   function secHeader(num, title) {
     return [
-      { canvas:[{ type:'line', x1:0, y1:0, x2:495, y2:0, lineWidth:0.5, lineColor:GHOST }], margin:[0,0,0,14] },
+      { canvas:[{ type:'line', x1:0, y1:0, x2:495, y2:0, lineWidth:0.5, lineColor:ACC }], margin:[0,0,0,14] },
       { columns:[
-          { text:num, fontSize:7, color:MUTED, bold:true, width:'auto', margin:[0,0,10,0] },
+          { text:num, fontSize:7, color:ACC, bold:true, width:'auto', margin:[0,0,10,0] },
           { text:title, fontSize:9, color:INK, bold:true, characterSpacing:1.5, width:'*' }
         ], margin:[0,0,0,22]
       }
@@ -11210,14 +11210,14 @@ function exportarPDF() {
 
   function tblHdr(txt, align, w) {
     return { text:txt, fontSize:7, bold:true, color:STEEL, fillColor:PALE,
-             border:[false,false,false,true], borderColor:['','','',GHOST],
+             border:[false,false,false,true], borderColor:['','','',ACC],
              alignment:align||'left', margin:w||[10,8,8,8] };
   }
 
   function riskLine(title, sub) {
     return {
       table:{ widths:['*'], body:[[{
-        border:[true,false,false,false], borderColor:[ACCM,'','',''],
+        border:[true,false,false,false], borderColor:[ACC,'','',''],
         stack:[
           { text:title, fontSize:8, color:INK },
           { text:sub,   fontSize:7, color:MUTED, lineHeight:1.4, margin:[0,2,0,0] }
@@ -11249,15 +11249,15 @@ function exportarPDF() {
       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:bg,
         stack:[
           { canvas:[
-            { type:'rect', x:0,   y:0, w:maxW,    h:7, r:2, color:ACCL },
-            { type:'rect', x:q1W, y:1, w:q3W-q1W, h:5,      color:ACCM },
+            { type:'rect', x:0,   y:0, w:maxW,    h:7, r:2, color:'#e8f5ef' },
+            { type:'rect', x:q1W, y:1, w:q3W-q1W, h:5,      color:'#9FE1CB' },
             { type:'rect', x:0,   y:0, w:barW,    h:7, r:2, color:ACC },
             { type:'line', x1:medW, y1:-4, x2:medW, y2:12, lineWidth:1.5, lineColor:ACCD }
           ]},
           { table:{ widths:[q1W, q3W-q1W, maxW-q3W], body:[[
-            { border:[false,false,false,false], text:'Min', fontSize:5, color:MUTED },
+            { border:[false,false,false,false], text:'Mín', fontSize:5, color:MUTED },
             { border:[false,false,false,false], text:'Mediana', fontSize:5, color:ACCD, bold:true, alignment:'center' },
-            { border:[false,false,false,false], text:'Max', fontSize:5, color:MUTED, alignment:'right' }
+            { border:[false,false,false,false], text:'Máx', fontSize:5, color:MUTED, alignment:'right' }
           ]]}, layout:'noBorders', margin:[0,3,0,0] }
         ], margin:[8,10,8,6] }
     ]);
@@ -11282,30 +11282,49 @@ function exportarPDF() {
 
   // ── PAGINA 1: CAPA ────────────────────────────────────────────────
   var pgCapa = [
-    // Logo discreto
+    // Branding no topo
     { columns:[
-      { text:[{text:'Vita',fontSize:16,bold:true,color:WHITE},{text:'Cash',fontSize:16,bold:true,color:'#9ca3af'}], width:'auto' },
-      { text:'  ANALYTICS', fontSize:8, color:'#6b7280', characterSpacing:3, width:'auto', margin:[2,5,0,0] }
+      { text:[{text:'Vita',fontSize:18,bold:true,color:WHITE},{text:'Cash',fontSize:18,bold:true,color:ACC}], width:'auto' },
+      { text:'  ANALYTICS', fontSize:9, color:'#4b5563', characterSpacing:3.5, width:'auto', margin:[4,6,0,0] }
     ]},
-    { text:'', margin:[0,90,0,0] },
-    // Thin accent line
-    { canvas:[{ type:'rect', x:0, y:0, w:40, h:2, color:ACC }], margin:[0,0,0,28] },
-    // Títulos
-    { text:'DIAGNÓSTICO FINANCEIRO', fontSize:11, color:'#9ca3af', bold:false, characterSpacing:2, margin:[0,0,0,8] },
-    { text:'ESTRATÉGICO', fontSize:30, color:WHITE, bold:true, margin:[0,0,0,40] },
-    // Linha separadora
-    { canvas:[{ type:'line', x1:0, y1:0, x2:495, y2:0, lineWidth:0.3, lineColor:'#374151' }], margin:[0,0,0,28] },
+    { text:'', margin:[0,72,0,0] },
+
+    // Composição premium: barra vertical + títulos
+    { columns:[
+      // Accent bar verde vertical
+      { canvas:[
+          { type:'rect', x:0, y:0, w:3, h:58, color:ACC }
+        ], width:3, margin:[0,0,0,0] },
+      // Bloco de títulos
+      { stack:[
+          { text:'DIAGNÓSTICO FINANCEIRO', fontSize:10, color:'#9ca3af', characterSpacing:2.5, margin:[0,0,0,7] },
+          { text:'ESTRATÉGICO', fontSize:33, color:WHITE, bold:true, lineHeight:0.9 }
+        ], margin:[18,0,0,0], width:'*'
+      }
+    ], margin:[0,0,0,36] },
+
+    // Linha decorativa dupla — premium
+    { canvas:[
+        { type:'line', x1:0, y1:0, x2:56, y2:0, lineWidth:2,   lineColor:ACC },
+        { type:'line', x1:60, y1:0, x2:495, y2:0, lineWidth:0.3, lineColor:'#2d3748' }
+      ], margin:[0,0,0,32] },
+
     // Empresa
-    { text:empresaNome, fontSize:18, color:WHITE, bold:true, margin:[0,0,0,10] },
-    { text:cnpj, fontSize:10, color:'#6b7280', margin:[0,0,0,6] },
+    { text:empresaNome, fontSize:20, color:WHITE, bold:true, margin:[0,0,0,10] },
+    { text:cnpj, fontSize:10, color:'#9ca3af', margin:[0,0,0,5] },
     { text:'Setor: Comércio Atacadista  ·  Exercício '+anoRef, fontSize:10, color:'#6b7280' },
-    // Espaço
-    { text:'', margin:[0,200,0,0] },
+
+    // Espaço para base da capa
+    { text:'', margin:[0,168,0,0] },
+
     // Rodapé da capa
-    { canvas:[{ type:'line', x1:0, y1:0, x2:495, y2:0, lineWidth:0.3, lineColor:'#374151' }], margin:[0,0,0,14] },
+    { canvas:[
+        { type:'line', x1:0, y1:0, x2:56, y2:0, lineWidth:1.5, lineColor:ACC },
+        { type:'line', x1:60, y1:0, x2:495, y2:0, lineWidth:0.3, lineColor:'#2d3748' }
+      ], margin:[0,0,0,14] },
     { columns:[
       { text:'Emitido em '+dataEmissao, fontSize:9, color:'#6b7280', width:'*' },
-      { text:'CONFIDENCIAL', fontSize:9, color:'#6b7280', bold:true, width:'auto' }
+      { text:'CONFIDENCIAL', fontSize:9, color:'#9ca3af', bold:true, characterSpacing:1, width:'auto' }
     ], pageBreak:'after' }
   ];
 
@@ -11326,7 +11345,7 @@ function exportarPDF() {
         { border:[false,false,true,false], borderColor:['','','',GHOST,''],
           stack:[
             { text:'ÍNDICE DE SAÚDE FINANCEIRA', fontSize:6, color:MUTED, characterSpacing:0.8 },
-            { text:nota+' / 10', fontSize:19, color:ACC, margin:[0,6,0,3] },
+            { text:nota+' / 10', fontSize:22, color:ACC, bold:true, margin:[0,6,0,3] },
             { text:'Percentil 85 — setor atacadista', fontSize:7, color:MUTED }
           ], margin:[0,0,16,22] },
         { border:[false,false,true,false], borderColor:['','','',GHOST,''],
@@ -11787,8 +11806,8 @@ function exportarPDF() {
     { canvas:[{ type:'line', x1:0, y1:0, x2:495, y2:0, lineWidth:0.5, lineColor:GHOST }], margin:[0,0,0,12] },
     { text:'Este relatório foi gerado pelo VitaCash Analytics com base nos demonstrativos contábeis fornecidos pela empresa. As projeções e estimativas de impacto são fundamentadas em benchmarks setoriais e premissas declaradas neste documento. Não constitui opinião de auditoria, relatório de due diligence ou assessoria jurídica. Para decisões de M&A, captação ou reestruturação societária, recomenda-se a contratação de assessoria financeira especializada.', fontSize:7, color:MUTED, lineHeight:1.7, italics:true, margin:[0,0,0,16] },
     { columns:[
-      { text:[{text:'Vita',bold:true,color:ACCD,fontSize:9},{text:'Cash',bold:true,color:ACC,fontSize:9}], width:'auto' },
-      { text:'  Analytics  |  vita-cash.vercel.app  |  '+dataEmissao, fontSize:7, color:MUTED, width:'auto', margin:[0,2,0,0] },
+      { text:[{text:'Vita',bold:true,color:INK2,fontSize:9},{text:'Cash',bold:true,color:ACC,fontSize:9}], width:'auto' },
+      { text:'  Analytics  ·  vita-cash.vercel.app  ·  '+dataEmissao, fontSize:7, color:MUTED, width:'auto', margin:[0,2,0,0] },
       { text:'Confidencial', fontSize:7, color:LIGHT, alignment:'right', width:'*' }
     ]}
   ]);
@@ -11807,7 +11826,7 @@ function exportarPDF() {
       if (pg === 1) return {};
       return {
         columns:[
-          { text:[{text:'Vita',bold:true,color:STEEL,fontSize:10},{text:'Cash',bold:true,color:ACC,fontSize:10}], margin:[50,20,0,0] },
+          { text:[{text:'Vita',bold:true,color:INK2,fontSize:11},{text:'Cash',bold:true,color:ACC,fontSize:11}], margin:[50,19,0,0] },
           { text:empresaNome+'  ·  p. '+pg+'/'+total, fontSize:9, color:LIGHT, alignment:'right', margin:[0,22,50,0] }
         ]
       };
@@ -11815,7 +11834,7 @@ function exportarPDF() {
 
     footer: function(pg) {
       if (pg === 1) return {};
-      return { text:'Diagnóstico Financeiro Estratégico  ·  VitaCash Analytics  ·  Confidencial', fontSize:6, color:LIGHT, alignment:'center', margin:[50,6,50,0] };
+      return { text:'Diagnóstico Financeiro Estratégico  ·  VitaCash Analytics  ·  Confidencial', fontSize:6, color:ACCM, alignment:'center', margin:[50,6,50,0] };
     },
 
     content: [].concat(pgCapa, pgExec, pgMet, pgDRE, pgBench, pgPlan, pgConc),
