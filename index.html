@@ -10179,14 +10179,15 @@ function fileToBase64(file) {
 // ── Popula o dashboard com os dados extraídos pela IA ────────────
 function popularDashboard(dados) {
   if (!dados || !dados.dre) return;
-  var d = dados.dre;
-  var b = dados.balanco || {};
+  var d   = dados.dre;
+  var b   = dados.balanco || {};
   var ind = dados.indicadores || {};
-  var rec = d.receita_bruta || 1;
-  var recL = d.receita_liquida || rec;
+  var rec  = Math.abs(d.receita_bruta || 1);
+  var recL = Math.abs(d.receita_liquida || rec);
+  var cmvAbs = Math.abs(d.cmv || 0);
 
-  function fmt(v) {
-    if (!v && v !== 0) return '—';
+  function fmtV(v) {
+    if (v === null || v === undefined) return '—';
     var abs = Math.abs(v);
     var prefix = v < 0 ? '– R$ ' : 'R$ ';
     if (abs >= 1e9) return prefix + (abs/1e9).toFixed(2).replace('.',',') + ' bi';
@@ -10194,72 +10195,140 @@ function popularDashboard(dados) {
     if (abs >= 1e3) return prefix + Math.round(abs).toLocaleString('pt-BR');
     return prefix + abs.toFixed(2).replace('.',',');
   }
-  function pct(v, base) {
+  function fmtPct(v, base) {
     if (!base) return '—';
-    return (v/base*100).toFixed(1).replace('.',',') + '%';
+    return (Math.abs(v)/Math.abs(base)*100).toFixed(1).replace('.',',') + '%';
+  }
+  function setText(id, txt) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = txt;
+  }
+  function setHTML(id, html) {
+    var el = document.getElementById(id);
+    if (el) el.innerHTML = html;
   }
 
-  // Linhas da DRE
+  // ── 1. LINHAS DA DRE ─────────────────────────────────────────
   var linhas = [
-    { id:'l1', nome:'Receita bruta de vendas',         val:d.receita_bruta,           base:rec,  pos:true  },
-    { id:'l2', nome:'Custo dos bens e serviços (CMV)', val:d.cmv,                     base:rec,  pos:false },
-    { id:'l3', nome:'Resultado bruto (Lucro Bruto)',   val:d.lucro_bruto,             base:recL, pos:(d.lucro_bruto||0)>=0 },
-    { id:'l4', nome:'Despesas com vendas',             val:d.despesas_vendas,         base:rec,  pos:false },
-    { id:'l5', nome:'Despesas gerais e administrativas',val:d.despesas_admin,         base:rec,  pos:false },
-    { id:'l6', nome:'Outras despesas operacionais',    val:d.outras_despesas_op,      base:rec,  pos:false },
-    { id:'l7', nome:'EBIT — Resultado operacional',    val:d.ebit,                    base:recL, pos:(d.ebit||0)>=0 },
-    { id:'l8', nome:'Resultado financeiro (juros)',    val:d.resultado_financeiro,    base:rec,  pos:(d.resultado_financeiro||0)>=0 },
-    { id:'l9', nome:'Resultado antes dos tributos',    val:d.resultado_antes_tributos,base:recL, pos:(d.resultado_antes_tributos||0)>=0 },
-    { id:'l10',nome:'IR e contribuição social',        val:d.impostos,                base:rec,  pos:false },
-    { id:'l11',nome:'Lucro líquido do período',        val:d.lucro_liquido,           base:recL, pos:(d.lucro_liquido||0)>=0 }
+    { id:'l1', nome:'Receita bruta de vendas',          val:d.receita_bruta,            pos:true  },
+    { id:'l2', nome:'Custo dos bens e serviços (CMV)',  val:d.cmv,                      pos:false },
+    { id:'l3', nome:'Resultado bruto (Lucro Bruto)',    val:d.lucro_bruto,              pos:(d.lucro_bruto||0)>=0 },
+    { id:'l4', nome:'Despesas com vendas',              val:d.despesas_vendas,          pos:false },
+    { id:'l5', nome:'Despesas gerais e administrativas',val:d.despesas_admin,           pos:false },
+    { id:'l6', nome:'Outras despesas operacionais',     val:d.outras_despesas_op,       pos:false },
+    { id:'l7', nome:'EBIT — Resultado operacional',     val:d.ebit,                     pos:(d.ebit||0)>=0 },
+    { id:'l8', nome:'Resultado financeiro (juros)',     val:d.resultado_financeiro,     pos:(d.resultado_financeiro||0)>=0 },
+    { id:'l9', nome:'Resultado antes dos tributos',     val:d.resultado_antes_tributos, pos:(d.resultado_antes_tributos||0)>=0 },
+    { id:'l10',nome:'IR e contribuição social',         val:d.impostos,                 pos:false },
+    { id:'l11',nome:'Lucro líquido do período',         val:d.lucro_liquido,            pos:(d.lucro_liquido||0)>=0 }
   ];
-
   linhas.forEach(function(l) {
-    var el = document.getElementById(l.id);
-    if (!el) return;
+    var el = document.getElementById(l.id); if (!el) return;
     var nomeEl  = el.querySelector('.linha-nome');
     var valorEl = el.querySelector('.linha-valor');
     var pctEl   = el.querySelector('.linha-pct');
-    if (nomeEl)  nomeEl.textContent  = l.nome;
-    if (valorEl) {
-      valorEl.textContent = fmt(l.val);
-      valorEl.className   = 'linha-valor' + (l.pos ? ' pos' : ' neg');
-    }
-    if (pctEl)   pctEl.textContent   = pct(Math.abs(l.val||0), Math.abs(recL||1));
+    if (nomeEl)  nomeEl.textContent = l.nome;
+    if (valorEl) { valorEl.textContent = fmtV(l.val); valorEl.className = 'linha-valor' + (l.pos ? ' pos' : ' neg'); }
+    if (pctEl)   pctEl.textContent   = fmtPct(l.val, recL);
   });
 
-  // Score / nota
-  var notaEl = document.querySelector('.nota-num');
-  if (notaEl && ind.nota) notaEl.textContent = ind.nota.toFixed(1).replace('.',',');
+  // ── 2. SCORE ─────────────────────────────────────────────────
+  document.querySelectorAll('.nota-num').forEach(function(el) {
+    if (ind.nota) el.textContent = ind.nota.toFixed(1).replace('.',',');
+  });
 
-  // CGV (capital de giro)
-  var cgvEl = document.getElementById('cgv');
-  if (cgvEl) cgvEl.textContent = fmt(b.ativo_circulante ? b.ativo_circulante - Math.abs(b.passivo_circulante||0) : 0);
+  // ── 3. CICLO DE CAIXA ────────────────────────────────────────
+  var ciclo   = ind.ciclo || 0;
+  var pmr     = ind.pmr   || 0;
+  var pme     = ind.pme   || 0;
+  var pmp     = ind.pmp   || 0;
+  var caixa   = b.caixa || 0;
+  var gdiar   = cmvAbs > 0 ? Math.round(cmvAbs / 365) : 116952;
+  var ncg     = ciclo > 0 ? gdiar * ciclo : 0;
+  var excesso = caixa - ncg;
 
-  // Nome da empresa no header do dashboard
-  var empresaNome = dados.empresa || 'Empresa';
-  document.querySelectorAll('.empresa-nome-dash').forEach(function(el){ el.textContent = empresaNome; });
+  // Atualiza variável global gastosDiarios usada pelo slider recalc()
+  try { window.gastosDiarios = gdiar; } catch(e){}
 
-  // Indicadores extras — atualiza onde existir no DOM
+  // Sliders PMR/PME/PMP
+  var s1 = document.getElementById('s1'), s2 = document.getElementById('s2'), s3 = document.getElementById('s3');
+  if (s1) { s1.value = pmp; } setText('sv1', pmp + ' dias');
+  if (s2) { s2.value = pme; } setText('sv2', pme + ' dias');
+  if (s3) { s3.value = pmr; } setText('sv3', pmr + ' dias');
+
+  // Cards de ciclo
+  setText('resciclo', ciclo + ' dias');
+  if (ciclo <= 0) {
+    setText('rescg',  'Ciclo negativo!');
+    setText('cgv',    fmtV(Math.abs(ncg) > 0 ? ncg : 0));
+    setText('resmsg', 'Ciclo negativo! Empresa recebe ANTES de pagar fornecedores — capital de giro necessário é mínimo.');
+    setHTML('cgsub',  'Caixa disponível: <strong>' + fmtV(caixa) + '</strong> · Ciclo: <strong>' + ciclo + ' dias</strong> — empresa com posição de caixa privilegiada.');
+  } else {
+    setText('rescg',  fmtV(ncg));
+    setText('cgv',    fmtV(ncg));
+    if (excesso > 0) {
+      setText('resmsg', 'A empresa precisa manter ' + fmtV(ncg) + ' reservado para operar com segurança.');
+      setHTML('cgsub',  'Caixa disponível: <strong>' + fmtV(caixa) + '</strong> · Necessário: <strong>' + fmtV(ncg) + '</strong> · Sobra: <strong>' + fmtV(excesso) + '</strong>.');
+    } else {
+      setText('resmsg', 'Atenção: com este ciclo faltariam ' + fmtV(Math.abs(excesso)) + ' no caixa.');
+      setHTML('cgsub',  'Necessário: <strong>' + fmtV(ncg) + '</strong> · Caixa: <strong>' + fmtV(caixa) + '</strong> · Faltam: <strong>' + fmtV(Math.abs(excesso)) + '</strong>.');
+    }
+  }
+
+  // Badge ciclo negativo inline
+  document.querySelectorAll('[id*="ciclo-badge"], .ciclo-badge').forEach(function(el){
+    el.textContent = ciclo + ' dias ' + (ciclo <= 0 ? '✓ ciclo negativo' : '');
+  });
+  // Atualiza textos hardcoded com -3 dias → valor real
+  document.querySelectorAll('.cm-dias').forEach(function(el, i) {
+    if (i === 0) el.textContent = '= ' + ciclo + ' dias';
+  });
+
+  // ── 4. BARRAS DE BENCHMARK ───────────────────────────────────
+  var brs = document.querySelectorAll('.br2');
+  var benchVals = [
+    { nome:'Margem bruta',         emp:ind.margemBruta||0,     med:ind.benchmarks?.margemBruta||20,  max:60  },
+    { nome:'Margem líquida',       emp:ind.margemLiq||0,       med:ind.benchmarks?.margemLiq||3.5,   max:20  },
+    { nome:'Despesas operacionais',emp:Math.abs(((d.despesas_vendas||0)+(d.despesas_admin||0)+(d.outras_despesas_op||0))/recL*100), med:18, max:40 },
+    { nome:'CMV sobre receita',    emp:cmvAbs/recL*100,        med:80,                                max:100 }
+  ];
+  brs.forEach(function(br, i) {
+    if (i >= benchVals.length) return;
+    var v = benchVals[i];
+    var bnEl = br.querySelector('.bn'), bmEl = br.querySelector('.bm');
+    var bfEl = br.querySelector('.bf'), bbEl = br.querySelector('.bb');
+    if (bnEl) bnEl.textContent = v.nome;
+    if (bmEl) bmEl.textContent = v.emp.toFixed(1).replace('.',',') + '% · Média: ' + v.med + '%';
+    var empPct = Math.min(v.emp / v.max * 100, 95);
+    var medPct = Math.min(v.med / v.max * 100, 95);
+    var isGood = (v.nome.includes('CMV') || v.nome.includes('Despesas')) ? v.emp <= v.med : v.emp >= v.med;
+    if (bfEl) { bfEl.style.width = empPct + '%'; bfEl.style.background = isGood ? '#5DCAA5' : '#F0997B'; }
+    if (bbEl) bbEl.style.left = medPct + '%';
+  });
+
+  // ── 5. CARDS KPI DO TOPO (receita, margem bruta, líquida, lucro) ─
+  // Atualiza os cards principais que usam data-ind ou IDs específicos
   var mapsInd = {
-    'margem-liquida':      (ind.margemLiq||0).toFixed(1).replace('.',',') + '%',
-    'margem-bruta':        (ind.margemBruta||0).toFixed(1).replace('.',',') + '%',
-    'margem-operacional':  (ind.margemOp||0).toFixed(1).replace('.',',') + '%',
-    'ciclo-caixa':         (ind.ciclo||0) + ' dias',
-    'roe':                 (ind.roe||0).toFixed(1).replace('.',',') + '%',
-    'pmr':                 (ind.pmr||0) + ' dias',
-    'pme':                 (ind.pme||0) + ' dias',
-    'pmp':                 (ind.pmp||0) + ' dias',
-    'liquidez-corrente':   (ind.liquidez||0).toFixed(2).replace('.',',') + 'x'
+    'margem-liquida':     (ind.margemLiq||0).toFixed(1).replace('.',',') + '%',
+    'margem-bruta':       (ind.margemBruta||0).toFixed(1).replace('.',',') + '%',
+    'margem-operacional': (ind.margemOp||0).toFixed(1).replace('.',',') + '%',
+    'ciclo-caixa':        ciclo + ' dias',
+    'roe':                (ind.roe||0).toFixed(1).replace('.',',') + '%',
+    'pmr':                pmr + ' dias',
+    'pme':                pme + ' dias',
+    'pmp':                pmp + ' dias',
+    'liquidez-corrente':  (ind.liquidez||0).toFixed(2).replace('.',',') + 'x',
+    'ebit':               fmtV(d.ebit),
+    'lucro-liquido':      fmtV(d.lucro_liquido),
+    'receita-bruta':      fmtV(d.receita_bruta)
   };
   Object.keys(mapsInd).forEach(function(k) {
-    var els = document.querySelectorAll('[data-ind="' + k + '"]');
-    els.forEach(function(el){ el.textContent = mapsInd[k]; });
+    document.querySelectorAll('[data-ind="' + k + '"]').forEach(function(el){ el.textContent = mapsInd[k]; });
   });
 
   // Salva para o PDF
   window._dadosIA = dados;
-  console.log('✅ Dashboard populado com dados da IA:', dados.empresa, dados.ano);
+  console.log('✅ Dashboard populado com dados da IA:', dados.empresa, dados.ano, '| Ciclo:', ciclo, 'dias | Nota:', ind.nota);
 }
 
 function ndreAnalisar() {
