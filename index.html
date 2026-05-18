@@ -11614,9 +11614,10 @@ function exportarPDF() {
     ]), unbreakable: true
   }];
   // ── PAGINA 6: INDICADORES ADICIONAIS + PLANO DE AÇÃO ──────────────
-  var pgPlan = [{
-    stack: [
-    // ─── Indicadores Adicionais (movido do pgBench p/ ficar com o Plano) ───
+  var pgPlan = [
+    // Force nova página + Indicadores Adicionais (bloco 1, unbreakable)
+    { text:'', pageBreak:'before' },
+    { stack:[
     { text:'INDICADORES ADICIONAIS DE EFICIÊNCIA OPERACIONAL', fontSize:7, color:MUTED, characterSpacing:1.2, margin:[0,0,0,12] },
     {
       table:{ widths:['*',68,90,70], body:[
@@ -11648,7 +11649,9 @@ function exportarPDF() {
          { border:[false,false,false,false], fillColor:ACCL, text:'Adequado', fontSize:9, color:ACC, alignment:'center', margin:[4,8,4,8] }]
       ]}, margin:[0,0,0,0]
     }
-    ].concat(secHeader('05','PLANO DE AÇÃO ESTRUTURADO'), [
+    ], unbreakable:true },
+    // Plano de Ação (bloco 2, unbreakable separado)
+    { stack: [].concat(secHeader('05','PLANO DE AÇÃO ESTRUTURADO'), [
     { text:'Iniciativas priorizadas por impacto financeiro e viabilidade de execução. Os prazos são contados a partir da data de início da implementação.', fontSize:9, color:MUTED, lineHeight:1.5, margin:[0,0,0,10] },
     {
       table:{ widths:[22,30,'*',68,52,72], body:[
