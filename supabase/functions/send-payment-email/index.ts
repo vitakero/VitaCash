@@ -97,16 +97,34 @@ function json(data: unknown, status: number) {
 
 function montarEmail(nome: string, link: string): string {
   return `<!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" xmlns:v="urn:schemas-microsoft-com:vml">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="supported-color-schemes" content="light">
   <title>Seu link Premium VitaCash</title>
+  <style>
+    :root { color-scheme: light only; }
+    body { background:#f1f5f9 !important; color:#111827 !important; }
+    * { -webkit-text-size-adjust:100%; }
+    @media (prefers-color-scheme: dark) {
+      body { background:#f1f5f9 !important; }
+      .email-wrapper { background:#f1f5f9 !important; }
+      .email-body { background:#ffffff !important; color:#111827 !important; }
+      .txt-gray { color:#6b7280 !important; }
+      .txt-dark { color:#111827 !important; }
+      .txt-green { color:#1d9e75 !important; }
+      .card-plano { background:#f0fdf7 !important; }
+      .step-circle { background:#ecfdf5 !important; }
+      .info-box { background:#f8fafc !important; }
+    }
+  </style>
 </head>
-<body style="margin:0;padding:0;background:#f1f5f9;font-family:'Helvetica Neue',Arial,sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9;padding:48px 0;">
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:'Helvetica Neue',Arial,sans-serif;" class="email-wrapper">
+<table width="100%" cellpadding="0" cellspacing="0" class="email-wrapper" style="background:#f1f5f9;padding:48px 0;">
 <tr><td align="center">
-  <table width="540" cellpadding="0" cellspacing="0" style="max-width:540px;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.10);">
+  <table width="540" cellpadding="0" cellspacing="0" class="email-body" style="max-width:540px;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.10);">
 
     <tr>
       <td style="background:linear-gradient(135deg,#155f47 0%,#1a7a5e 50%,#1d9e75 100%);padding:36px 36px 32px;text-align:center;">
@@ -119,18 +137,18 @@ function montarEmail(nome: string, link: string): string {
 
     <tr>
       <td style="padding:36px 36px 28px;">
-        <p style="margin:0 0 6px;font-size:20px;font-weight:700;color:#111827;">Olá, ${nome}!</p>
-        <p style="margin:0 0 24px;font-size:14px;color:#6b7280;line-height:1.7;">
+        <p style="margin:0 0 6px;font-size:20px;font-weight:700;color:#111827;" class="txt-dark">Olá, ${nome}!</p>
+        <p style="margin:0 0 24px;font-size:14px;color:#6b7280;line-height:1.7;" class="txt-gray">
           Conforme combinamos, segue o link para ativar sua assinatura
-          <strong style="color:#1d9e75;">Premium do VitaCash</strong>.
+          <strong style="color:#1d9e75;" class="txt-green">Premium do VitaCash</strong>.
         </p>
 
         <table cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:28px;">
           <tr>
-            <td style="background:linear-gradient(135deg,#f0fdf7 0%,#ecfdf5 100%);border:1px solid #a7f3d0;border-radius:10px;padding:20px 24px;">
+            <td class="card-plano" style="background:linear-gradient(135deg,#f0fdf7 0%,#ecfdf5 100%);border:1px solid #a7f3d0;border-radius:10px;padding:20px 24px;">
               <div style="font-size:10px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;">Plano selecionado</div>
               <div style="font-size:26px;font-weight:800;color:#064e3b;letter-spacing:-.3px;margin-bottom:4px;">PREMIUM</div>
-              <div style="font-size:13px;color:#6b7280;">R$ 347/mês &nbsp;·&nbsp; Cancele quando quiser</div>
+              <div style="font-size:13px;color:#6b7280;" class="txt-gray">R$ 347/mês &nbsp;·&nbsp; Cancele quando quiser</div>
             </td>
           </tr>
         </table>
@@ -149,25 +167,25 @@ function montarEmail(nome: string, link: string): string {
         <table cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:28px;">
           <tr><td style="padding:12px 0;border-bottom:1px solid #f1f5f9;">
             <table cellpadding="0" cellspacing="0"><tr>
-              <td style="width:28px;height:28px;background:#ecfdf5;border-radius:50%;text-align:center;vertical-align:middle;"><span style="font-size:12px;font-weight:700;color:#059669;">1</span></td>
+              <td style="width:28px;vertical-align:middle;"><div style="width:28px;height:28px;background:#ecfdf5;border-radius:50%;text-align:center;line-height:28px;"><span style="font-size:12px;font-weight:700;color:#059669;">1</span></div></td>
               <td style="padding-left:12px;font-size:13px;color:#374151;line-height:1.5;">Clique no botão acima</td>
             </tr></table>
           </td></tr>
           <tr><td style="padding:12px 0;border-bottom:1px solid #f1f5f9;">
             <table cellpadding="0" cellspacing="0"><tr>
-              <td style="width:28px;height:28px;background:#ecfdf5;border-radius:50%;text-align:center;vertical-align:middle;"><span style="font-size:12px;font-weight:700;color:#059669;">2</span></td>
+              <td style="width:28px;vertical-align:middle;"><div style="width:28px;height:28px;background:#ecfdf5;border-radius:50%;text-align:center;line-height:28px;"><span style="font-size:12px;font-weight:700;color:#059669;">2</span></div></td>
               <td style="padding-left:12px;font-size:13px;color:#374151;line-height:1.5;">Faça login ou cadastro rápido (se ainda não tem conta)</td>
             </tr></table>
           </td></tr>
           <tr><td style="padding:12px 0;border-bottom:1px solid #f1f5f9;">
             <table cellpadding="0" cellspacing="0"><tr>
-              <td style="width:28px;height:28px;background:#ecfdf5;border-radius:50%;text-align:center;vertical-align:middle;"><span style="font-size:12px;font-weight:700;color:#059669;">3</span></td>
+              <td style="width:28px;vertical-align:middle;"><div style="width:28px;height:28px;background:#ecfdf5;border-radius:50%;text-align:center;line-height:28px;"><span style="font-size:12px;font-weight:700;color:#059669;">3</span></div></td>
               <td style="padding-left:12px;font-size:13px;color:#374151;line-height:1.5;">Finalize o pagamento (cartão, PIX ou boleto)</td>
             </tr></table>
           </td></tr>
           <tr><td style="padding:12px 0;">
             <table cellpadding="0" cellspacing="0"><tr>
-              <td style="width:28px;height:28px;background:#ecfdf5;border-radius:50%;text-align:center;vertical-align:middle;"><span style="font-size:12px;font-weight:700;color:#059669;">4</span></td>
+              <td style="width:28px;vertical-align:middle;"><div style="width:28px;height:28px;background:#ecfdf5;border-radius:50%;text-align:center;line-height:28px;"><span style="font-size:12px;font-weight:700;color:#059669;">4</span></div></td>
               <td style="padding-left:12px;font-size:13px;color:#374151;line-height:1.5;"><strong style="color:#111827;">Premium ativa automaticamente</strong> — você já pode usar todas as funcionalidades</td>
             </tr></table>
           </td></tr>

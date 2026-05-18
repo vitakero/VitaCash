@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Template PDF Base — VitaCash</title>
+<style>
+  body { font-family: -apple-system, system-ui, sans-serif; background:#f5f5f5; margin:0; padding:40px; }
+  .card { max-width:520px; margin:60px auto; background:#fff; padding:36px; border-radius:12px; box-shadow:0 8px 32px rgba(0,0,0,0.08); }
+  h1 { font-size:18px; color:#111827; margin:0 0 8px; }
+  p { font-size:14px; color:#6b7280; line-height:1.55; margin:0 0 24px; }
+  button { background:#1D9E75; color:#fff; border:none; padding:12px 24px; font-size:14px; font-weight:600; border-radius:8px; cursor:pointer; }
+  button:hover { background:#085041; }
+  .hint { font-size:12px; color:#9ca3af; margin-top:14px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Template PDF Base</h1>
+  <p>Página A4 em branco com o header e footer do relatório VitaCash. Use como canvas para desenhar a estrutura editorial que você quer implementar.</p>
+  <button onclick="gerarTemplate()">Gerar PDF Template</button>
+  <div class="hint">A4 · margens [50, 55, 50, 46] · header "VitaCash | G JOAO DOS SANTOS · p. 2/12" · footer institucional</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script>
+function gerarTemplate() {
+  // Mesmas variáveis da paleta do PDF principal
+  var INK2 = '#1f2937';
+  var ACC  = '#1D9E75';
+  var LIGHT = '#9ca3af';
+  var ACCM  = '#9ca3af';
+
+  var docDef = {
+    pageSize: 'A4',
+    pageMargins: [50, 55, 50, 46],
+
+    header: {
+      columns: [
+        { text:[
+            { text:'Vita', bold:true, color:INK2, fontSize:11 },
+            { text:'Cash', bold:true, color:ACC,  fontSize:11 }
+          ], margin:[50, 19, 0, 0] },
+        { text:'G JOAO DOS SANTOS  ·  p. 2/12', fontSize:9, color:LIGHT, alignment:'right', margin:[0, 22, 50, 0] }
+      ]
+    },
+
+    footer: {
+      text:'Diagnóstico Financeiro Estratégico  ·  VitaCash Analytics  ·  Confidencial',
+      fontSize:6, color:ACCM, alignment:'center', margin:[50, 6, 50, 0]
+    },
+
+    // Conteúdo intencionalmente vazio — canvas para o cliente desenhar
+    content: [
+      { text:'', margin:[0, 0, 0, 0] }
+    ],
+
+    defaultStyle: { font:'Roboto', fontSize:8, color:'#111827', lineHeight:1.4 }
+  };
+
+  pdfMake.createPdf(docDef).download('template-base-vitacash.pdf');
+}
+</script>
+</body>
+</html>

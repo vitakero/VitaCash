@@ -9204,10 +9204,21 @@ function go(id){
     // Avançar barra de progresso
     setTimeout(()=>{pf.style.transition='width 3.8s ease';pf.style.width='95%';},50);
     // Salvar análise e ir ao dashboard após animação completa
-    setTimeout(async ()=>{
-      await salvarAnalise();
-      go('s-dash');
-    },4300);
+    // Aguarda até 30s pela IA; se não vier, abre com dados demo
+    const _anlStart = Date.now();
+    async function _aguardarIAeIr() {
+      const elapsed = Date.now() - _anlStart;
+      if (window._dadosIA || elapsed > 30000) {
+        await salvarAnalise();
+        if (window._dadosIA && typeof popularDashboard === 'function') {
+          popularDashboard(window._dadosIA);
+        }
+        go('s-dash');
+      } else {
+        setTimeout(_aguardarIAeIr, 600);
+      }
+    }
+    setTimeout(_aguardarIAeIr, 4300);
   }
 }
 
@@ -10155,6 +10166,102 @@ function ndreChkBtn(periodosOk) {
   }
 }
 
+// ── Converte File → base64 ────────────────────────────────────────
+function fileToBase64(file) {
+  return new Promise(function(resolve, reject) {
+    var reader = new FileReader();
+    reader.onload  = function(e) { resolve(e.target.result.split(',')[1]); };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// ── Popula o dashboard com os dados extraídos pela IA ────────────
+function popularDashboard(dados) {
+  if (!dados || !dados.dre) return;
+  var d = dados.dre;
+  var b = dados.balanco || {};
+  var ind = dados.indicadores || {};
+  var rec = d.receita_bruta || 1;
+  var recL = d.receita_liquida || rec;
+
+  function fmt(v) {
+    if (!v && v !== 0) return '—';
+    var abs = Math.abs(v);
+    var prefix = v < 0 ? '– R$ ' : 'R$ ';
+    if (abs >= 1e9) return prefix + (abs/1e9).toFixed(2).replace('.',',') + ' bi';
+    if (abs >= 1e6) return prefix + (abs/1e6).toFixed(2).replace('.',',') + ' mi';
+    if (abs >= 1e3) return prefix + Math.round(abs).toLocaleString('pt-BR');
+    return prefix + abs.toFixed(2).replace('.',',');
+  }
+  function pct(v, base) {
+    if (!base) return '—';
+    return (v/base*100).toFixed(1).replace('.',',') + '%';
+  }
+
+  // Linhas da DRE
+  var linhas = [
+    { id:'l1', nome:'Receita bruta de vendas',         val:d.receita_bruta,           base:rec,  pos:true  },
+    { id:'l2', nome:'Custo dos bens e serviços (CMV)', val:d.cmv,                     base:rec,  pos:false },
+    { id:'l3', nome:'Resultado bruto (Lucro Bruto)',   val:d.lucro_bruto,             base:recL, pos:(d.lucro_bruto||0)>=0 },
+    { id:'l4', nome:'Despesas com vendas',             val:d.despesas_vendas,         base:rec,  pos:false },
+    { id:'l5', nome:'Despesas gerais e administrativas',val:d.despesas_admin,         base:rec,  pos:false },
+    { id:'l6', nome:'Outras despesas operacionais',    val:d.outras_despesas_op,      base:rec,  pos:false },
+    { id:'l7', nome:'EBIT — Resultado operacional',    val:d.ebit,                    base:recL, pos:(d.ebit||0)>=0 },
+    { id:'l8', nome:'Resultado financeiro (juros)',    val:d.resultado_financeiro,    base:rec,  pos:(d.resultado_financeiro||0)>=0 },
+    { id:'l9', nome:'Resultado antes dos tributos',    val:d.resultado_antes_tributos,base:recL, pos:(d.resultado_antes_tributos||0)>=0 },
+    { id:'l10',nome:'IR e contribuição social',        val:d.impostos,                base:rec,  pos:false },
+    { id:'l11',nome:'Lucro líquido do período',        val:d.lucro_liquido,           base:recL, pos:(d.lucro_liquido||0)>=0 }
+  ];
+
+  linhas.forEach(function(l) {
+    var el = document.getElementById(l.id);
+    if (!el) return;
+    var nomeEl  = el.querySelector('.linha-nome');
+    var valorEl = el.querySelector('.linha-valor');
+    var pctEl   = el.querySelector('.linha-pct');
+    if (nomeEl)  nomeEl.textContent  = l.nome;
+    if (valorEl) {
+      valorEl.textContent = fmt(l.val);
+      valorEl.className   = 'linha-valor' + (l.pos ? ' pos' : ' neg');
+    }
+    if (pctEl)   pctEl.textContent   = pct(Math.abs(l.val||0), Math.abs(recL||1));
+  });
+
+  // Score / nota
+  var notaEl = document.querySelector('.nota-num');
+  if (notaEl && ind.nota) notaEl.textContent = ind.nota.toFixed(1).replace('.',',');
+
+  // CGV (capital de giro)
+  var cgvEl = document.getElementById('cgv');
+  if (cgvEl) cgvEl.textContent = fmt(b.ativo_circulante ? b.ativo_circulante - Math.abs(b.passivo_circulante||0) : 0);
+
+  // Nome da empresa no header do dashboard
+  var empresaNome = dados.empresa || 'Empresa';
+  document.querySelectorAll('.empresa-nome-dash').forEach(function(el){ el.textContent = empresaNome; });
+
+  // Indicadores extras — atualiza onde existir no DOM
+  var mapsInd = {
+    'margem-liquida':      (ind.margemLiq||0).toFixed(1).replace('.',',') + '%',
+    'margem-bruta':        (ind.margemBruta||0).toFixed(1).replace('.',',') + '%',
+    'margem-operacional':  (ind.margemOp||0).toFixed(1).replace('.',',') + '%',
+    'ciclo-caixa':         (ind.ciclo||0) + ' dias',
+    'roe':                 (ind.roe||0).toFixed(1).replace('.',',') + '%',
+    'pmr':                 (ind.pmr||0) + ' dias',
+    'pme':                 (ind.pme||0) + ' dias',
+    'pmp':                 (ind.pmp||0) + ' dias',
+    'liquidez-corrente':   (ind.liquidez||0).toFixed(2).replace('.',',') + 'x'
+  };
+  Object.keys(mapsInd).forEach(function(k) {
+    var els = document.querySelectorAll('[data-ind="' + k + '"]');
+    els.forEach(function(el){ el.textContent = mapsInd[k]; });
+  });
+
+  // Salva para o PDF
+  window._dadosIA = dados;
+  console.log('✅ Dashboard populado com dados da IA:', dados.empresa, dados.ano);
+}
+
 function ndreAnalisar() {
   var btn = document.getElementById('ndre-btn');
   if (btn) {
@@ -10169,8 +10276,49 @@ function ndreAnalisar() {
     dre:     ndreFiles.dre ? ndreFiles.dre.name : null,
     balanco: ndreFiles.bp  ? ndreFiles.bp.name  : null
   };
-  // Após 400ms de feedback visual, inicia a tela de análise
+
+  // Inicia tela de análise e chama a IA em paralelo
   setTimeout(function() { go('s-anl'); }, 400);
+
+  // Converte PDFs para base64 e chama a edge function
+  (async function() {
+    try {
+      var dreB64      = ndreFiles.dre ? await fileToBase64(ndreFiles.dre) : null;
+      var balancoB64  = ndreFiles.bp  ? await fileToBase64(ndreFiles.bp)  : null;
+
+      // Se arquivo único com DRE+BP juntos, usa o mesmo
+      if (!balancoB64 && ndreUnico) balancoB64 = dreB64;
+
+      var SUPABASE_URL = 'https://asrecwsocneepipvfymx.supabase.co';
+      var resp = await fetch(SUPABASE_URL + '/functions/v1/analisar-pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type':  'application/json',
+          'Authorization': 'Bearer ' + (sb._headers?.['x-client-info'] ? sb.auth.session()?.access_token : ''),
+          'apikey':        'sb_publishable_mPLOadOpzna9wpDKjtB1-w_OwjwRwVW'
+        },
+        body: JSON.stringify({
+          dre_base64:     dreB64,
+          balanco_base64: balancoB64,
+          user_id:        currentUser ? currentUser.id : null,
+          ano:            window._analiseAtual.year,
+          periodo:        window._analiseAtual.period
+        })
+      });
+
+      if (!resp.ok) throw new Error('Erro HTTP ' + resp.status);
+      var dados = await resp.json();
+      if (dados.error) throw new Error(dados.error);
+
+      // Guarda para usar quando o dashboard abrir
+      window._dadosIA = dados;
+
+      console.log('✅ IA retornou dados:', dados.empresa, dados.ano, dados.cache ? '(cache)' : '(novo)');
+    } catch(e) {
+      console.error('❌ Erro na análise IA:', e.message);
+      // Não bloqueia — dashboard abre com dados demo
+    }
+  })();
 }
 
 // ── TOAST ─────────────────────────────────────────────────────────
