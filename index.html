@@ -10508,15 +10508,21 @@ async function salvarAnalise() {
   toast('Salvando análise...', 'info');
 
   var iaData = window._dadosIA || {};
-  var { data, error } = await sb.from('analyses').upsert({
+  var upsertPayload = {
     user_id:          currentUser.id,
     year:             meta.year,
     period:           meta.period || 'Não informado',
     filename_dre:     meta.dre     || null,
-    filename_balanco: meta.balanco || null,
-    hash_combo:       iaData._hashCombo  || null,
-    dados_extraidos:  Object.keys(iaData).length ? iaData : null
-  }, { onConflict: 'user_id,year,period' }).select();
+    filename_balanco: meta.balanco || null
+  };
+  // Só inclui dados da IA se existirem — evita sobrescrever com NULL o que a edge function salvou
+  if (iaData._hashCombo)             upsertPayload.hash_combo      = iaData._hashCombo;
+  if (Object.keys(iaData).length)    upsertPayload.dados_extraidos = iaData;
+
+  var { data, error } = await sb.from('analyses').upsert(
+    upsertPayload,
+    { onConflict: 'user_id,year,period' }
+  ).select();
 
   if (error) {
     console.error('❌ Erro ao salvar análise:', error.message, error.details, error.hint);
