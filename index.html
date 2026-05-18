@@ -11243,9 +11243,9 @@ function exportarPDF() {
       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:bg,
         text:nome, fontSize:9, color:STEEL, margin:[10,22,8,22] },
       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL,
-        text:empresaVal, fontSize:9, bold:true, color:ACCD, alignment:'center', margin:[4,14,4,14] },
+        text:empresaVal, fontSize:9, bold:true, color:ACCD, alignment:'center', margin:[4,8,4,8] },
       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:bg,
-        text:medianaVal, fontSize:9, color:STEEL, alignment:'center', margin:[4,14,4,14] },
+        text:medianaVal, fontSize:9, color:STEEL, alignment:'center', margin:[4,8,4,8] },
       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:bg,
         stack:[
           { canvas:[
@@ -11518,28 +11518,28 @@ function exportarPDF() {
       table:{ widths:[110,55,40,55,40,'*'], body:[
         [tblHdr('Indicador'), tblHdr('Empresa','center',[4,7,4,7]), tblHdr('Mínimo','center',[4,7,4,7]), tblHdr('Mediana','center',[4,7,4,7]), tblHdr('Máximo','center',[4,7,4,7]), tblHdr('Posição relativa','center',[4,7,4,7])],
 
-        [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Margem líquida', fontSize:8, color:STEEL, margin:[8,12,8,12] },
+        [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Margem líquida', fontSize:8, color:STEEL, margin:[8,7,8,7] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'3,7%', fontSize:8, bold:true, color:ACCD, alignment:'center', margin:[4,9,4,9] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'1,2%', fontSize:8, color:STEEL, alignment:'center', margin:[4,9,4,9] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'3,5%', fontSize:8, color:STEEL, alignment:'center', margin:[4,9,4,9] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'6,8%', fontSize:8, color:STEEL, alignment:'center', margin:[4,9,4,9] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Acima da mediana', fontSize:8, color:ACC, alignment:'center', margin:[4,9,4,9] }],
 
-        [{ border:[false,false,false,true], borderColor:['','','',GHOST], text:'Margem bruta', fontSize:8, color:STEEL, margin:[8,12,8,12] },
+        [{ border:[false,false,false,true], borderColor:['','','',GHOST], text:'Margem bruta', fontSize:8, color:STEEL, margin:[8,7,8,7] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'21,7%', fontSize:8, bold:true, color:ACCD, alignment:'center', margin:[4,9,4,9] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], text:'14%', fontSize:8, color:STEEL, alignment:'center', margin:[4,9,4,9] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], text:'20%', fontSize:8, color:STEEL, alignment:'center', margin:[4,9,4,9] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], text:'28%', fontSize:8, color:STEEL, alignment:'center', margin:[4,9,4,9] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Acima da mediana', fontSize:8, color:ACC, alignment:'center', margin:[4,9,4,9] }],
 
-        [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'ROE', fontSize:8, color:STEEL, margin:[8,12,8,12] },
+        [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'ROE', fontSize:8, color:STEEL, margin:[8,7,8,7] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'25,3%', fontSize:8, bold:true, color:ACCD, alignment:'center', margin:[4,9,4,9] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'8%', fontSize:8, color:STEEL, alignment:'center', margin:[4,9,4,9] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'15%', fontSize:8, color:STEEL, alignment:'center', margin:[4,9,4,9] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'28%', fontSize:8, color:STEEL, alignment:'center', margin:[4,9,4,9] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Quartil superior', fontSize:8, color:ACC, alignment:'center', margin:[4,9,4,9] }],
 
-        [{ border:[false,false,false,false], text:'Desp. operacionais', fontSize:8, color:STEEL, margin:[8,12,8,12] },
+        [{ border:[false,false,false,false], text:'Desp. operacionais', fontSize:8, color:STEEL, margin:[8,7,8,7] },
          { border:[false,false,false,false], fillColor:ACCL, text:'15,4%', fontSize:8, bold:true, color:ACCD, alignment:'center', margin:[4,9,4,9] },
          { border:[false,false,false,false], text:'24%', fontSize:8, color:STEEL, alignment:'center', margin:[4,9,4,9] },
          { border:[false,false,false,false], text:'18%', fontSize:8, color:STEEL, alignment:'center', margin:[4,9,4,9] },
@@ -11650,58 +11650,58 @@ function exportarPDF() {
   // ── PAGINA 6: PLANO ESTRATEGICO ───────────────────────────────────
   var pgPlan = [{
     stack: [].concat(secHeader('05','PLANO DE AÇÃO ESTRUTURADO'), [
-    { text:'Iniciativas priorizadas por impacto financeiro e viabilidade de execução. Os prazos são contados a partir da data de início da implementação.', fontSize:9, color:MUTED, lineHeight:1.5, margin:[0,0,0,20] },
+    { text:'Iniciativas priorizadas por impacto financeiro e viabilidade de execução. Os prazos são contados a partir da data de início da implementação.', fontSize:9, color:MUTED, lineHeight:1.5, margin:[0,0,0,10] },
     {
       table:{ widths:[22,30,'*',68,52,72], body:[
         [tblHdr('Pri.','center',[4,8,4,8]), tblHdr('Prazo','center',[4,8,4,8]), tblHdr('Ação Recomendada','left',[8,8,8,8]), tblHdr('Impacto Est.','right',[4,8,4,8]), tblHdr('Dificuldade','center',[4,8,4,8]), tblHdr('Métrica','left',[4,8,4,8])],
 
         // Linha 1
-        [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PALE, text:'01', fontSize:9, bold:true, color:INK, alignment:'center', margin:[4,14,4,14] },
-         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PALE, text:'30 dias', fontSize:8, color:MUTED, alignment:'center', margin:[4,14,4,14] },
+        [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PALE, text:'01', fontSize:9, bold:true, color:INK, alignment:'center', margin:[4,8,4,8] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PALE, text:'30 dias', fontSize:8, color:MUTED, alignment:'center', margin:[4,8,4,8] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PALE,
            stack:[
              { text:'Redução das despesas administrativas', fontSize:9, bold:true, color:INK },
              { text:'Mapeamento por centro de custo; meta: reduzir de 14,7% para 12% da receita líquida', fontSize:8, color:MUTED, margin:[0,2,0,0] }
-           ], margin:[8,12,8,12] },
-         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PALE, text:'+R$ 1,25 mi/ano', fontSize:8, color:STEEL, bold:true, alignment:'right', margin:[4,14,4,14] },
-         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PALE, text:'Média', fontSize:8, color:MUTED, alignment:'center', margin:[4,14,4,14] },
-         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PALE, text:'Desp. adm. / Receita (%)', fontSize:8, color:MUTED, margin:[4,14,4,14] }],
+           ], margin:[8,7,8,7] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PALE, text:'+R$ 1,25 mi/ano', fontSize:8, color:STEEL, bold:true, alignment:'right', margin:[4,8,4,8] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PALE, text:'Média', fontSize:8, color:MUTED, alignment:'center', margin:[4,8,4,8] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PALE, text:'Desp. adm. / Receita (%)', fontSize:8, color:MUTED, margin:[4,8,4,8] }],
 
         // Linha 2
-        [{ border:[false,false,false,true], borderColor:['','','',GHOST], text:'02', fontSize:9, bold:true, color:INK, alignment:'center', margin:[4,14,4,14] },
-         { border:[false,false,false,true], borderColor:['','','',GHOST], text:'Imediato', fontSize:8, color:MUTED, alignment:'center', margin:[4,14,4,14] },
+        [{ border:[false,false,false,true], borderColor:['','','',GHOST], text:'02', fontSize:9, bold:true, color:INK, alignment:'center', margin:[4,8,4,8] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], text:'Imediato', fontSize:8, color:MUTED, alignment:'center', margin:[4,8,4,8] },
          { border:[false,false,false,true], borderColor:['','','',GHOST],
            stack:[
              { text:'Quitação da dívida financeira remanescente', fontSize:9, bold:true, color:INK },
              { text:'Liquidar R$ 212 mil com caixa disponível; eliminar despesas financeiras correntes', fontSize:8, color:MUTED, margin:[0,2,0,0] }
-           ], margin:[8,12,8,12] },
-         { border:[false,false,false,true], borderColor:['','','',GHOST], text:'+R$ 212 mil/ano', fontSize:8, color:STEEL, bold:true, alignment:'right', margin:[4,14,4,14] },
-         { border:[false,false,false,true], borderColor:['','','',GHOST], text:'Baixa', fontSize:8, color:MUTED, alignment:'center', margin:[4,14,4,14] },
-         { border:[false,false,false,true], borderColor:['','','',GHOST], text:'Saldo devedor = zero', fontSize:8, color:MUTED, margin:[4,14,4,14] }],
+           ], margin:[8,7,8,7] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], text:'+R$ 212 mil/ano', fontSize:8, color:STEEL, bold:true, alignment:'right', margin:[4,8,4,8] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], text:'Baixa', fontSize:8, color:MUTED, alignment:'center', margin:[4,8,4,8] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], text:'Saldo devedor = zero', fontSize:8, color:MUTED, margin:[4,8,4,8] }],
 
         // Linha 3
-        [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PALE, text:'03', fontSize:9, bold:true, color:INK, alignment:'center', margin:[4,14,4,14] },
-         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PALE, text:'60–90 dias', fontSize:8, color:MUTED, alignment:'center', margin:[4,14,4,14] },
+        [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PALE, text:'03', fontSize:9, bold:true, color:INK, alignment:'center', margin:[4,8,4,8] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PALE, text:'60–90 dias', fontSize:8, color:MUTED, alignment:'center', margin:[4,8,4,8] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PALE,
            stack:[
              { text:'Renegociação com fornecedores estratégicos', fontSize:9, bold:true, color:INK },
              { text:'Aproveitar volume de R$ 36 mi/ano para negociar descontos; cada 1% de desconto = +R$ 460 mil no lucro bruto', fontSize:8, color:MUTED, margin:[0,2,0,0] }
-           ], margin:[8,12,8,12] },
-         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PALE, text:'+R$ 460 mil/1%', fontSize:8, color:STEEL, bold:true, alignment:'right', margin:[4,14,4,14] },
-         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PALE, text:'Alta', fontSize:8, color:MUTED, alignment:'center', margin:[4,14,4,14] },
-         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PALE, text:'% desconto médio CMV', fontSize:8, color:MUTED, margin:[4,14,4,14] }],
+           ], margin:[8,7,8,7] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PALE, text:'+R$ 460 mil/1%', fontSize:8, color:STEEL, bold:true, alignment:'right', margin:[4,8,4,8] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PALE, text:'Alta', fontSize:8, color:MUTED, alignment:'center', margin:[4,8,4,8] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PALE, text:'% desconto médio CMV', fontSize:8, color:MUTED, margin:[4,8,4,8] }],
 
         // Linha 4
-        [{ border:[false,false,false,false], text:'04', fontSize:9, bold:true, color:INK, alignment:'center', margin:[4,14,4,14] },
-         { border:[false,false,false,false], text:'90–180 dias', fontSize:8, color:MUTED, alignment:'center', margin:[4,14,4,14] },
+        [{ border:[false,false,false,false], text:'04', fontSize:9, bold:true, color:INK, alignment:'center', margin:[4,8,4,8] },
+         { border:[false,false,false,false], text:'90–180 dias', fontSize:8, color:MUTED, alignment:'center', margin:[4,8,4,8] },
          { border:[false,false,false,false],
            stack:[
              { text:'Reestruturação do modelo de remuneração variável', fontSize:9, bold:true, color:INK },
              { text:'Migrar comissão fixa para variável atrelada à margem de contribuição; alinha incentivos à rentabilidade', fontSize:8, color:MUTED, margin:[0,2,0,0] }
-           ], margin:[8,12,8,12] },
-         { border:[false,false,false,false], text:'Ganho estrutural', fontSize:8, color:MUTED, alignment:'right', margin:[4,14,4,14] },
-         { border:[false,false,false,false], text:'Alta', fontSize:8, color:MUTED, alignment:'center', margin:[4,14,4,14] },
-         { border:[false,false,false,false], text:'Margem contrib. por vendedor', fontSize:8, color:MUTED, margin:[4,14,4,14] }]
+           ], margin:[8,7,8,7] },
+         { border:[false,false,false,false], text:'Ganho estrutural', fontSize:8, color:MUTED, alignment:'right', margin:[4,8,4,8] },
+         { border:[false,false,false,false], text:'Alta', fontSize:8, color:MUTED, alignment:'center', margin:[4,8,4,8] },
+         { border:[false,false,false,false], text:'Margem contrib. por vendedor', fontSize:8, color:MUTED, margin:[4,8,4,8] }]
       ]}, margin:[0,0,0,20]
     }
     ]), unbreakable: true
@@ -11713,15 +11713,15 @@ function exportarPDF() {
     {
       table:{ widths:['*',80,80,80], body:[
         [tblHdr('Cenário','left',[8,8,8,8]), tblHdr('Conservador','center',[4,8,4,8]), tblHdr('Base','center',[4,8,4,8]), tblHdr('Otimista','center',[4,8,4,8])],
-        [{ border:[false,false,false,true], borderColor:['','','',GHOST], text:'Margem líquida assumida', fontSize:8, color:STEEL, margin:[8,12,8,12] },
+        [{ border:[false,false,false,true], borderColor:['','','',GHOST], text:'Margem líquida assumida', fontSize:8, color:STEEL, margin:[8,7,8,7] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], text:'2,5%', fontSize:8, color:STEEL, alignment:'center', margin:[4,12,4,12] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PALE, text:'3,7%', fontSize:8, color:INK, bold:true, alignment:'center', margin:[4,12,4,12] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], text:'6,0%', fontSize:8, color:STEEL, alignment:'center', margin:[4,12,4,12] }],
-        [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Lucro líquido estimado', fontSize:8, color:STEEL, margin:[8,12,8,12] },
+        [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Lucro líquido estimado', fontSize:8, color:STEEL, margin:[8,7,8,7] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'R$ 1,15 mi', fontSize:8, color:STEEL, alignment:'center', margin:[4,12,4,12] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PALE, text:'R$ 1,70 mi', fontSize:8, color:INK, bold:true, alignment:'center', margin:[4,12,4,12] },
          { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'R$ 2,95 mi', fontSize:8, color:STEEL, alignment:'center', margin:[4,12,4,12] }],
-        [{ border:[false,false,false,false], text:'Valor estimado (média 4 métodos)', fontSize:8, color:STEEL, margin:[8,12,8,12] },
+        [{ border:[false,false,false,false], text:'Valor estimado (média 4 métodos)', fontSize:8, color:STEEL, margin:[8,7,8,7] },
          { border:[false,false,false,false], text:'R$ 9,7 mi', fontSize:9, color:STEEL, bold:true, alignment:'center', margin:[4,12,4,12] },
          { border:[false,false,false,false], fillColor:PALE, text:'R$ 14,4 mi', fontSize:9, color:INK, bold:true, alignment:'center', margin:[4,12,4,12] },
          { border:[false,false,false,false], text:'R$ 22,5 mi', fontSize:9, color:STEEL, bold:true, alignment:'center', margin:[4,12,4,12] }]
