@@ -10326,9 +10326,87 @@ function popularDashboard(dados) {
     document.querySelectorAll('[data-ind="' + k + '"]').forEach(function(el){ el.textContent = mapsInd[k]; });
   });
 
+  // ── 6. CARDS .mc — atualiza pelo label (.mlb) ────────────────
+  // Helper: encontra o card pelo título e atualiza o valor (.mv)
+  function setMC(labelTexto, valor, cor) {
+    document.querySelectorAll('.mc').forEach(function(mc) {
+      var lbl = mc.querySelector('.mlb');
+      if (!lbl) return;
+      var txt = lbl.textContent.trim().toLowerCase();
+      if (txt === labelTexto.toLowerCase()) {
+        var mv = mc.querySelector('.mv');
+        if (mv) { mv.textContent = valor; if (cor) mv.style.color = cor; }
+      }
+    });
+  }
+
+  var despFinAbs = Math.abs(d.resultado_financeiro || 0);
+  var cobJuros   = despFinAbs > 0 ? (Math.abs(d.ebit||0) / despFinAbs) : 999;
+  var cmvPctRecL = recL > 0 ? (cmvAbs / recL * 100) : 0;
+  var despOpAbs  = Math.abs((d.despesas_vendas||0)+(d.despesas_admin||0)+(d.outras_despesas_op||0));
+  var dividaAtual= Math.abs(b.emprestimos_cp||0) + Math.abs(b.emprestimos_lp||0);
+  var limiteMax  = Math.abs(d.ebit||0) / 0.25 / 2;  // EBIT / (taxa 25% × 2)
+  var espacoDisp = limiteMax - dividaAtual;
+  var endivGeral = b.ativo_total > 0 ? (Math.abs(b.passivo_total||0) / b.ativo_total * 100) : 0;
+  var endivPL    = b.patrimonio_liquido > 0 ? (Math.abs(b.passivo_total||0) / b.patrimonio_liquido) : 0;
+  var giroAtivo  = b.ativo_total > 0 ? (rec / b.ativo_total) : 0;
+  var giroEstoq  = b.estoques > 0 && cmvAbs > 0 ? (cmvAbs / b.estoques) : 0;
+  var liqCorr    = b.passivo_circulante && b.passivo_circulante !== 0 ? (b.ativo_circulante / Math.abs(b.passivo_circulante)) : 0;
+  var liqSeca    = b.passivo_circulante && b.passivo_circulante !== 0 ? ((b.ativo_circulante - Math.abs(b.estoques||0)) / Math.abs(b.passivo_circulante)) : 0;
+  var liqImed    = b.passivo_circulante && b.passivo_circulante !== 0 ? ((b.caixa||0) / Math.abs(b.passivo_circulante)) : 0;
+  var imobPL     = b.patrimonio_liquido > 0 ? (Math.abs(b.ativo_nao_circulante||0) / b.patrimonio_liquido * 100) : 0;
+  var roe        = b.patrimonio_liquido > 0 ? (Math.abs(d.lucro_liquido||0) / b.patrimonio_liquido * 100) : 0;
+
+  var verde = 'var(--green)', amber = 'var(--amber)';
+
+  // Visão geral — KPI cards
+  setMC('Receita bruta',      fmtV(d.receita_bruta),  verde);
+  setMC('Margem bruta',       (ind.margemBruta||0).toFixed(1).replace('.',',') + '%', (ind.margemBruta||0) >= (ind.benchmarks?.margemBruta||20) ? verde : amber);
+  setMC('Margem líquida',     (ind.margemLiq||0).toFixed(1).replace('.',',') + '%',   (ind.margemLiq||0) >= (ind.benchmarks?.margemLiq||3) ? verde : amber);
+  setMC('Lucro líquido',      fmtV(d.lucro_liquido),  (d.lucro_liquido||0) >= 0 ? verde : 'var(--red)');
+  setMC('EBIT',               fmtV(d.ebit),            verde);
+  setMC('Cobertura de juros', cobJuros > 99 ? '999x' : cobJuros.toFixed(1).replace('.',',') + 'x', verde);
+  setMC('Desp. financeiras',  fmtV(Math.abs(d.resultado_financeiro||0)), verde);
+  setMC('CMV total',          fmtV(cmvAbs), verde);
+  setMC('ROE',                roe.toFixed(1).replace('.',',') + '%', verde);
+
+  // Endividamento
+  setMC('Limite máximo seguro', fmtV(limiteMax), verde);
+  setMC('Dívida atual',         dividaAtual > 0 ? fmtV(dividaAtual) : 'R$ 0', verde);
+  setMC('Espaço disponível',    fmtV(Math.max(0, espacoDisp)), verde);
+  setMC('Cobertura de juros',   cobJuros > 99 ? '999x' : cobJuros.toFixed(1) + 'x', verde);
+
+  // Alerta endividamento
+  document.querySelectorAll('.ab .at').forEach(function(el) {
+    if (el.textContent.indexOf('ndividamento') >= 0) {
+      el.innerHTML = 'Endividamento <strong>' + (endivGeral > 0 ? endivGeral.toFixed(1).replace('.',',') + '%' : 'muito baixo') + '</strong> — ' +
+        (endivGeral < 40 ? 'muito abaixo do limite de 60%. Excelente posição para captar crédito.' : endivGeral < 60 ? 'dentro do limite de 60%. Posição saudável.' : 'acima de 60% — atenção ao nível de endividamento.');
+    }
+  });
+
+  // Balanço — cards de liquidez e estrutura
+  setMC('Liquidez corrente', liqCorr.toFixed(2).replace('.',',') + 'x', liqCorr >= 1.5 ? verde : amber);
+  setMC('Liquidez seca',     liqSeca.toFixed(2).replace('.',',') + 'x', liqSeca >= 1 ? verde : amber);
+  setMC('Liquidez imediata', liqImed.toFixed(2).replace('.',',') + 'x', liqImed >= 0.5 ? verde : amber);
+  setMC('Endividamento geral',    endivGeral.toFixed(1).replace('.',',') + '%', endivGeral < 60 ? verde : 'var(--red)');
+  setMC('Endividamento / pl',     endivPL.toFixed(2).replace('.',',') + 'x',   endivPL < 1 ? verde : amber);
+  setMC('Giro do ativo',          giroAtivo.toFixed(2).replace('.',',') + 'x', verde);
+  setMC('Giro do estoque',        giroEstoq.toFixed(1).replace('.',',') + 'x', verde);
+  setMC('Imobilização do pl',     imobPL.toFixed(1).replace('.',',') + '%',    imobPL < 80 ? verde : amber);
+
+  // ── 7. "O QUE FAZER" — atualiza números-chave nos cards ──────
+  // Atualiza o card de oportunidade total
+  var potencialLucro = Math.abs(recL * 0.04 - Math.abs(d.lucro_liquido||0));
+  document.querySelectorAll('[style*="font-size:18px"][style*="font-weight:800"]').forEach(function(el) {
+    var txt = el.textContent.trim();
+    if (txt.includes('R$') && txt.includes('mi') && el.closest('[style*="green-light"]')) {
+      el.textContent = fmtV(potencialLucro > 0 ? potencialLucro : Math.abs(d.lucro_liquido||0) * 0.5);
+    }
+  });
+
   // Salva para o PDF
   window._dadosIA = dados;
-  console.log('✅ Dashboard populado com dados da IA:', dados.empresa, dados.ano, '| Ciclo:', ciclo, 'dias | Nota:', ind.nota);
+  console.log('✅ Dashboard populado — Empresa:', dados.empresa, '| Ano:', dados.ano, '| Ciclo:', ciclo, 'dias | Nota:', ind.nota);
 }
 
 function ndreAnalisar() {
