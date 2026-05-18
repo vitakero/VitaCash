@@ -178,7 +178,7 @@ Deno.serve(async (req) => {
 
     if (cached?.dados_extraidos) {
       console.log('✅ Cache hit:', hashCombo)
-      return new Response(JSON.stringify({ ...cached.dados_extraidos, cache: true }), {
+      return new Response(JSON.stringify({ ...cached.dados_extraidos, _hashCombo: hashCombo, cache: true }), {
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
       })
     }
@@ -228,6 +228,7 @@ Deno.serve(async (req) => {
       dre:         extraido.dre || {},
       balanco:     extraido.balanco || {},
       indicadores,
+      _hashCombo:  hashCombo,
       cache: false
     }
 

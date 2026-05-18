@@ -9009,7 +9009,7 @@ async function carregarPerfilDash() {
   } catch(e) { console.warn('carregarPerfilDash:', e); }
 }
 let abertos=new Set();
-const gastosDiarios=116952;
+let gastosDiarios=116952;
 
 
 
@@ -10437,11 +10437,13 @@ function ndreAnalisar() {
       if (!balancoB64 && ndreUnico) balancoB64 = dreB64;
 
       var SUPABASE_URL = 'https://asrecwsocneepipvfymx.supabase.co';
+      var { data: { session: _iaSession } } = await sb.auth.getSession();
+      var _iaToken = _iaSession?.access_token || '';
       var resp = await fetch(SUPABASE_URL + '/functions/v1/analisar-pdf', {
         method: 'POST',
         headers: {
           'Content-Type':  'application/json',
-          'Authorization': 'Bearer ' + (sb._headers?.['x-client-info'] ? sb.auth.session()?.access_token : ''),
+          'Authorization': 'Bearer ' + _iaToken,
           'apikey':        'sb_publishable_mPLOadOpzna9wpDKjtB1-w_OwjwRwVW'
         },
         body: JSON.stringify({
@@ -10505,12 +10507,15 @@ async function salvarAnalise() {
 
   toast('Salvando análise...', 'info');
 
+  var iaData = window._dadosIA || {};
   var { data, error } = await sb.from('analyses').upsert({
     user_id:          currentUser.id,
     year:             meta.year,
     period:           meta.period || 'Não informado',
     filename_dre:     meta.dre     || null,
-    filename_balanco: meta.balanco || null
+    filename_balanco: meta.balanco || null,
+    hash_combo:       iaData._hashCombo  || null,
+    dados_extraidos:  Object.keys(iaData).length ? iaData : null
   }, { onConflict: 'user_id,year,period' }).select();
 
   if (error) {
