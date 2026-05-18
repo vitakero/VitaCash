@@ -11613,43 +11613,42 @@ function exportarPDF() {
     _barTabela()
     ]), unbreakable: true
   }];
-  pgBench.push({ stack:[
-  { text:'INDICADORES ADICIONAIS DE EFICIÊNCIA OPERACIONAL', fontSize:7, color:MUTED, characterSpacing:1.2, margin:[0,8,0,12] },
-  {
-    table:{ widths:['*',68,90,70], body:[
-      [tblHdr('Indicador'), tblHdr('Empresa','center',[4,7,4,7]), tblHdr('Referência setorial','center',[4,7,4,7]), tblHdr('Avaliação','center',[4,7,4,7])],
-
-      [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Ciclo de caixa', fontSize:9, color:STEEL, margin:[10,10,8,10] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'-3 dias', fontSize:9, bold:true, color:ACCD, alignment:'center', margin:[4,8,4,8] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Referência: 15 dias', fontSize:9, color:STEEL, alignment:'center', margin:[4,8,4,8] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Excelente', fontSize:9, color:ACC, alignment:'center', margin:[4,8,4,8] }],
-
-      [{ border:[false,false,false,true], borderColor:['','','',GHOST], text:'Giro do ativo', fontSize:9, color:STEEL, margin:[10,10,8,10] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'4,71x', fontSize:9, bold:true, color:ACCD, alignment:'center', margin:[4,8,4,8] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], text:'Mediana: 2,5x', fontSize:9, color:STEEL, alignment:'center', margin:[4,8,4,8] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Top 25% do setor', fontSize:9, color:ACC, alignment:'center', margin:[4,8,4,8] }],
-
-      [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Endividamento total', fontSize:9, color:STEEL, margin:[10,10,8,10] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'31,2%', fontSize:9, bold:true, color:ACCD, alignment:'center', margin:[4,8,4,8] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Limite saudável: 60%', fontSize:9, color:STEEL, alignment:'center', margin:[4,8,4,8] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Posição sólida', fontSize:9, color:ACC, alignment:'center', margin:[4,8,4,8] }],
-
-      [{ border:[false,false,false,true], borderColor:['','','',GHOST], text:'Liquidez imediata', fontSize:9, color:STEEL, margin:[10,10,8,10] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'1,83x', fontSize:9, bold:true, color:ACCD, alignment:'center', margin:[4,8,4,8] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], text:'Mínimo: 1,0x', fontSize:9, color:STEEL, alignment:'center', margin:[4,8,4,8] },
-       { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Confortável', fontSize:9, color:ACC, alignment:'center', margin:[4,8,4,8] }],
-
-      [{ border:[false,false,false,false], text:'Cobertura de juros', fontSize:9, color:STEEL, margin:[10,10,8,10] },
-       { border:[false,false,false,false], fillColor:ACCL, text:'2,1x', fontSize:9, bold:true, color:ACCD, alignment:'center', margin:[4,8,4,8] },
-       { border:[false,false,false,false], text:'Faixa ideal: 2-3x', fontSize:9, color:STEEL, alignment:'center', margin:[4,8,4,8] },
-       { border:[false,false,false,false], fillColor:ACCL, text:'Adequado', fontSize:9, color:ACC, alignment:'center', margin:[4,8,4,8] }]
-    ]}, margin:[0,0,0,0]
-  }
-  ], unbreakable:true });
-
-  // ── PAGINA 6: PLANO ESTRATEGICO ───────────────────────────────────
+  // ── PAGINA 6: INDICADORES ADICIONAIS + PLANO DE AÇÃO ──────────────
   var pgPlan = [{
-    stack: [].concat(secHeader('05','PLANO DE AÇÃO ESTRUTURADO'), [
+    stack: [
+    // ─── Indicadores Adicionais (movido do pgBench p/ ficar com o Plano) ───
+    { text:'INDICADORES ADICIONAIS DE EFICIÊNCIA OPERACIONAL', fontSize:7, color:MUTED, characterSpacing:1.2, margin:[0,0,0,12] },
+    {
+      table:{ widths:['*',68,90,70], body:[
+        [tblHdr('Indicador'), tblHdr('Empresa','center',[4,7,4,7]), tblHdr('Referência setorial','center',[4,7,4,7]), tblHdr('Avaliação','center',[4,7,4,7])],
+
+        [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Ciclo de caixa', fontSize:9, color:STEEL, margin:[10,10,8,10] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'-3 dias', fontSize:9, bold:true, color:ACCD, alignment:'center', margin:[4,8,4,8] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Referência: 15 dias', fontSize:9, color:STEEL, alignment:'center', margin:[4,8,4,8] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Excelente', fontSize:9, color:ACC, alignment:'center', margin:[4,8,4,8] }],
+
+        [{ border:[false,false,false,true], borderColor:['','','',GHOST], text:'Giro do ativo', fontSize:9, color:STEEL, margin:[10,10,8,10] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'4,71x', fontSize:9, bold:true, color:ACCD, alignment:'center', margin:[4,8,4,8] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], text:'Mediana: 2,5x', fontSize:9, color:STEEL, alignment:'center', margin:[4,8,4,8] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Top 25% do setor', fontSize:9, color:ACC, alignment:'center', margin:[4,8,4,8] }],
+
+        [{ border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Endividamento total', fontSize:9, color:STEEL, margin:[10,10,8,10] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'31,2%', fontSize:9, bold:true, color:ACCD, alignment:'center', margin:[4,8,4,8] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:PAPER, text:'Limite saudável: 60%', fontSize:9, color:STEEL, alignment:'center', margin:[4,8,4,8] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Posição sólida', fontSize:9, color:ACC, alignment:'center', margin:[4,8,4,8] }],
+
+        [{ border:[false,false,false,true], borderColor:['','','',GHOST], text:'Liquidez imediata', fontSize:9, color:STEEL, margin:[10,10,8,10] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'1,83x', fontSize:9, bold:true, color:ACCD, alignment:'center', margin:[4,8,4,8] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], text:'Mínimo: 1,0x', fontSize:9, color:STEEL, alignment:'center', margin:[4,8,4,8] },
+         { border:[false,false,false,true], borderColor:['','','',GHOST], fillColor:ACCL, text:'Confortável', fontSize:9, color:ACC, alignment:'center', margin:[4,8,4,8] }],
+
+        [{ border:[false,false,false,false], text:'Cobertura de juros', fontSize:9, color:STEEL, margin:[10,10,8,10] },
+         { border:[false,false,false,false], fillColor:ACCL, text:'2,1x', fontSize:9, bold:true, color:ACCD, alignment:'center', margin:[4,8,4,8] },
+         { border:[false,false,false,false], text:'Faixa ideal: 2-3x', fontSize:9, color:STEEL, alignment:'center', margin:[4,8,4,8] },
+         { border:[false,false,false,false], fillColor:ACCL, text:'Adequado', fontSize:9, color:ACC, alignment:'center', margin:[4,8,4,8] }]
+      ]}, margin:[0,0,0,0]
+    }
+    ].concat(secHeader('05','PLANO DE AÇÃO ESTRUTURADO'), [
     { text:'Iniciativas priorizadas por impacto financeiro e viabilidade de execução. Os prazos são contados a partir da data de início da implementação.', fontSize:9, color:MUTED, lineHeight:1.5, margin:[0,0,0,10] },
     {
       table:{ widths:[22,30,'*',68,52,72], body:[
