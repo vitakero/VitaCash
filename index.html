@@ -11650,9 +11650,11 @@ function exportarPDF() {
       ]}, margin:[0,0,0,0]
     }
     ], unbreakable:true },
-    // Plano de Ação (bloco 2, unbreakable separado)
+    // Plano de Ação — bloco 2a: título + intro (unbreakable, anchor do título)
     { stack: [].concat(secHeader('05','PLANO DE AÇÃO ESTRUTURADO'), [
-    { text:'Iniciativas priorizadas por impacto financeiro e viabilidade de execução. Os prazos são contados a partir da data de início da implementação.', fontSize:9, color:MUTED, lineHeight:1.5, margin:[0,0,0,10] },
+    { text:'Iniciativas priorizadas por impacto financeiro e viabilidade de execução. Os prazos são contados a partir da data de início da implementação.', fontSize:9, color:MUTED, lineHeight:1.5, margin:[0,0,0,10] }
+    ]), unbreakable: true },
+    // Plano de Ação — bloco 2b: tabela (pode quebrar entre linhas se necessário)
     {
       table:{ widths:[22,30,'*',68,52,72], body:[
         [tblHdr('Pri.','center',[4,8,4,8]), tblHdr('Prazo','center',[4,8,4,8]), tblHdr('Ação Recomendada','left',[8,8,8,8]), tblHdr('Impacto Est.','right',[4,8,4,8]), tblHdr('Dificuldade','center',[4,8,4,8]), tblHdr('Métrica','left',[4,8,4,8])],
@@ -11706,8 +11708,7 @@ function exportarPDF() {
          { border:[false,false,false,false], text:'Margem contrib. por vendedor', fontSize:8, color:MUTED, margin:[4,8,4,8] }]
       ]}, margin:[0,0,0,20]
     }
-    ]), unbreakable: true
-  }];
+  ];
 
   pgPlan = pgPlan.concat([
     { stack:[
