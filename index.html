@@ -10511,7 +10511,7 @@ async function salvarAnalise() {
   var upsertPayload = {
     user_id:          currentUser.id,
     year:             meta.year,
-    period:           meta.period || 'Não informado',
+    period:           meta.period || 'Anual',
     filename_dre:     meta.dre     || null,
     filename_balanco: meta.balanco || null
   };
@@ -10592,13 +10592,13 @@ async function popularFiltroDash() {
   }
 
   sel.innerHTML = analises.map(function(a) {
-    var lbl = a.year + (a.period && a.period !== 'Não informado' ? ' · ' + a.period : '');
+    var lbl = a.year + (a.period && a.period !== 'Anual' ? ' · ' + a.period : '');
     return '<option value="' + a.id + '" data-year="' + a.year + '" data-period="' + (a.period||'') + '">' + lbl + '</option>';
   }).join('');
 
   if (menu) {
     menu.innerHTML = analises.map(function(a) {
-      var lbl = a.year + (a.period && a.period !== 'Não informado' ? ' · ' + a.period : '');
+      var lbl = a.year + (a.period && a.period !== 'Anual' ? ' · ' + a.period : '');
       return '<div class="dash-cs-opt" data-val="' + a.id + '" onclick="pickDashCs(this)">' + lbl + '</div>';
     }).join('');
   }
@@ -10630,7 +10630,7 @@ async function dashFilterChange(id) {
   if (error || !data) return;
 
   // Atualiza rótulo do nicho/período no header (SVG + texto)
-  var labelPeriodo = data.year + (data.period && data.period !== 'Não informado' ? ' · ' + data.period : '');
+  var labelPeriodo = data.year + (data.period && data.period !== 'Anual' ? ' · ' + data.period : '');
   ['dt'].forEach(function(eid) {
     var el = document.getElementById(eid);
     if (el) el.innerHTML = nichoToHTML(nicho); // mantém nicho do usuário
