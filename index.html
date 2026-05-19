@@ -3634,7 +3634,7 @@ function adminAbrirWhatsApp() {
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;">
         <div style="display:flex;align-items:center;gap:8px;">
           <span style="width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse-dot 2s ease infinite;"></span>
-          <span style="font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.8px;">Radar IA · R$ 1,25 mi mapeados</span>
+          <span id="radar-titulo" style="font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.8px;">Radar IA · R$ 1,25 mi mapeados</span>
         </div>
         <span class="chip new">Novo hoje</span>
       </div>
@@ -3650,9 +3650,9 @@ function adminAbrirWhatsApp() {
             <span class="chip impact" style="display:inline-flex;align-items:center;gap:4px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>Maior impacto</span>
             <span class="chip" style="background:#f8f8f6;color:#5f5e5a;border:.5px solid #d0cfc9;">Comece por aqui</span>
           </div>
-          <div class="ai-card-title">Você está deixando R$ 1,25 mi por ano na mesa</div>
-          <div class="ai-card-desc">R$ 365 mil em perdas de estoque + R$ 705 mil parados sem render. Dinheiro seu — ainda não capturado.</div>
-          <div class="ai-card-value">Quero recuperar esse dinheiro →</div>
+          <div id="radar-c1-title" class="ai-card-title">Você está deixando R$ 1,25 mi por ano na mesa</div>
+          <div id="radar-c1-desc" class="ai-card-desc">R$ 365 mil em perdas de estoque + R$ 705 mil parados sem render. Dinheiro seu — ainda não capturado.</div>
+          <div id="radar-c1-cta" class="ai-card-value">Quero recuperar esse dinheiro →</div>
         </div>
       </div>
       <div class="ai-card" onclick="swTab('tcg',document.querySelector('[data-tab=tcg]'))">
@@ -3662,8 +3662,8 @@ function adminAbrirWhatsApp() {
             <span class="chip quick" style="display:inline-flex;align-items:center;gap:4px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 15 14"/></svg>Ação rápida</span>
             <span class="chip" style="background:#f8f8f6;color:#5f5e5a;border:.5px solid #d0cfc9;">Menos de 1h</span>
           </div>
-          <div class="ai-card-title">Você recebe antes de pagar — mas não está usando isso</div>
-          <div class="ai-card-desc">Ciclo -3 dias é vantagem que 90% do setor não tem. Use agora para pressionar fornecedores por desconto.</div>
+          <div id="radar-c2-title" class="ai-card-title">Você recebe antes de pagar — mas não está usando isso</div>
+          <div id="radar-c2-desc" class="ai-card-desc">Ciclo -3 dias é vantagem que 90% do setor não tem. Use agora para pressionar fornecedores por desconto.</div>
           <div class="ai-card-value" style="color:var(--amber);">Aplicar essa vantagem agora →</div>
         </div>
       </div>
@@ -3673,15 +3673,15 @@ function adminAbrirWhatsApp() {
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
             <span class="chip gain" style="display:inline-flex;align-items:center;gap:4px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Ganho imediato</span>
           </div>
-          <div class="ai-card-title">Você paga R$ 277 mil/ano a mais por não trocar de banco</div>
-          <div class="ai-card-desc">Endividamento de 31,2% é baixo — você tem poder de negociação. BNDES a 0,97%/mês vs taxas atuais.</div>
-          <div class="ai-card-value" style="color:#3b82f6;">Ver como economizar R$ 277 mil →</div>
+          <div id="radar-c3-title" class="ai-card-title">Você paga R$ 277 mil/ano a mais por não trocar de banco</div>
+          <div id="radar-c3-desc" class="ai-card-desc">Endividamento de 31,2% é baixo — você tem poder de negociação. BNDES a 0,97%/mês vs taxas atuais.</div>
+          <div id="radar-c3-cta" class="ai-card-value" style="color:#3b82f6;">Ver como economizar R$ 277 mil →</div>
         </div>
       </div>
       <!-- Reforço de valor -->
       <div style="background:var(--green-light);border:.5px solid var(--green-mid);border-radius:10px;padding:.625rem 1rem;display:flex;align-items:center;gap:8px;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1D9E75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        <span style="font-size:12px;color:var(--green-dark);font-weight:600;">Você já tem R$ 1,25 mi mapeados. Agora é só executar.</span>
+        <span id="radar-footer" style="font-size:12px;color:var(--green-dark);font-weight:600;">Você já tem R$ 1,25 mi mapeados. Agora é só executar.</span>
       </div>
     </div>
     <div class="sl">Indicadores extraídos — 2024</div>
@@ -10489,6 +10489,68 @@ function popularDashboard(dados) {
       el.textContent = fmtV(potencialLucro > 0 ? potencialLucro : Math.abs(d.lucro_liquido||0) * 0.5);
     }
   });
+
+  // ── 8. RADAR IA — atualiza cards com dados reais ─────────────
+  (function() {
+    // Card 1: oportunidade de melhoria de lucro
+    var margemMetaSetor = ml; // benchmark do setor
+    var gapMargem = Math.max(0, (margemMetaSetor - (ind.margemLiq||0)) / 100 * recL);
+    var caixoParado = b.caixa > 0 && ncg >= 0 ? Math.max(0, b.caixa - ncg) : 0;
+    var economiaDespesas = Math.max(0, (despOpAbs - recL * mo / 100));
+    var potencial = gapMargem > 0 ? gapMargem : economiaDespesas;
+    if (potencial <= 0) potencial = Math.abs(d.lucro_liquido||0) * 0.3;
+    var totalMapeado = potencial + (caixoParado > 0 ? caixoParado * 0.05 : 0);
+
+    var t1 = document.getElementById('radar-c1-title');
+    var d1 = document.getElementById('radar-c1-desc');
+    if (t1) t1.textContent = 'Você está deixando ' + fmtV(totalMapeado) + ' por ano na mesa';
+    if (d1) {
+      if (gapMargem > 0) {
+        d1.textContent = fmtV(economiaDespesas > 0 ? economiaDespesas : gapMargem) + ' em despesas acima do benchmark' +
+          (caixoParado > 1e5 ? ' + ' + fmtV(caixoParado) + ' parados sem render' : '') +
+          '. Dinheiro seu — ainda não capturado.';
+      } else {
+        d1.textContent = 'Margem acima do setor — potencial de mais ' + fmtV(potencial) + ' otimizando despesas operacionais.';
+      }
+    }
+
+    // Card 2: ciclo de caixa
+    var t2 = document.getElementById('radar-c2-title');
+    var d2 = document.getElementById('radar-c2-desc');
+    if (ciclo < 0) {
+      if (t2) t2.textContent = 'Você recebe antes de pagar — mas não está usando isso';
+      if (d2) d2.textContent = 'Ciclo ' + ciclo + ' dias é vantagem que 90% do setor não tem. Use agora para pressionar fornecedores por desconto.';
+    } else if (ciclo > 0) {
+      if (t2) t2.textContent = 'Seu ciclo de caixa prende ' + fmtV(ncg) + ' no giro';
+      if (d2) d2.textContent = 'Ciclo de ' + ciclo + ' dias exige capital parado. Reduzir ' + Math.round(ciclo*0.2) + ' dias libera ' + fmtV(ncg * 0.2) + ' de volta ao caixa.';
+    } else {
+      if (t2) t2.textContent = 'Ciclo de caixa neutro — oportunidade de melhorar';
+      if (d2) d2.textContent = 'PMR: ' + pmr + ' dias · PME: ' + pme + ' dias · PMP: ' + pmp + ' dias. Alinhar prazos pode liberar caixa imediatamente.';
+    }
+
+    // Card 3: endividamento e poder de negociação
+    var t3 = document.getElementById('radar-c3-title');
+    var d3 = document.getElementById('radar-c3-desc');
+    var economiaBanco = dividaAtual > 0 ? dividaAtual * 0.10 : recL * 0.003; // 10% da dívida ou 0,3% da receita
+    if (t3) t3.textContent = 'Endividamento ' + endivGeral.toFixed(1).replace('.',',') + '% — ' + fmtV(economiaBanco) + '/ano de economia disponível';
+    if (d3) {
+      if (endivGeral < 40) {
+        d3.textContent = 'Endividamento baixo (' + endivGeral.toFixed(1).replace('.',',') + '%) — você tem poder de negociação. BNDES a 0,97%/mês vs taxas de mercado.';
+      } else if (endivGeral < 65) {
+        d3.textContent = 'Endividamento em ' + endivGeral.toFixed(1).replace('.',',') + '% — dentro do limite. Renegociar taxas pode economizar ' + fmtV(economiaBanco) + '/ano.';
+      } else {
+        d3.textContent = 'Endividamento em ' + endivGeral.toFixed(1).replace('.',',') + '% — acima de 60%. Prioridade: refinanciar dívida cara e reduzir alavancagem.';
+      }
+    }
+    var c3cta = document.getElementById('radar-c3-cta');
+    if (c3cta) c3cta.textContent = 'Ver como economizar ' + fmtV(economiaBanco) + ' →';
+
+    // Título e rodapé do radar
+    var radarTitulo = document.getElementById('radar-titulo');
+    if (radarTitulo) radarTitulo.textContent = 'Radar IA · ' + fmtV(totalMapeado) + ' mapeados';
+    var radarFooter = document.getElementById('radar-footer');
+    if (radarFooter) radarFooter.textContent = 'Você já tem ' + fmtV(totalMapeado) + ' mapeados. Agora é só executar.';
+  })();
 
   // Salva globais para simuladores (empréstimo, etc.)
   window._ebitReal    = d.ebit || 0;
