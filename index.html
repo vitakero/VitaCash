@@ -10517,6 +10517,20 @@ function ndreAnalisar() {
       if (balancoB64) content.push({ type:'document', source:{ type:'base64', media_type:'application/pdf', data: balancoB64.replace(/\s+/g,'') } });
       content.push({ type:'text', text: window._PROMPT_IA });
 
+      // Garante que a chave foi carregada — se não veio no login, busca agora
+      if (!window._VCFG) {
+        var { data: { session: _s2 } } = await sb.auth.getSession();
+        if (_s2?.access_token) {
+          try {
+            var r2 = await fetch('https://asrecwsocneepipvfymx.supabase.co/functions/v1/get-config', {
+              headers: { 'Authorization': 'Bearer ' + _s2.access_token, 'apikey': 'sb_publishable_mPLOadOpzna9wpDKjtB1-w_OwjwRwVW' }
+            });
+            if (r2.ok) { var j2 = await r2.json(); window._VCFG = j2.k || ''; }
+          } catch(_) {}
+        }
+      }
+      if (!window._VCFG) throw new Error('Chave de IA não carregada. Faça logout e login novamente.');
+
       console.log('🤖 Chamando Claude diretamente...');
 
       // 3. Chamar Claude API
