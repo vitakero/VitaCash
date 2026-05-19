@@ -10447,13 +10447,12 @@ function ndreAnalisar() {
   // Converte PDFs para base64 e chama a edge function
   (async function() {
     try {
-      var dreB64      = ndreFiles.dre ? await fileToBase64(ndreFiles.dre) : null;
-      var balancoB64  = ndreFiles.bp  ? await fileToBase64(ndreFiles.bp)  : null;
+      var dreB64 = ndreFiles.dre ? await fileToBase64(ndreFiles.dre) : null;
+      // Arquivo único: não envia balanço separado (evita duplicar o PDF no request)
+      var arquivoSeparado = !ndreUnico && ndreFiles.bp && ndreFiles.bp !== ndreFiles.dre;
+      var balancoB64 = arquivoSeparado ? await fileToBase64(ndreFiles.bp) : null;
 
-      // Se arquivo único com DRE+BP juntos, usa o mesmo
-      if (!balancoB64 && ndreUnico) balancoB64 = dreB64;
-
-      console.log('📤 Enviando para edge function — DRE:', !!dreB64, '| Balanço:', !!balancoB64, '| Ano:', window._analiseAtual?.year);
+      console.log('📤 Enviando para edge function — DRE:', !!dreB64, '| Balanço sep.:', !!balancoB64, '| Ano:', window._analiseAtual?.year);
 
       var SUPABASE_URL = 'https://asrecwsocneepipvfymx.supabase.co';
       var { data: { session: _iaSession } } = await sb.auth.getSession();
