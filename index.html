@@ -10449,9 +10449,12 @@ function ndreAnalisar() {
       // Se arquivo único com DRE+BP juntos, usa o mesmo
       if (!balancoB64 && ndreUnico) balancoB64 = dreB64;
 
+      console.log('📤 Enviando para edge function — DRE:', !!dreB64, '| Balanço:', !!balancoB64, '| Ano:', window._analiseAtual?.year);
+
       var SUPABASE_URL = 'https://asrecwsocneepipvfymx.supabase.co';
       var { data: { session: _iaSession } } = await sb.auth.getSession();
       var _iaToken = _iaSession?.access_token || '';
+      console.log('🔑 Token presente:', !!_iaToken);
       var resp = await fetch(SUPABASE_URL + '/functions/v1/analisar-pdf', {
         method: 'POST',
         headers: {
