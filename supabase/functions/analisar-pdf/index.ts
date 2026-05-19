@@ -153,7 +153,7 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json()
-    const { dre_base64, balanco_base64, user_id, ano, periodo } = body
+    const { dre_base64, balanco_base64, hash_combo: hashComboClient, user_id, ano, periodo } = body
 
     if (!dre_base64 || !user_id) {
       return new Response(JSON.stringify({ error: 'dre_base64 e user_id são obrigatórios' }), {
@@ -161,12 +161,18 @@ Deno.serve(async (req) => {
       })
     }
 
-    // ── 1. Gerar hash dos PDFs ──────────────────────────────────
-    const dreBytes  = Uint8Array.from(atob(dre_base64),  c => c.charCodeAt(0))
-    const bpBytes   = balanco_base64 ? Uint8Array.from(atob(balanco_base64), c => c.charCodeAt(0)) : null
-    const hashDRE   = await sha256(dreBytes)
-    const hashBP    = bpBytes ? await sha256(bpBytes) : 'none'
-    const hashCombo = await sha256(new TextEncoder().encode(hashDRE + hashBP))
+    // ── 1. Hash recebido do cliente (evita recalcular no servidor) ──
+    // Fallback: recalcula se não veio no request (compatibilidade)
+    let hashCombo: string
+    if (hashComboClient) {
+      hashCombo = hashComboClient
+    } else {
+      const dreBytes  = Uint8Array.from(atob(dre_base64),  c => c.charCodeAt(0))
+      const bpBytes   = balanco_base64 ? Uint8Array.from(atob(balanco_base64), c => c.charCodeAt(0)) : null
+      const hashDRE   = await sha256(dreBytes)
+      const hashBP    = bpBytes ? await sha256(bpBytes) : 'none'
+      hashCombo = await sha256(new TextEncoder().encode(hashDRE + hashBP))
+    }
 
     // ── 2. Verificar cache ──────────────────────────────────────
     const { data: cached } = await supabase

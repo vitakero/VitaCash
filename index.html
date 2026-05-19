@@ -10452,7 +10452,17 @@ function ndreAnalisar() {
       var arquivoSeparado = !ndreUnico && ndreFiles.bp && ndreFiles.bp !== ndreFiles.dre;
       var balancoB64 = arquivoSeparado ? await fileToBase64(ndreFiles.bp) : null;
 
-      console.log('📤 Enviando para edge function — DRE:', !!dreB64, '| Balanço sep.:', !!balancoB64, '| Ano:', window._analiseAtual?.year);
+      // Calcula hash no browser para não consumir CPU da edge function
+      async function sha256b64(str) {
+        var bytes = new TextEncoder().encode(str);
+        var buf   = await crypto.subtle.digest('SHA-256', bytes);
+        return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+      }
+      var hashDRE    = dreB64    ? await sha256b64(dreB64)    : 'none';
+      var hashBP     = balancoB64? await sha256b64(balancoB64): 'none';
+      var hashCombo  = await sha256b64(hashDRE + hashBP);
+
+      console.log('📤 Enviando para edge function — DRE:', !!dreB64, '| Balanço sep.:', !!balancoB64, '| Hash:', hashCombo.slice(0,8));
 
       var SUPABASE_URL = 'https://asrecwsocneepipvfymx.supabase.co';
       var { data: { session: _iaSession } } = await sb.auth.getSession();
@@ -10468,6 +10478,7 @@ function ndreAnalisar() {
         body: JSON.stringify({
           dre_base64:     dreB64,
           balanco_base64: balancoB64,
+          hash_combo:     hashCombo,
           user_id:        currentUser ? currentUser.id : null,
           ano:            window._analiseAtual.year,
           periodo:        window._analiseAtual.period
