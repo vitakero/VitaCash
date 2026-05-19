@@ -10490,66 +10490,164 @@ function popularDashboard(dados) {
     }
   });
 
-  // ── 8. RADAR IA — atualiza cards com dados reais ─────────────
+  // ── 8. RADAR IA — análise financeira real, rankeada por impacto ──────
   (function() {
-    // Card 1: oportunidade de melhoria de lucro
-    var margemMetaSetor = ml; // benchmark do setor
-    var gapMargem = Math.max(0, (margemMetaSetor - (ind.margemLiq||0)) / 100 * recL);
-    var caixoParado = b.caixa > 0 && ncg >= 0 ? Math.max(0, b.caixa - ncg) : 0;
-    var economiaDespesas = Math.max(0, (despOpAbs - recL * mo / 100));
-    var potencial = gapMargem > 0 ? gapMargem : economiaDespesas;
-    if (potencial <= 0) potencial = Math.abs(d.lucro_liquido||0) * 0.3;
-    var totalMapeado = potencial + (caixoParado > 0 ? caixoParado * 0.05 : 0);
+    var ops = []; // lista de oportunidades reais
 
-    var t1 = document.getElementById('radar-c1-title');
-    var d1 = document.getElementById('radar-c1-desc');
-    if (t1) t1.textContent = 'Você está deixando ' + fmtV(totalMapeado) + ' por ano na mesa';
-    if (d1) {
-      if (gapMargem > 0) {
-        d1.textContent = fmtV(economiaDespesas > 0 ? economiaDespesas : gapMargem) + ' em despesas acima do benchmark' +
-          (caixoParado > 1e5 ? ' + ' + fmtV(caixoParado) + ' parados sem render' : '') +
-          '. Dinheiro seu — ainda não capturado.';
-      } else {
-        d1.textContent = 'Margem acima do setor — potencial de mais ' + fmtV(potencial) + ' otimizando despesas operacionais.';
-      }
+    // ① Juros consumindo o lucro operacional (cobJuros < 3)
+    if (despFinAbs > 0) {
+      var custoDivida = despFinAbs; // juros pagos no ano
+      var economiaPotencial = custoDivida * 0.20; // refinanciar pode reduzir 20%
+      var gravidade = cobJuros < 1 ? 3 : cobJuros < 2 ? 2 : 1;
+      ops.push({
+        impacto: economiaPotencial,
+        gravidade: gravidade,
+        urgencia: cobJuros < 2 ? 'impact' : 'gain',
+        tab: 'tend',
+        titulo: cobJuros < 1
+          ? 'Resultado financeiro está consumindo todo o EBIT — ' + fmtV(custoDivida) + '/ano em juros'
+          : 'Juros de ' + fmtV(custoDivida) + '/ano — refinanciar pode economizar ' + fmtV(economiaPotencial),
+        desc: cobJuros < 1
+          ? 'EBIT de ' + fmtV(Math.abs(d.ebit||0)) + ' não cobre as despesas financeiras de ' + fmtV(custoDivida) + ' (' + despFinPct.toFixed(1) + '% da receita). Cobertura de ' + cobJurosStr + ' — risco alto. Refinanciar é prioridade máxima.'
+          : 'Despesas financeiras de ' + fmtV(custoDivida) + ' (' + despFinPct.toFixed(1) + '% da receita). Cobertura de juros: ' + cobJurosStr + '. BNDES a 0,97%/mês pode economizar até ' + fmtV(economiaPotencial) + '/ano.',
+        cta: cobJuros < 1 ? 'Ver plano de refinanciamento urgente →' : 'Ver como economizar ' + fmtV(economiaPotencial) + ' →'
+      });
     }
 
-    // Card 2: ciclo de caixa
-    var t2 = document.getElementById('radar-c2-title');
-    var d2 = document.getElementById('radar-c2-desc');
-    if (ciclo < 0) {
-      if (t2) t2.textContent = 'Você recebe antes de pagar — mas não está usando isso';
-      if (d2) d2.textContent = 'Ciclo ' + ciclo + ' dias é vantagem que 90% do setor não tem. Use agora para pressionar fornecedores por desconto.';
-    } else if (ciclo > 0) {
-      if (t2) t2.textContent = 'Seu ciclo de caixa prende ' + fmtV(ncg) + ' no giro';
-      if (d2) d2.textContent = 'Ciclo de ' + ciclo + ' dias exige capital parado. Reduzir ' + Math.round(ciclo*0.2) + ' dias libera ' + fmtV(ncg * 0.2) + ' de volta ao caixa.';
+    // ② Despesas operacionais acima do benchmark do setor
+    var despOpPct = recL > 0 ? despOpAbs / recL * 100 : 0;
+    var despOpBenchmark = mo * 2.5; // benchmark de despesas op. = ~2,5x margem op.
+    var gapDespOp = despOpAbs - (recL * despOpBenchmark / 100);
+    if (gapDespOp > recL * 0.01) { // só mostra se gap > 1% da receita
+      ops.push({
+        impacto: gapDespOp,
+        gravidade: gapDespOp > recL * 0.05 ? 3 : 2,
+        urgencia: 'impact',
+        tab: 'ta',
+        titulo: 'Despesas operacionais ' + (despOpPct - despOpBenchmark).toFixed(1) + 'pp acima do setor — ' + fmtV(gapDespOp) + '/ano a recuperar',
+        desc: 'Despesas de vendas + admin: ' + fmtV(despOpAbs) + ' (' + despOpPct.toFixed(1) + '% da receita vs benchmark ' + despOpBenchmark.toFixed(0) + '%). Reduzir para a média do setor transforma ' + fmtV(gapDespOp) + ' direto em lucro.',
+        cta: 'Ver plano de redução de despesas →'
+      });
+    }
+
+    // ③ CMV — renegociação com fornecedores
+    var cmvBenchmark = (100 - mb); // % ideal do CMV sobre receita líquida
+    var gapCMV = cmvAbs - (recL * cmvBenchmark / 100);
+    if (gapCMV > 0) {
+      var economiaFornecedor = cmvAbs * 0.02; // 2% de desconto de fornecedor
+      ops.push({
+        impacto: economiaFornecedor,
+        gravidade: 1,
+        urgencia: 'quick',
+        tab: 'ta',
+        titulo: 'Renegociar fornecedores — cada 1% = ' + fmtV(cmvAbs * 0.01) + ' de lucro a mais',
+        desc: 'CMV de ' + fmtV(cmvAbs) + ' (' + cmvPctRecL.toFixed(1) + '% da receita líquida, benchmark ' + cmvBenchmark + '%). Com esse volume de compras, 2% de desconto gera ' + fmtV(economiaFornecedor) + '/ano sem mudar nada na operação.',
+        cta: 'Ver estratégia de negociação →'
+      });
     } else {
-      if (t2) t2.textContent = 'Ciclo de caixa neutro — oportunidade de melhorar';
-      if (d2) d2.textContent = 'PMR: ' + pmr + ' dias · PME: ' + pme + ' dias · PMP: ' + pmp + ' dias. Alinhar prazos pode liberar caixa imediatamente.';
+      // CMV abaixo do benchmark = margem bruta forte
+      var expandirGanho = Math.abs(d.lucro_bruto||0) * 0.05;
+      ops.push({
+        impacto: expandirGanho,
+        gravidade: 1,
+        urgencia: 'quick',
+        tab: 'ta',
+        titulo: 'Margem bruta de ' + (ind.margemBruta||0).toFixed(1) + '% acima da média — expanda antes da concorrência copiar',
+        desc: 'CMV de ' + cmvPctRecL.toFixed(1) + '% da receita é ' + Math.abs(gapCMV/recL*100).toFixed(1) + 'pp abaixo do benchmark do setor. Essa vantagem de custo pode gerar mais ' + fmtV(expandirGanho) + '/ano escalando o volume.',
+        cta: 'Ver como ampliar essa vantagem →'
+      });
     }
 
-    // Card 3: endividamento e poder de negociação
-    var t3 = document.getElementById('radar-c3-title');
-    var d3 = document.getElementById('radar-c3-desc');
-    var economiaBanco = dividaAtual > 0 ? dividaAtual * 0.10 : recL * 0.003; // 10% da dívida ou 0,3% da receita
-    if (t3) t3.textContent = 'Endividamento ' + endivGeral.toFixed(1).replace('.',',') + '% — ' + fmtV(economiaBanco) + '/ano de economia disponível';
-    if (d3) {
-      if (endivGeral < 40) {
-        d3.textContent = 'Endividamento baixo (' + endivGeral.toFixed(1).replace('.',',') + '%) — você tem poder de negociação. BNDES a 0,97%/mês vs taxas de mercado.';
-      } else if (endivGeral < 65) {
-        d3.textContent = 'Endividamento em ' + endivGeral.toFixed(1).replace('.',',') + '% — dentro do limite. Renegociar taxas pode economizar ' + fmtV(economiaBanco) + '/ano.';
-      } else {
-        d3.textContent = 'Endividamento em ' + endivGeral.toFixed(1).replace('.',',') + '% — acima de 60%. Prioridade: refinanciar dívida cara e reduzir alavancagem.';
+    // ④ Ciclo de caixa (positivo = capital preso; negativo = vantagem)
+    if (ciclo < 0) {
+      var vantagemCiclo = Math.abs(ciclo) * gdiar * 0.12; // custo de oportunidade do capital liberado (12% a.a.)
+      ops.push({
+        impacto: vantagemCiclo,
+        gravidade: 1,
+        urgencia: 'quick',
+        tab: 'tcg',
+        titulo: 'Você recebe antes de pagar — ciclo ' + ciclo + ' dias é vantagem que 90% do setor não tem',
+        desc: 'PMR ' + pmr + ' dias · PMP ' + pmp + ' dias. Isso libera ' + fmtV(Math.abs(ciclo) * gdiar) + ' que não precisam estar financiados. Use para pressionar fornecedores por desconto de antecipação.',
+        cta: 'Aplicar essa vantagem agora →'
+      });
+    } else if (ciclo > 0 && ncg > 0) {
+      ops.push({
+        impacto: ncg * 0.15,
+        gravidade: 2,
+        urgencia: 'quick',
+        tab: 'tcg',
+        titulo: fmtV(ncg) + ' presos no ciclo de caixa — ' + ciclo + ' dias de capital sem girar',
+        desc: 'PMR ' + pmr + ' dias · PME ' + pme + ' dias · PMP ' + pmp + ' dias. Reduzir o ciclo em 20% libera ' + fmtV(ncg * 0.2) + ' imediatamente. Cobrar mais rápido ou esticar prazo de fornecedor resolve.',
+        cta: 'Ver como liberar esse caixa →'
+      });
+    }
+
+    // ⑤ Caixa excedente (acima do NCG em mais de 20% da receita)
+    var excesso = (b.caixa||0) - Math.max(0, ncg);
+    if (excesso > recL * 0.10) {
+      var rendimento = excesso * 0.12;
+      ops.push({
+        impacto: rendimento,
+        gravidade: 1,
+        urgencia: 'gain',
+        tab: 'ta',
+        titulo: fmtV(excesso) + ' parados em caixa rendendo zero — ' + fmtV(rendimento) + '/ano desperdiçados',
+        desc: 'Caixa de ' + fmtV(b.caixa) + ' muito acima do necessário para o giro (' + fmtV(Math.max(0,ncg)) + '). Aplicar o excedente a 12% a.a. (CDI) gera ' + fmtV(rendimento) + ' por ano sem risco adicional.',
+        cta: 'Ver estratégia de alocação →'
+      });
+    }
+
+    // ⑥ ROE baixo (capital dos sócios mal remunerado)
+    if (roe < 15 && roe > 0 && b.patrimonio_liquido > 0) {
+      var lucroMeta = b.patrimonio_liquido * 0.15;
+      var gapROE = lucroMeta - Math.abs(d.lucro_liquido||0);
+      if (gapROE > 0) {
+        ops.push({
+          impacto: gapROE,
+          gravidade: 1,
+          urgencia: 'gain',
+          tab: 'ta',
+          titulo: 'ROE de ' + roe.toFixed(1) + '% — sócios ganham menos que a Selic (' + fmtV(gapROE) + '/ano abaixo da meta)',
+          desc: 'Patrimônio líquido de ' + fmtV(b.patrimonio_liquido) + ' gera apenas ' + roe.toFixed(1) + '% de retorno. Para superar a Selic (15%), o lucro deveria ser ' + fmtV(lucroMeta) + '. Gap de ' + fmtV(gapROE) + '/ano.',
+          cta: 'Ver como aumentar o retorno →'
+        });
       }
     }
-    var c3cta = document.getElementById('radar-c3-cta');
-    if (c3cta) c3cta.textContent = 'Ver como economizar ' + fmtV(economiaBanco) + ' →';
 
-    // Título e rodapé do radar
+    // Ordena por gravidade (desc) depois por impacto (desc) e pega top 3
+    ops.sort(function(a, b) {
+      if (b.gravidade !== a.gravidade) return b.gravidade - a.gravidade;
+      return b.impacto - a.impacto;
+    });
+    var top3 = ops.slice(0, 3);
+    while (top3.length < 3) top3.push(null); // padding se < 3 oportunidades
+
+    // Calcula total mapeado (soma dos top3)
+    var totalMapeado = 0;
+    top3.forEach(function(o) { if (o) totalMapeado += o.impacto; });
+
+    // Preenche os 3 cards
+    var ids = [
+      { t:'radar-c1-title', d:'radar-c1-desc', c:'radar-c1-cta' },
+      { t:'radar-c2-title', d:'radar-c2-desc', c:null },
+      { t:'radar-c3-title', d:'radar-c3-desc', c:'radar-c3-cta' }
+    ];
+    top3.forEach(function(op, i) {
+      if (!op) return;
+      var el = ids[i];
+      var tEl = document.getElementById(el.t);
+      var dEl = document.getElementById(el.d);
+      var cEl = el.c ? document.getElementById(el.c) : null;
+      if (tEl) tEl.textContent = op.titulo;
+      if (dEl) dEl.textContent = op.desc;
+      if (cEl) cEl.textContent = op.cta;
+    });
+
+    // Atualiza título e rodapé
     var radarTitulo = document.getElementById('radar-titulo');
-    if (radarTitulo) radarTitulo.textContent = 'Radar IA · ' + fmtV(totalMapeado) + ' mapeados';
+    if (radarTitulo) radarTitulo.textContent = 'RADAR IA · ' + fmtV(totalMapeado) + ' mapeados';
     var radarFooter = document.getElementById('radar-footer');
-    if (radarFooter) radarFooter.textContent = 'Você já tem ' + fmtV(totalMapeado) + ' mapeados. Agora é só executar.';
+    if (radarFooter) radarFooter.textContent = 'Você já tem ' + fmtV(totalMapeado) + ' em oportunidades mapeadas. Agora é só executar.';
   })();
 
   // Salva globais para simuladores (empréstimo, etc.)
