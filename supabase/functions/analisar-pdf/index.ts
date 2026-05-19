@@ -192,17 +192,22 @@ Deno.serve(async (req) => {
     // ── 3. Chamar Claude API ────────────────────────────────────
     console.log('🤖 Chamando Claude para análise...')
 
+    // Remove espaços/quebras de linha que invalidam o base64
+    const cleanB64 = (s: string) => s.replace(/\s+/g, '')
+    const dreClean = cleanB64(dre_base64)
+    const bpClean  = balanco_base64 ? cleanB64(balanco_base64) : null
+
     const content: Anthropic.MessageParam['content'] = [
       {
         type: 'document',
-        source: { type: 'base64', media_type: 'application/pdf', data: dre_base64 }
+        source: { type: 'base64', media_type: 'application/pdf', data: dreClean }
       } as never
     ]
 
-    if (balanco_base64) {
+    if (bpClean) {
       content.push({
         type: 'document',
-        source: { type: 'base64', media_type: 'application/pdf', data: balanco_base64 }
+        source: { type: 'base64', media_type: 'application/pdf', data: bpClean }
       } as never)
     }
 
