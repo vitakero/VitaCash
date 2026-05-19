@@ -9213,6 +9213,7 @@ function go(id){
         if (window._dadosIA && typeof popularDashboard === 'function') {
           popularDashboard(window._dadosIA);
         }
+        window._iaFresh = true; // impede popularFiltroDash de sobrescrever os dados recém-chegados
         go('s-dash');
       } else {
         setTimeout(_aguardarIAeIr, 600);
@@ -10673,6 +10674,11 @@ async function dashFilterChange(id) {
   console.log('📊 Análise carregada:', labelPeriodo, data);
 
   // Popula dashboard com dados salvos da IA
+  // Se veio de uma análise fresca, não sobrescreve — os dados já foram populados
+  if (window._iaFresh) {
+    window._iaFresh = false; // consome a flag
+    return;
+  }
   if (data.dados_extraidos && typeof popularDashboard === 'function') {
     window._dadosIA = data.dados_extraidos;
     popularDashboard(data.dados_extraidos);
