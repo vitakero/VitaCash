@@ -199,7 +199,7 @@ Deno.serve(async (req) => {
       } as never
     ]
 
-    if (bpBytes && balanco_base64) {
+    if (balanco_base64) {
       content.push({
         type: 'document',
         source: { type: 'base64', media_type: 'application/pdf', data: balanco_base64 }
