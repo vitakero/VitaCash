@@ -4172,7 +4172,7 @@ function adminAbrirWhatsApp() {
       </div>
       <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:.875rem;" id="cgsub">Caixa disponível: <strong>R$ 5,48 mi</strong> · Necessário: <strong>R$ 351 mil</strong> · Sobra: <strong>R$ 5,13 mi</strong> — empresa com caixa extremamente robusto.</div>
       <div class="cg-bar-track"><div class="cg-bar-fill" id="cgfill" style="width:94%;background:#5DCAA5;"></div></div>
-      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:.875rem;"><span>R$ 0</span><span style="color:var(--green);">Necessário: R$ 351 mil</span><span>Caixa: R$ 5,48 mi</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:.875rem;" id="cgbarlabels"><span>R$ 0</span><span style="color:var(--green);" id="cgnec">Necessário: R$ 351 mil</span><span id="cgcaixa">Caixa: R$ 5,48 mi</span></div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;margin-top:.25rem;">
         <div style="font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Ciclo de caixa</div>
         <div style="font-size:11px;color:var(--green);font-weight:700;background:var(--green-light);padding:2px 8px;border-radius:99px;border:.5px solid var(--green-mid);">-3 dias ✓ ciclo negativo</div>
@@ -9599,22 +9599,30 @@ function recalc(){
   const caixa=5481375;
   const excesso=caixa-ncg;
   document.getElementById('resciclo').textContent=ciclo+' dias';
-  document.getElementById('rescg').textContent=ciclo<=0?'Ciclo negativo!':fmt(ncg);
-  document.getElementById('cgv').textContent=ciclo<=0?'R$ 351 mil':fmt(ncg);
-  const pct=Math.min(Math.round((ncg/caixa)*100),95);
-  document.getElementById('cgfill').style.width=Math.min(pct+18,95)+'%';
-  if(excesso>0){
+  document.getElementById('rescg').textContent=ciclo<=0?'R$ 0,00':fmt(ncg);
+  document.getElementById('cgv').textContent=ciclo<=0?'R$ 0,00':fmt(ncg);
+  var necLabel=document.getElementById('cgnec'); if(necLabel) necLabel.textContent='Necessário: '+(ciclo<=0?'R$ 0,00':fmt(ncg));
+  var cxLabel=document.getElementById('cgcaixa'); if(cxLabel) cxLabel.textContent='Caixa: '+fmt(caixa);
+  const pct=ciclo<=0?0:Math.min(Math.round((ncg/caixa)*100),95);
+  document.getElementById('cgfill').style.width=ciclo<=0?'2%':Math.min(pct+18,95)+'%';
+  if(ciclo<=0){
     document.getElementById('cgfill').style.background='#5DCAA5';
     document.getElementById('cgst').textContent='Situação ok';
     document.getElementById('cgst').className='cg-status ok';
-    document.getElementById('cgsub').innerHTML='Caixa disponível: <strong>R$ 5,48 mi</strong> · Necessário: <strong>'+fmt(ncg)+'</strong> · Sobra: <strong>'+fmt(excesso)+'</strong> para dividendos ou reinvestimento.';
-    document.getElementById('resmsg').textContent=ciclo<=0?'Ciclo negativo: empresa recebe ANTES de pagar fornecedores — capital de giro necessário é mínimo!':'A empresa precisa manter '+fmt(ncg)+' reservado para operar com segurança.';
+    document.getElementById('cgsub').innerHTML='Caixa disponível: <strong>'+fmt(caixa)+'</strong> · Ciclo negativo — empresa recebe antes de pagar fornecedores.';
+    document.getElementById('resmsg').textContent='Ciclo negativo: empresa recebe ANTES de pagar fornecedores — capital de giro necessário é zero!';
+  }else if(excesso>0){
+    document.getElementById('cgfill').style.background='#5DCAA5';
+    document.getElementById('cgst').textContent='Situação ok';
+    document.getElementById('cgst').className='cg-status ok';
+    document.getElementById('cgsub').innerHTML='Caixa disponível: <strong>'+fmt(caixa)+'</strong> · Necessário: <strong>'+fmt(ncg)+'</strong> · Sobra: <strong>'+fmt(excesso)+'</strong> para dividendos ou reinvestimento.';
+    document.getElementById('resmsg').textContent='A empresa precisa manter '+fmt(ncg)+' reservado para operar com segurança.';
   }else{
     const falta=Math.abs(excesso);
     document.getElementById('cgfill').style.background='#F0997B';
     document.getElementById('cgst').textContent='Atenção!';
     document.getElementById('cgst').className='cg-status atencao';
-    document.getElementById('cgsub').innerHTML='Com este ciclo seriam necessários <strong>'+fmt(ncg)+'</strong> mas o caixa é <strong>R$ 5,48 mi</strong>. <strong>Faltam '+fmt(falta)+'</strong> — risco de aperto.';
+    document.getElementById('cgsub').innerHTML='Necessário: <strong>'+fmt(ncg)+'</strong> · Caixa: <strong>'+fmt(caixa)+'</strong> · <strong>Faltam '+fmt(falta)+'</strong> — risco de aperto.';
     document.getElementById('resmsg').textContent='Atenção: com este ciclo faltariam '+fmt(falta)+' no caixa.';
   }
 }
@@ -10259,13 +10267,17 @@ function popularDashboard(dados) {
   // Cards de ciclo
   setText('resciclo', ciclo + ' dias');
   if (ciclo <= 0) {
-    setText('rescg',  'Ciclo negativo!');
-    setText('cgv',    fmtV(Math.abs(ncg) > 0 ? ncg : 0));
-    setText('resmsg', 'Ciclo negativo! Empresa recebe ANTES de pagar fornecedores — capital de giro necessário é mínimo.');
+    setText('rescg',  'R$ 0,00');
+    setText('cgv',    'R$ 0,00');
+    setText('resmsg', 'Ciclo negativo! Empresa recebe ANTES de pagar fornecedores — capital de giro necessário é zero.');
     setHTML('cgsub',  'Caixa disponível: <strong>' + fmtV(caixa) + '</strong> · Ciclo: <strong>' + ciclo + ' dias</strong> — empresa com posição de caixa privilegiada.');
+    setText('cgnec',  'Necessário: R$ 0,00');
+    setText('cgcaixa','Caixa: ' + fmtV(caixa));
   } else {
     setText('rescg',  fmtV(ncg));
     setText('cgv',    fmtV(ncg));
+    setText('cgnec',  'Necessário: ' + fmtV(ncg));
+    setText('cgcaixa','Caixa: ' + fmtV(caixa));
     if (excesso > 0) {
       setText('resmsg', 'A empresa precisa manter ' + fmtV(ncg) + ' reservado para operar com segurança.');
       setHTML('cgsub',  'Caixa disponível: <strong>' + fmtV(caixa) + '</strong> · Necessário: <strong>' + fmtV(ncg) + '</strong> · Sobra: <strong>' + fmtV(excesso) + '</strong>.');
