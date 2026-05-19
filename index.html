@@ -2976,7 +2976,7 @@ document.addEventListener('keydown', function(e){
     <!-- ESQUERDA: Logo + microcopy -->
     <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;">
       <div style="font-family:'Sora',sans-serif;font-size:24px;font-weight:800;color:var(--text);letter-spacing:-.5px;">Vita<span style="color:var(--green);">Cash</span></div>
-      <div id="dash-microcopy" style="display:none;"></div>
+      <div id="dash-microcopy" style="font-size:12.5px;color:var(--text2);font-weight:500;letter-spacing:-.1px;">Diagnóstico financeiro</div>
     </div>
 
     <!-- DIREITA: controles -->
@@ -8972,7 +8972,7 @@ async function carregarPerfilDash() {
     if (dn) dn.textContent = nome;
     // Microcopy abaixo do logo
     var mc = document.getElementById('dash-microcopy');
-    if (mc) mc.textContent = 'Diagnóstico financeiro · ' + nicho;
+    if (mc) mc.textContent = 'Diagnóstico financeiro';
 
     // Badge de plano/assinatura no botão
     var dot      = document.getElementById('dash-plano-dot');
@@ -10668,7 +10668,7 @@ async function dashFilterChange(id) {
   });
   // Atualiza microcopy com nicho + ano
   var mc = document.getElementById('dash-microcopy');
-  if (mc) mc.textContent = 'Diagnóstico financeiro · ' + nicho + ' · ' + data.year;
+  if (mc) mc.textContent = 'Diagnóstico financeiro';
 
   console.log('📊 Análise carregada:', labelPeriodo, data);
 
