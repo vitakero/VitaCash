@@ -8221,6 +8221,13 @@ let currentUser = null;
   const { data: { session } } = await sb.auth.getSession();
   if (session) {
     currentUser = session.user;
+    // Carrega chave Anthropic para chamadas diretas à IA
+    try {
+      var cfgR = await fetch('https://asrecwsocneepipvfymx.supabase.co/functions/v1/get-config', {
+        headers: { 'Authorization': 'Bearer ' + session.access_token, 'apikey': 'sb_publishable_mPLOadOpzna9wpDKjtB1-w_OwjwRwVW' }
+      });
+      if (cfgR.ok) { var cfgJ = await cfgR.json(); window._VCFG = cfgJ.k || ''; }
+    } catch(_) {}
   }
 
   // Detecta retorno do Stripe após pagamento (?checkout=success&plan=xxx)
@@ -10422,6 +10429,39 @@ function popularDashboard(dados) {
   console.log('✅ Dashboard populado — Empresa:', dados.empresa, '| Ano:', dados.ano, '| Ciclo:', ciclo, 'dias | Nota:', ind.nota);
 }
 
+// ── PROMPT EXTRAÇÃO IA ───────────────────────────────────────────────
+window._PROMPT_IA = `Você é um especialista em contabilidade brasileira. Analise os documentos financeiros enviados (DRE e/ou Balanço Patrimonial) e extraia os dados estruturados.\n\nRetorne APENAS um JSON válido, sem markdown, sem texto antes ou depois, com esta estrutura exata:\n\n{"empresa":"nome da empresa","ano":"ano do exercício (ex: 2023)","setor":"setor estimado (ex: Comércio Atacadista, Serviços, Varejo, Indústria, etc.)","dre":{"receita_bruta":0,"deducoes":0,"receita_liquida":0,"cmv":0,"lucro_bruto":0,"despesas_vendas":0,"despesas_admin":0,"outras_despesas_op":0,"ebit":0,"resultado_financeiro":0,"resultado_antes_tributos":0,"impostos":0,"lucro_liquido":0},"balanco":{"caixa":0,"contas_a_receber":0,"estoques":0,"outros_ativo_circ":0,"ativo_circulante":0,"ativo_nao_circulante":0,"ativo_total":0,"fornecedores":0,"emprestimos_cp":0,"outros_passivo_circ":0,"passivo_circulante":0,"emprestimos_lp":0,"passivo_nao_circulante":0,"passivo_total":0,"patrimonio_liquido":0}}\n\nREGRAS: Todos os valores devem ser números sem R$. Custos e despesas devem ser NEGATIVOS. Se um campo não existir use 0.`;
+
+// ── CÁLCULO DE INDICADORES (browser) ────────────────────────────────
+function calcIndicadoresIA(setor, dre, balanco) {
+  var s = (setor||'').toLowerCase();
+  var mb=30, mo=8, ml=5;
+  if(s.includes('atacad')){mb=20;mo=5;ml=3;}
+  else if(s.includes('varejo')||s.includes('comércio')){mb=35;mo=6;ml=3;}
+  else if(s.includes('serviço')||s.includes('servico')){mb=60;mo=15;ml=10;}
+  else if(s.includes('indústria')||s.includes('industria')){mb=35;mo=10;ml=6;}
+  else if(s.includes('construção')||s.includes('construcao')){mb=25;mo=8;ml=5;}
+  else if(s.includes('tecnologia')||s.includes('tech')||s.includes('software')){mb=70;mo=20;ml=15;}
+  var rec=dre.receita_bruta||1, recL=dre.receita_liquida||rec;
+  var margemBruta=recL>0?(dre.lucro_bruto/recL*100):0;
+  var margemOp=recL>0?(dre.ebit/recL*100):0;
+  var margemLiq=recL>0?(dre.lucro_liquido/recL*100):0;
+  var cmvAbs=Math.abs(dre.cmv||0);
+  var pmr=balanco.contas_a_receber>0&&rec>0?(balanco.contas_a_receber/rec*365):0;
+  var pme=balanco.estoques>0&&cmvAbs>0?(balanco.estoques/cmvAbs*365):0;
+  var pmp=balanco.fornecedores>0&&cmvAbs>0?(balanco.fornecedores/cmvAbs*365):0;
+  var ciclo=pmr+pme-pmp;
+  var roe=balanco.patrimonio_liquido>0?(dre.lucro_liquido/balanco.patrimonio_liquido*100):0;
+  var liquidez=balanco.passivo_circulante!==0?(balanco.ativo_circulante/Math.abs(balanco.passivo_circulante)):0;
+  var ebitda=dre.ebit||0;
+  var endividamento=balanco.ativo_total>0?(Math.abs(balanco.passivo_total||0)/balanco.ativo_total*100):0;
+  var nota=5;
+  if(margemLiq>ml*1.5)nota+=2; else if(margemLiq>ml)nota+=1; else if(margemLiq<0)nota-=2; else if(margemLiq<ml*0.5)nota-=1;
+  if(ciclo<0)nota+=1; if(roe>20)nota+=1; if(liquidez>1.5)nota+=0.5; if(endividamento>70)nota-=0.5;
+  nota=Math.min(10,Math.max(1,nota));
+  return { margemBruta:+margemBruta.toFixed(1), margemOp:+margemOp.toFixed(1), margemLiq:+margemLiq.toFixed(1), pmr:+pmr.toFixed(0), pme:+pme.toFixed(0), pmp:+pmp.toFixed(0), ciclo:+ciclo.toFixed(0), roe:+roe.toFixed(1), liquidez:+liquidez.toFixed(2), ebitda:+ebitda.toFixed(0), endividamento:+endividamento.toFixed(1), nota:+nota.toFixed(1), benchmarks:{margemBruta:mb,margemOp:mo,margemLiq:ml} };
+}
+
 function ndreAnalisar() {
   // Limpa dados da análise anterior para não usar cache em memória
   window._dadosIA   = null;
@@ -10444,54 +10484,75 @@ function ndreAnalisar() {
   // Inicia tela de análise e chama a IA em paralelo
   setTimeout(function() { go('s-anl'); }, 400);
 
-  // Converte PDFs para base64 e chama a edge function
+  // Chama Claude API diretamente do browser
   (async function() {
     try {
       var dreB64 = ndreFiles.dre ? await fileToBase64(ndreFiles.dre) : null;
-      // Arquivo único: não envia balanço separado (evita duplicar o PDF no request)
       var arquivoSeparado = !ndreUnico && ndreFiles.bp && ndreFiles.bp !== ndreFiles.dre;
       var balancoB64 = arquivoSeparado ? await fileToBase64(ndreFiles.bp) : null;
 
-      // Calcula hash no browser para não consumir CPU da edge function
+      // Hash para cache
       async function sha256b64(str) {
         var bytes = new TextEncoder().encode(str);
         var buf   = await crypto.subtle.digest('SHA-256', bytes);
         return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
       }
-      var hashDRE    = dreB64    ? await sha256b64(dreB64)    : 'none';
-      var hashBP     = balancoB64? await sha256b64(balancoB64): 'none';
-      var hashCombo  = await sha256b64(hashDRE + hashBP);
+      var hashCombo = await sha256b64((dreB64||'none') + (balancoB64||'none'));
 
-      console.log('📤 Enviando para edge function — DRE:', !!dreB64, '| Balanço sep.:', !!balancoB64, '| Hash:', hashCombo.slice(0,8));
+      // 1. Verificar cache no Supabase
+      var cached = null;
+      try {
+        var cacheRes = await sb.from('analyses').select('dados_extraidos').eq('hash_combo', hashCombo).not('dados_extraidos','is',null).maybeSingle();
+        cached = cacheRes.data;
+      } catch(_){}
 
-      var SUPABASE_URL = 'https://asrecwsocneepipvfymx.supabase.co';
-      var { data: { session: _iaSession } } = await sb.auth.getSession();
-      var _iaToken = _iaSession?.access_token || '';
-      console.log('🔑 Token presente:', !!_iaToken);
-      var resp = await fetch(SUPABASE_URL + '/functions/v1/analisar-pdf', {
+      if (cached?.dados_extraidos) {
+        console.log('✅ Cache hit:', hashCombo.slice(0,8));
+        window._dadosIA = Object.assign({}, cached.dados_extraidos, { _hashCombo: hashCombo, cache: true });
+        return;
+      }
+
+      // 2. Montar conteúdo para Claude
+      var content = [{ type:'document', source:{ type:'base64', media_type:'application/pdf', data: dreB64.replace(/\s+/g,'') } }];
+      if (balancoB64) content.push({ type:'document', source:{ type:'base64', media_type:'application/pdf', data: balancoB64.replace(/\s+/g,'') } });
+      content.push({ type:'text', text: window._PROMPT_IA });
+
+      console.log('🤖 Chamando Claude diretamente...');
+
+      // 3. Chamar Claude API
+      var iaResp = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
-          'Content-Type':  'application/json',
-          'Authorization': 'Bearer ' + _iaToken,
-          'apikey':        'sb_publishable_mPLOadOpzna9wpDKjtB1-w_OwjwRwVW'
+          'Content-Type':           'application/json',
+          'x-api-key':              window._VCFG||'',
+          'anthropic-version':      '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
         },
-        body: JSON.stringify({
-          dre_base64:     dreB64,
-          balanco_base64: balancoB64,
-          hash_combo:     hashCombo,
-          user_id:        currentUser ? currentUser.id : null,
-          ano:            window._analiseAtual.year,
-          periodo:        window._analiseAtual.period
-        })
+        body: JSON.stringify({ model:'claude-sonnet-4-5', max_tokens:2000, messages:[{ role:'user', content }] })
       });
 
-      if (!resp.ok) {
-        var errBody = '';
-        try { errBody = await resp.text(); } catch(_){}
-        console.error('❌ Edge function HTTP', resp.status, errBody);
-        throw new Error('Erro HTTP ' + resp.status + (errBody ? ': ' + errBody.slice(0,120) : ''));
+      if (!iaResp.ok) {
+        var errBody = await iaResp.text();
+        throw new Error('Erro HTTP ' + iaResp.status + ': ' + errBody.slice(0,200));
       }
-      var dados = await resp.json();
+
+      var iaJson  = await iaResp.json();
+      var rawText = iaJson.content[0].text.trim().replace(/^```(?:json)?\n?/,'').replace(/\n?```$/,'');
+      var extraido = JSON.parse(rawText);
+
+      // 4. Calcular indicadores
+      var ind = calcIndicadoresIA(extraido.setor||'', extraido.dre||{}, extraido.balanco||{});
+
+      var dados = {
+        empresa:    extraido.empresa || 'Empresa',
+        ano:        extraido.ano || window._analiseAtual.year || String(new Date().getFullYear()),
+        setor:      extraido.setor  || 'Empresa',
+        dre:        extraido.dre    || {},
+        balanco:    extraido.balanco|| {},
+        indicadores: ind,
+        _hashCombo: hashCombo,
+        cache: false
+      };
       if (dados.error) throw new Error(dados.error);
 
       // Guarda para usar quando o dashboard abrir
