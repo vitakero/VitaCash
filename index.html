@@ -10615,6 +10615,8 @@ async function popularFiltroDash() {
     }).join('');
   }
 
+  // Tenta selecionar a análise atual; se não tiver, pega a mais recente
+  var idParaCarregar = null;
   var ultima = window._analiseAtual;
   if (ultima) {
     Array.from(sel.options).forEach(function(opt) {
@@ -10626,9 +10628,26 @@ async function popularFiltroDash() {
           document.querySelectorAll('.dash-cs-opt').forEach(function(o){ o.classList.remove('sel'); });
           csOpt.classList.add('sel');
         }
+        idParaCarregar = opt.value;
       }
     });
   }
+
+  // Se não tinha análise atual, auto-seleciona a primeira (mais recente)
+  if (!idParaCarregar && sel.options.length > 0) {
+    var primeiraOpt = sel.options[0];
+    sel.value = primeiraOpt.value;
+    if (labelEl) labelEl.textContent = primeiraOpt.textContent;
+    var csOpt = menu && menu.querySelector('[data-val="' + primeiraOpt.value + '"]');
+    if (csOpt) {
+      document.querySelectorAll('.dash-cs-opt').forEach(function(o){ o.classList.remove('sel'); });
+      csOpt.classList.add('sel');
+    }
+    idParaCarregar = primeiraOpt.value;
+  }
+
+  // Carrega os dados da análise selecionada
+  if (idParaCarregar) dashFilterChange(idParaCarregar);
 }
 
 async function dashFilterChange(id) {
@@ -10652,7 +10671,12 @@ async function dashFilterChange(id) {
   if (mc) mc.textContent = 'Diagnóstico financeiro · ' + nicho + ' · ' + data.year;
 
   console.log('📊 Análise carregada:', labelPeriodo, data);
-  // Quando houver métricas reais (data.metrics), aqui os cards do dashboard serão atualizados
+
+  // Popula dashboard com dados salvos da IA
+  if (data.dados_extraidos && typeof popularDashboard === 'function') {
+    window._dadosIA = data.dados_extraidos;
+    popularDashboard(data.dados_extraidos);
+  }
 }
 
 // ── TOGGLE ARQUIVO SEPARADO ──────────────────────────────────────────
