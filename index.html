@@ -10468,7 +10468,12 @@ function ndreAnalisar() {
         })
       });
 
-      if (!resp.ok) throw new Error('Erro HTTP ' + resp.status);
+      if (!resp.ok) {
+        var errBody = '';
+        try { errBody = await resp.text(); } catch(_){}
+        console.error('❌ Edge function HTTP', resp.status, errBody);
+        throw new Error('Erro HTTP ' + resp.status + (errBody ? ': ' + errBody.slice(0,120) : ''));
+      }
       var dados = await resp.json();
       if (dados.error) throw new Error(dados.error);
 
@@ -10478,7 +10483,7 @@ function ndreAnalisar() {
       console.log('✅ IA retornou dados:', dados.empresa, dados.ano, dados.cache ? '(cache)' : '(novo)');
     } catch(e) {
       console.error('❌ Erro na análise IA:', e.message);
-      // Não bloqueia — dashboard abre com dados demo
+      toast('Erro na análise: ' + e.message, 'erro');
     }
   })();
 }
