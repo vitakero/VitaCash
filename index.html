@@ -9576,8 +9576,11 @@ function calcEmp(){
   document.getElementById('emp-taxa').textContent=t+'% a.a.';
   const jurosAnuais=v*t/100;
   document.getElementById('emp-juros').textContent='R$ '+jurosAnuais.toFixed(1)+' mi';
-  const novaDesp=34.83+jurosAnuais;
-  const cobertura=(2907.85/novaDesp).toFixed(1);
+  // Usa EBIT e despesas financeiras reais da IA (em milhões), fallback para demo
+  var ebitM   = window._ebitReal   != null ? window._ebitReal/1e6   : 2907.85/1000;
+  var despM   = window._despFinReal!= null ? window._despFinReal/1e6 : 34.83/1000;
+  const novaDesp=despM+jurosAnuais;
+  const cobertura=(ebitM/novaDesp).toFixed(1);
   document.getElementById('emp-cobertura').textContent=cobertura+'x';
   const cob=parseFloat(cobertura);
   let st,msg,cor;
@@ -10347,8 +10350,8 @@ function popularDashboard(dados) {
   });
 
   // ── 6. CARDS .mc — atualiza pelo label (.mlb) ────────────────
-  // Helper: encontra o card pelo título e atualiza o valor (.mv)
-  function setMC(labelTexto, valor, cor) {
+  // Helper: encontra o card pelo título e atualiza valor, subtítulo e pílulas
+  function setMC(labelTexto, valor, cor, sub2, badge1, badge2) {
     document.querySelectorAll('.mc').forEach(function(mc) {
       var lbl = mc.querySelector('.mlb');
       if (!lbl) return;
@@ -10356,13 +10359,24 @@ function popularDashboard(dados) {
       if (txt === labelTexto.toLowerCase()) {
         var mv = mc.querySelector('.mv');
         if (mv) { mv.textContent = valor; if (cor) mv.style.color = cor; }
+        // Atualiza subtítulo (.mc2)
+        if (sub2 != null) {
+          var mc2 = mc.querySelector('.mc2');
+          if (mc2) mc2.textContent = sub2;
+        }
+        // Atualiza pílulas (spans com border-radius:99px)
+        var pills = mc.querySelectorAll('span[style*="border-radius:99px"]');
+        if (badge1 != null && pills[0]) pills[0].textContent = badge1;
+        if (badge2 != null && pills[1]) pills[1].textContent = badge2;
       }
     });
   }
 
   var despFinAbs = Math.abs(d.resultado_financeiro || 0);
   var cobJuros   = despFinAbs > 0 ? (Math.abs(d.ebit||0) / despFinAbs) : 999;
+  var cobJurosStr = cobJuros > 99 ? '999x' : cobJuros.toFixed(1).replace('.',',') + 'x';
   var cmvPctRecL = recL > 0 ? (cmvAbs / recL * 100) : 0;
+  var despFinPct = recL > 0 ? (despFinAbs / recL * 100) : 0;
   var despOpAbs  = Math.abs((d.despesas_vendas||0)+(d.despesas_admin||0)+(d.outras_despesas_op||0));
   var dividaAtual= Math.abs(b.emprestimos_cp||0) + Math.abs(b.emprestimos_lp||0);
   var limiteMax  = Math.abs(d.ebit||0) / 0.25 / 2;  // EBIT / (taxa 25% × 2)
@@ -10378,23 +10392,75 @@ function popularDashboard(dados) {
   var roe        = b.patrimonio_liquido > 0 ? (Math.abs(d.lucro_liquido||0) / b.patrimonio_liquido * 100) : 0;
 
   var verde = 'var(--green)', amber = 'var(--amber)';
+  var periodo = dados.periodo || 'Anual';
+  var ano     = dados.ano || '';
+  var mb = ind.benchmarks?.margemBruta || 20;
+  var ml = ind.benchmarks?.margemLiq   || 3;
+  var mo = ind.benchmarks?.margemOp    || 8;
 
-  // Visão geral — KPI cards
-  setMC('Receita bruta',      fmtV(d.receita_bruta),  verde);
-  setMC('Margem bruta',       (ind.margemBruta||0).toFixed(1).replace('.',',') + '%', (ind.margemBruta||0) >= (ind.benchmarks?.margemBruta||20) ? verde : amber);
-  setMC('Margem líquida',     (ind.margemLiq||0).toFixed(1).replace('.',',') + '%',   (ind.margemLiq||0) >= (ind.benchmarks?.margemLiq||3) ? verde : amber);
-  setMC('Lucro líquido',      fmtV(d.lucro_liquido),  (d.lucro_liquido||0) >= 0 ? verde : 'var(--red)');
-  setMC('EBIT',               fmtV(d.ebit),            verde);
-  setMC('Cobertura de juros', cobJuros > 99 ? '999x' : cobJuros.toFixed(1).replace('.',',') + 'x', verde);
-  setMC('Desp. financeiras',  fmtV(Math.abs(d.resultado_financeiro||0)), verde);
-  setMC('CMV total',          fmtV(cmvAbs), verde);
-  setMC('ROE',                roe.toFixed(1).replace('.',',') + '%', verde);
+  // Visão geral — KPI cards (valor, cor, subtítulo, badge1, badge2)
+  setMC('Receita bruta',
+    fmtV(d.receita_bruta), verde,
+    '▲ ' + periodo + ' ' + ano,
+    'Receita: ' + fmtV(d.receita_bruta),
+    'Líquida: ' + fmtV(d.receita_liquida));
+
+  setMC('Margem bruta',
+    (ind.margemBruta||0).toFixed(1).replace('.',',') + '%',
+    (ind.margemBruta||0) >= mb ? verde : amber,
+    (ind.margemBruta||0) >= mb ? '▲ Dentro da média' : '▼ Abaixo da média',
+    'Você: ' + (ind.margemBruta||0).toFixed(1).replace('.',',') + '%',
+    'Média: ' + mb + '%');
+
+  setMC('Margem líquida',
+    (ind.margemLiq||0).toFixed(1).replace('.',',') + '%',
+    (ind.margemLiq||0) >= ml ? verde : amber,
+    (ind.margemLiq||0) >= ml ? '▲ Dentro da média' : '▼ Abaixo da média',
+    'Você: ' + (ind.margemLiq||0).toFixed(1).replace('.',',') + '%',
+    'Média: ' + ml + '%');
+
+  setMC('Lucro líquido',
+    fmtV(d.lucro_liquido),
+    (d.lucro_liquido||0) >= 0 ? verde : 'var(--red)',
+    (d.lucro_liquido||0) >= 0 ? '▲ positivo' : '▼ negativo',
+    'Margem: ' + (ind.margemLiq||0).toFixed(1).replace('.',',') + '%',
+    'Média: ' + ml + '–' + (ml*2) + '%');
+
+  setMC('EBIT',
+    fmtV(d.ebit), verde,
+    'Margem op.: ' + (ind.margemOp||0).toFixed(1).replace('.',',') + '%',
+    'Você: ' + (ind.margemOp||0).toFixed(1).replace('.',',') + '%',
+    'Média: ' + mo + '%');
+
+  setMC('Cobertura de juros',
+    cobJurosStr, verde,
+    cobJuros >= 3 ? '▲ excelente' : cobJuros >= 2 ? '▲ saudável' : cobJuros >= 1 ? '▲ atenção' : '▼ risco',
+    'Você: ' + cobJurosStr,
+    'Ideal: acima 2x');
+
+  setMC('Desp. financeiras',
+    fmtV(despFinAbs), verde,
+    despFinPct < 2 ? '▲ muito baixo' : despFinPct < 5 ? '▲ moderado' : '▼ elevado',
+    'Você: ' + despFinPct.toFixed(2).replace('.',',') + '%',
+    'Ideal: abaixo 2%');
+
+  setMC('CMV total',
+    fmtV(cmvAbs), verde,
+    cmvPctRecL <= 80 ? '▲ bem controlado' : '▼ acima da média',
+    'Você: ' + cmvPctRecL.toFixed(1).replace('.',',') + '%',
+    'Média: 75–85%');
+
+  setMC('ROE',
+    roe.toFixed(1).replace('.',',') + '%', verde,
+    roe >= 15 ? '▲ acima da Selic!' : roe >= 10 ? '▲ bom' : '▼ abaixo da Selic',
+    'Você: ' + roe.toFixed(1).replace('.',',') + '%',
+    'Selic: 15% a.a.');
 
   // Endividamento
   setMC('Limite máximo seguro', fmtV(limiteMax), verde);
   setMC('Dívida atual',         dividaAtual > 0 ? fmtV(dividaAtual) : 'R$ 0', verde);
   setMC('Espaço disponível',    fmtV(Math.max(0, espacoDisp)), verde);
-  setMC('Cobertura de juros',   cobJuros > 99 ? '999x' : cobJuros.toFixed(1) + 'x', verde);
+  setMC('Cobertura de juros',   cobJurosStr, verde);
 
   // Alerta endividamento
   document.querySelectorAll('.ab .at').forEach(function(el) {
@@ -10423,6 +10489,10 @@ function popularDashboard(dados) {
       el.textContent = fmtV(potencialLucro > 0 ? potencialLucro : Math.abs(d.lucro_liquido||0) * 0.5);
     }
   });
+
+  // Salva globais para simuladores (empréstimo, etc.)
+  window._ebitReal    = d.ebit || 0;
+  window._despFinReal = despFinAbs;
 
   // Salva para o PDF
   window._dadosIA = dados;
