@@ -10423,6 +10423,10 @@ function popularDashboard(dados) {
 }
 
 function ndreAnalisar() {
+  // Limpa dados da análise anterior para não usar cache em memória
+  window._dadosIA   = null;
+  window._iaFresh   = false;
+
   var btn = document.getElementById('ndre-btn');
   if (btn) {
     btn.textContent = '⏳ Enviando arquivo...';
