@@ -10269,10 +10269,32 @@ function popularDashboard(dados) {
         'Os dois lados <strong>sempre se igualam</strong> — no caso da ' + empresa2 + ': <strong>' + atFmt + ' = ' + atFmt + ' ✓</strong>';
     }
 
-    // Pills educativas
+    // Pills educativas — valores reais calculados
     var nomeAbrev = empresa2.split(' ')[0];
-    document.querySelectorAll('.bp-edu-pill').forEach(function(el) {
-      el.textContent = el.textContent.replace(/^G JOAO/, nomeAbrev);
+    var atTotal   = Math.abs(b.ativo_total || 1);
+    var atCircPct = atTotal > 0 && b.ativo_circulante  ? Math.round(Math.abs(b.ativo_circulante) / atTotal * 100)     : 0;
+    var caixaPct  = atTotal > 0 && b.caixa             ? Math.round(b.caixa / atTotal * 100)                          : 0;
+    var gEstPill  = b.estoques > 0 && cmvAbs > 0       ? (cmvAbs / b.estoques).toFixed(1).replace('.',',')           : '—';
+    var dEstPill  = b.estoques > 0 && cmvAbs > 0       ? Math.round(b.estoques / cmvAbs * 365)                       : '—';
+    var ancPct    = atTotal > 0 && b.ativo_nao_circulante ? Math.round(Math.abs(b.ativo_nao_circulante) / atTotal * 100) : 0;
+    var lCorrPill = (ind.liquidez || 0).toFixed(2).replace('.',',');
+    var pmpPill   = Math.abs(b.fornecedores || 0) > 0 && cmvAbs > 0 ? Math.round(Math.abs(b.fornecedores) / cmvAbs * 365) : '—';
+    var empTot    = Math.abs(b.emprestimos_cp || 0) + Math.abs(b.emprestimos_lp || 0);
+    var caixaCov  = b.caixa > 0 && empTot > 0 ? Math.round(b.caixa / empTot) + 'x' : 'valor alto';
+
+    var pillDados = [
+      nomeAbrev + ': ' + atCircPct + '% do ativo é circulante — boa liquidez operacional',
+      nomeAbrev + ': ' + caixaPct + '% do ativo em caixa',
+      nomeAbrev + ': giro de ' + gEstPill + 'x/ano (~' + dEstPill + ' dias). Veja setor nas referências',
+      nomeAbrev + ': ' + ancPct + '% em ativos não circulantes (imobilizado e intangível)',
+      nomeAbrev + ': Liquidez corrente de ' + lCorrPill + 'x — para cada R$1 de dívida CP, tem R$' + lCorrPill + ' disponível',
+      nomeAbrev + ': ' + fmtV(Math.abs(b.fornecedores || 0)) + ' com fornecedores = prazo médio de ~' + pmpPill + ' dias',
+      nomeAbrev + ': caixa (' + fmtV(b.caixa || 0) + ') cobre ' + caixaCov + ' os empréstimos totais',
+      nomeAbrev + ': capital próprio dos sócios — base do patrimônio',
+      nomeAbrev + ': PL de ' + fmtV(b.patrimonio_liquido || 0) + ' acumulado ao longo dos anos ✓'
+    ];
+    document.querySelectorAll('.bp-edu-pill').forEach(function(el, i) {
+      if (pillDados[i] !== undefined) el.textContent = pillDados[i];
     });
 
     // Resumo final
@@ -10939,7 +10961,7 @@ function popularDashboard(dados) {
   setMC('Giro do ativo', giroAStr, verde,
     giroAtivo >= 2 ? '▲ excelente giro' : '▲ bom giro',
     'Você: ' + giroAStr, 'Média: 2–4x');
-  setMC('Giro do estoque', giroEStr, verde,
+  setMC('Giro de estoque', giroEStr, verde,
     giroEstoq >= 12 ? '▲ estoque girando muito bem' : '▲ giro ok',
     'Você: ' + giroEStr, 'Ideal: 8–15x/ano');
   setMC('Imobilização do pl', imobStr, imobPL < 80 ? verde : amber,
