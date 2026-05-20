@@ -10905,53 +10905,55 @@ function popularDashboard(dados) {
     }
   })();
 
-  // ── Painel resumo topo "O QUE FAZER" ─────────────────────────
-  // Calcula críticas vs pontos fortes baseado nos cards c1-c4
-  var recsCriticas = 0, recsBoas = 0;
-  if (dados.recomendacoes && Array.isArray(dados.recomendacoes)) {
-    dados.recomendacoes.forEach(function(r) {
-      if (r.tipo === 'ruim') recsCriticas++; else recsBoas++;
-    });
-  } else {
-    recsCriticas = diffDespOp2 > 0 ? 2 : 1;
-    recsBoas     = 4 - recsCriticas;
-  }
-  var potencialLucro = impactoDesp2 + recL * (Math.max(0, bMB2 - margemBrutaAt) / 100);
-  var potencialTotal = potencialLucro > 0 ? potencialLucro : lucroAtualOF * 0.5;
-
-  var pTotal = document.getElementById('painel-total');
-  var pAcoesNum = document.getElementById('painel-acoes-num');
-  var pAcoesSub = document.getElementById('painel-acoes-sub');
-  var pPontosNum = document.getElementById('painel-pontos-num');
-  var pPlanoVal = document.getElementById('painel-plano-valor');
-
-  // Usa potencial_realista do Claude se disponível, senão cálculo local
-  var valorExibir = (dados.potencial_realista && dados.potencial_realista > 0)
-    ? dados.potencial_realista
-    : potencialTotal;
-
-  if (pTotal)    pTotal.textContent = fmtV(valorExibir);
-  if (pAcoesNum) pAcoesNum.textContent = '4';
-  if (pAcoesSub) pAcoesSub.textContent = recsCriticas + ' crítica' + (recsCriticas !== 1 ? 's' : '') + ' · ' + recsBoas + ' para potencializar';
-  if (pPontosNum) pPontosNum.textContent = recsBoas;
-  if (pPlanoVal) pPlanoVal.textContent = fmtV(valorExibir);
-
-  // Adiciona nota de transparência se usando estimativa Claude
-  if (dados.potencial_realista && dados.potencial_descricao) {
-    var pNota = document.querySelector('#painel-total')?.closest('div');
-    if (pNota) {
-      var notaEl = pNota.querySelector('.painel-nota');
-      if (!notaEl) {
-        notaEl = document.createElement('div');
-        notaEl.className = 'painel-nota';
-        notaEl.style.cssText = 'font-size:9px;color:var(--green-bg);margin-top:4px;line-height:1.4;opacity:.85;';
-        pNota.appendChild(notaEl);
-      }
-      notaEl.textContent = '↳ ' + dados.potencial_descricao;
-    }
-  }
-
   } // fim do else (sem recomendacoes personalizadas)
+
+  // ── Painel resumo topo "O QUE FAZER" ─────────────────────────
+  // Fica FORA do else — roda sempre, com ou sem recomendações do Claude
+  (function() {
+    var recsCriticas = 0, recsBoas = 0;
+    if (dados.recomendacoes && Array.isArray(dados.recomendacoes)) {
+      dados.recomendacoes.forEach(function(r) {
+        if (r.tipo === 'ruim') recsCriticas++; else recsBoas++;
+      });
+    } else {
+      recsCriticas = diffDespOp2 > 0 ? 2 : 1;
+      recsBoas     = 4 - recsCriticas;
+    }
+    var potencialLucro = impactoDesp2 + recL * (Math.max(0, bMB2 - margemBrutaAt) / 100);
+    var potencialTotal = potencialLucro > 0 ? potencialLucro : lucroAtualOF * 0.5;
+
+    var pTotal     = document.getElementById('painel-total');
+    var pAcoesNum  = document.getElementById('painel-acoes-num');
+    var pAcoesSub  = document.getElementById('painel-acoes-sub');
+    var pPontosNum = document.getElementById('painel-pontos-num');
+    var pPlanoVal  = document.getElementById('painel-plano-valor');
+
+    // Usa potencial_realista do Claude se disponível, senão cálculo local
+    var valorExibir = (dados.potencial_realista && dados.potencial_realista > 0)
+      ? dados.potencial_realista
+      : potencialTotal;
+
+    if (pTotal)     pTotal.textContent     = fmtV(valorExibir);
+    if (pAcoesNum)  pAcoesNum.textContent  = '4';
+    if (pAcoesSub)  pAcoesSub.textContent  = recsCriticas + ' crítica' + (recsCriticas !== 1 ? 's' : '') + ' · ' + recsBoas + ' para potencializar';
+    if (pPontosNum) pPontosNum.textContent = recsBoas;
+    if (pPlanoVal)  pPlanoVal.textContent  = fmtV(valorExibir);
+
+    // Nota de transparência se usando estimativa Claude
+    if (dados.potencial_realista && dados.potencial_descricao) {
+      var pNota = pTotal && pTotal.closest('div');
+      if (pNota) {
+        var notaEl = pNota.querySelector('.painel-nota');
+        if (!notaEl) {
+          notaEl = document.createElement('div');
+          notaEl.className = 'painel-nota';
+          notaEl.style.cssText = 'font-size:9px;color:var(--green-bg);margin-top:4px;line-height:1.4;opacity:.85;';
+          pNota.appendChild(notaEl);
+        }
+        notaEl.textContent = '↳ ' + dados.potencial_descricao;
+      }
+    }
+  })();
 
   // ── 8. RADAR IA — análise financeira real, rankeada por impacto ──────
   (function() {
