@@ -4275,8 +4275,8 @@ function adminAbrirWhatsApp() {
     <p style="font-size:11px;color:var(--text3);line-height:1.4;margin:-0.5rem 0 0.875rem;">Onde a empresa está na escala de risco — do saudável ao crítico</p>
     <div class="card mg-section-pro" data-plan-required="pro" style="margin-bottom:1.25rem;">
       <div style="position:relative;height:14px;border-radius:99px;background:linear-gradient(to right,#5DCAA5,#EF9F27,#F0997B);margin-bottom:.75rem;overflow:visible;">
-        <div style="position:absolute;top:-4px;left:4%;transform:translateX(-50%);width:4px;height:22px;background:var(--text);border-radius:2px;"></div>
-        <div style="position:absolute;top:20px;left:4%;transform:translateX(-50%);font-size:10px;color:var(--green);font-weight:600;white-space:nowrap;">Você está aqui</div>
+        <div id="termo-marker" style="position:absolute;top:-4px;left:4%;transform:translateX(-50%);width:4px;height:22px;background:var(--text);border-radius:2px;"></div>
+        <div id="termo-label" style="position:absolute;top:20px;left:4%;transform:translateX(-50%);font-size:10px;color:var(--green);font-weight:600;white-space:nowrap;">Você está aqui</div>
       </div>
       <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:28px;">
         <span><svg width="8" height="8" viewBox="0 0 8 8" style="vertical-align:middle;margin-right:3px;"><circle cx="4" cy="4" r="4" fill="#1D9E75"/></svg>Seguro</span><span><svg width="8" height="8" viewBox="0 0 8 8" style="vertical-align:middle;margin-right:3px;"><circle cx="4" cy="4" r="4" fill="#EF9F27"/></svg>Atenção</span><span><svg width="8" height="8" viewBox="0 0 8 8" style="vertical-align:middle;margin-right:3px;"><circle cx="4" cy="4" r="4" fill="#D85A30"/></svg>Risco</span>
@@ -10611,6 +10611,29 @@ function popularDashboard(dados) {
         eTerm.innerHTML = '<strong>Endividamento saudável:</strong> dívida de ' + fmtV(dividaAtual) + ' com cobertura de juros de ' + cobStr + '. ' + (espaco > 0 ? 'Há ' + fmtV(espaco) + ' de espaço para novo crédito sem risco.' : 'Dívida próxima do limite seguro — avaliar antes de contrair novo crédito.');
       }
     }
+
+    // Termômetro — posição do marcador (baseada na cobertura de juros)
+    // Escala: <1x = crítico (88%), 1–1.5x = risco (72%), 1.5–2x = atenção (52%), 2–3x = saudável (25%), >=3x = excelente (8%)
+    (function() {
+      var marker = document.getElementById('termo-marker');
+      var label  = document.getElementById('termo-label');
+      if (!marker || !label) return;
+      var pos, cor;
+      if (cobJuros < 1) {
+        pos = 88; cor = '#dc2626';          // crítico — vermelho
+      } else if (cobJuros < 1.5) {
+        pos = 72; cor = '#ea580c';          // risco — laranja
+      } else if (cobJuros < 2) {
+        pos = 52; cor = '#d97706';          // atenção — âmbar
+      } else if (cobJuros < 3) {
+        pos = 25; cor = '#16a34a';          // saudável — verde
+      } else {
+        pos = 8;  cor = '#15803d';          // excelente — verde escuro
+      }
+      marker.style.left = pos + '%';
+      label.style.left  = pos + '%';
+      label.style.color = cor;
+    })();
   })();
 
   var verde = 'var(--green)', amber = 'var(--amber)';
