@@ -10623,24 +10623,57 @@ function popularDashboard(dados) {
   var bMB2         = bm2.mb || 35;
   var margemBrutaAt = ind.margemBruta || 0;
 
+  // helper: gera HTML de acao-item
+  function _acao(tipo, txt, sub, impacto) {
+    return '<div class="acao-item"><div class="acao-num ' + tipo + '">•</div>' +
+      '<div class="acao-texto"><strong>' + txt + '</strong>' + (sub ? ' — ' + sub : '') +
+      '<div><span class="impacto ' + impacto + '">' + (impacto==='alto'?'Impacto alto':impacto==='medio'?'Impacto médio':'Impacto baixo') + '</span></div></div></div>';
+  }
+  function _acoesHTML(titulo, tipo, acoes, impactoTexto, ctaTxt) {
+    return '<div class="acoes-section"><div class="acoes-titulo ' + tipo + '">' + titulo + '</div>' +
+      acoes.join('') +
+      '<div class="ind-impacto-r"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>' + impactoTexto + '</div>' +
+      '<div class="potencial" id="pot-' + (ctaTxt||'') + '"></div>' +
+      '<div style="display:flex;gap:8px;margin-top:.75rem;"><span class="ind-cta ' + (tipo==='ruim'?'urgente':'') + '">' + ctaTxt + ' →</span></div></div>';
+  }
+
   // c1 — despesas operacionais
   (function() {
     var el = document.getElementById('c1'); if (!el) return;
     var nomeEl = el.querySelector('.ind-nome');
     var valEl  = el.querySelector('.ind-val');
     var medEl  = el.querySelector('.ind-media');
-    var impEl  = el.querySelector('.ind-impacto-r strong');
-    var potEl  = el.querySelector('.potencial');
+    var bodyEl = el.querySelector('.ind-body');
     var impC1  = impactoDesp2 > 0 ? impactoDesp2 : recL * 0.015;
+    var lucroAlvoC1 = lucroAtualOF + impC1;
+    var despAdminPct = recL > 0 ? (despAdminAbs2/recL*100) : 0;
+    var metaDespAdmin = bDespOp2 * 0.55;
+
     if (nomeEl) nomeEl.textContent = diffDespOp2 > 0
       ? 'Despesas operacionais ' + diffDespOp2.toFixed(0) + ' p.p. acima do setor — ' + fmtV(impC1) + ' a recuperar por ano'
       : 'Despesas operacionais controladas — margem líquida pode crescer mais ' + fmtV(recL * 0.01);
     if (valEl) { valEl.className = 'ind-val ' + (diffDespOp2 > 0 ? 'ruim' : 'bom'); valEl.textContent = 'margem op.: ' + (ind.margemOp||0).toFixed(1).replace('.',',') + '%'; }
     if (medEl) medEl.textContent = '· meta: acima de ' + bm2.mo + '%';
-    if (impEl) impEl.textContent = '+' + fmtV(impC1) + '/ano';
-    if (potEl) {
-      var lucroAlvoC1 = lucroAtualOF + impC1;
-      potEl.textContent = empresa2 + ' fatura ' + fmtV(d.receita_bruta) + ' e fica com ' + fmtV(lucroAtualOF) + ' de lucro líquido. ' +
+
+    if (bodyEl) {
+      var acoes1 = [
+        _acao('ruim',
+          'Corte as despesas administrativas de ' + despAdminPct.toFixed(1).replace('.',',') + '% para ' + metaDespAdmin.toFixed(0) + '% da receita',
+          'hoje ' + fmtV(despAdminAbs2) + ' em despesas admin. — revisar pessoal, contratos e materiais é o maior impacto possível agora', 'alto'),
+        dividaAtual > 0
+          ? _acao('ruim', 'Quite ' + fmtV(dividaAtual) + ' de dívida financeira',
+              b.caixa > dividaAtual
+                ? 'com caixa de ' + fmtV(b.caixa||0) + ', quitar hoje elimina 100% das despesas financeiras e melhora o resultado imediatamente'
+                : 'priorize o pagamento antecipado para eliminar despesas financeiras de ' + fmtV(despFinAbs) + '/ano', 'alto')
+          : _acao('bom', 'Empresa sem dívida financeira', 'mantenha essa posição ao expandir — use capital de terceiros com juros abaixo do seu ROIC', 'medio'),
+        _acao('ruim',
+          'Revise as despesas com vendas de ' + fmtV(despVendasAbs2),
+          'troque comissões fixas por variáveis atreladas à margem para incentivar vendas mais rentáveis sem aumentar custo fixo', 'medio')
+      ];
+      bodyEl.innerHTML = _acoesHTML('3 ações para recuperar ' + fmtV(impC1) + '/ano', 'ruim', acoes1,
+        'Impacto estimado: <strong>+' + fmtV(impC1) + '/ano</strong> de lucro líquido a mais', 'Ver como executar essa redução');
+      var pot1 = bodyEl.querySelector('.potencial');
+      if (pot1) pot1.textContent = empresa2 + ' fatura ' + fmtV(d.receita_bruta) + ' e fica com ' + fmtV(lucroAtualOF) + ' de lucro líquido. ' +
         (diffDespOp2 > 0
           ? 'Reduzindo despesas de ' + despOpPctOF.toFixed(1).replace('.',',') + '% para ' + bDespOp2 + '% da receita, o lucro sobe para ~' + fmtV(lucroAlvoC1) + ' — ' + ((lucroAlvoC1 / (lucroAtualOF||1) - 1) * 100).toFixed(0) + '% a mais com a mesma receita.'
           : 'As despesas estão bem controladas. Mantenha essa disciplina ao crescer para que o lucro acompanhe a receita.');
@@ -10653,21 +10686,38 @@ function popularDashboard(dados) {
     var nomeEl = el.querySelector('.ind-nome');
     var valEl  = el.querySelector('.ind-val');
     var medEl  = el.querySelector('.ind-media');
-    var impEl  = el.querySelector('.ind-impacto-r strong');
-    var potEl  = el.querySelector('.potencial');
+    var bodyEl = el.querySelector('.ind-body');
     var dvPct  = recL > 0 ? (despVendasAbs2 / recL * 100) : 0;
     var dvBench = bDespOp2 * 0.55;
     var impC2  = recL * Math.max(0, dvPct - dvBench) / 100;
+
     if (nomeEl) nomeEl.textContent = dvPct > dvBench
       ? 'Despesas com vendas de ' + dvPct.toFixed(1).replace('.',',') + '% — ' + fmtV(impC2) + ' a recuperar otimizando canais'
       : 'Despesas com vendas bem controladas em ' + dvPct.toFixed(1).replace('.',',') + '% da receita';
     if (valEl) { valEl.className = 'ind-val ' + (dvPct > dvBench ? 'ruim' : 'bom'); valEl.textContent = dvPct.toFixed(1).replace('.',',') + '% da receita'; }
     if (medEl) medEl.textContent = '· média do setor: ~' + dvBench.toFixed(0) + '%';
-    if (impEl) impEl.textContent = impC2 > 0 ? '+' + fmtV(impC2) + '/ano' : 'manter benchmark';
-    if (potEl) potEl.textContent = empresa2 + ' tem ' + fmtV(despVendasAbs2) + ' em despesas de vendas (' + dvPct.toFixed(1).replace('.',',') + '% da receita). ' +
-      (dvPct > dvBench
-        ? 'Otimizar comissões, canais e estrutura comercial pode recuperar até ' + fmtV(impC2) + ' direto no resultado.'
-        : 'Essa eficiência é um diferencial competitivo. Escale receita mantendo esse percentual para multiplicar o lucro.');
+
+    if (bodyEl) {
+      var acoes2 = [
+        _acao('ruim',
+          'Mapeie cada centavo das despesas por categoria',
+          'com ' + fmtV(despAdminAbs2) + ' em despesas admin., separe fixo de variável — contratos, serviços terceirizados e estrutura de pessoal têm o maior espaço de corte', 'alto'),
+        _acao('ruim',
+          'Defina uma meta de custo por filial ou unidade',
+          'identifique quais operações custam mais por R$ gerado e tome decisões cirúrgicas — um centro de custo descontrolado pode ser o problema inteiro', 'medio'),
+        _acao('bom',
+          'Escale receita sem escalar despesas',
+          'giro do ativo atual de ' + giroAtivo.toFixed(2).replace('.',',') + 'x — mais vendas com estrutura atual dilui custos fixos e sobe a margem automaticamente', 'alto')
+      ];
+      var impC2txt = impC2 > 0 ? '+' + fmtV(impC2) + '/ano ao reduzir de ' + dvPct.toFixed(1).replace('.',',') + '% para ' + dvBench.toFixed(0) + '% da receita' : 'manter abaixo de ' + dvBench.toFixed(0) + '% ao crescer';
+      bodyEl.innerHTML = _acoesHTML('3 ações para enxugar as despesas operacionais', 'ruim', acoes2,
+        'Impacto estimado: <strong>' + impC2txt + '</strong>', 'Aplicar plano de redução de despesas');
+      var pot2 = bodyEl.querySelector('.potencial');
+      if (pot2) pot2.textContent = empresa2 + ' tem ' + fmtV(despVendasAbs2) + ' em despesas de vendas (' + dvPct.toFixed(1).replace('.',',') + '% da receita). ' +
+        (dvPct > dvBench
+          ? 'Otimizar comissões, canais e estrutura comercial pode recuperar até ' + fmtV(impC2) + ' direto no resultado.'
+          : 'Essa eficiência é um diferencial competitivo. Escale receita mantendo esse percentual para multiplicar o lucro.');
+    }
   })();
 
   // c3 — margem bruta
@@ -10676,22 +10726,42 @@ function popularDashboard(dados) {
     var nomeEl   = el.querySelector('.ind-nome');
     var valEl    = el.querySelector('.ind-val');
     var medEl    = el.querySelector('.ind-media');
-    var impEl    = el.querySelector('.ind-impacto-r strong');
-    var potEl    = el.querySelector('.potencial');
+    var bodyEl   = el.querySelector('.ind-body');
     var statusEl = el.querySelector('.ind-status');
     var acimaMB  = margemBrutaAt >= bMB2;
     var potMBPct = acimaMB ? 2 : Math.max(1, bMB2 - margemBrutaAt);
     var impC3    = recL * potMBPct / 100;
+    var cmv1pct  = recL * 0.01; // impacto de 1% de redução no CMV
+
     if (statusEl) { statusEl.className = 'ind-status ' + (acimaMB ? 'bom' : 'ruim'); statusEl.textContent = acimaMB ? '↑' : '↓'; }
     if (nomeEl) nomeEl.textContent = acimaMB
       ? 'Margem bruta acima da média — ' + fmtV(impC3) + ' adicionais ainda disponíveis para ampliar'
       : 'Margem bruta ' + (bMB2 - margemBrutaAt).toFixed(1) + ' p.p. abaixo da média — recuperar ' + fmtV(impC3) + ' renegociando fornecedores';
     if (valEl) { valEl.className = 'ind-val ' + (acimaMB ? 'bom' : 'ruim'); valEl.textContent = margemBrutaAt.toFixed(1).replace('.',',') + '% atual'; }
     if (medEl) medEl.textContent = '· média do setor: ' + bMB2 + '%';
-    if (impEl) impEl.textContent = '+' + fmtV(impC3) + ' elevando margem ' + potMBPct.toFixed(0) + ' p.p.';
-    if (potEl) potEl.textContent = acimaMB
-      ? 'Margem bruta de ' + margemBrutaAt.toFixed(1).replace('.',',') + '% está ' + (margemBrutaAt - bMB2).toFixed(1) + ' p.p. acima do benchmark do setor ' + bm2.label + ' (' + bMB2 + '%). Ampliar mais 2 p.p. gera ' + fmtV(impC3) + ' de lucro bruto adicional com a mesma receita.'
-      : 'Margem bruta de ' + margemBrutaAt.toFixed(1).replace('.',',') + '% está abaixo do benchmark do setor ' + bm2.label + ' (' + bMB2 + '%). Renegociar fornecedores e revisar mix de produtos pode recuperar ' + fmtV(impC3) + '/ano.';
+
+    if (bodyEl) {
+      var acoes3 = [
+        _acao(acimaMB?'bom':'ruim',
+          'Renegocie condições com os principais fornecedores',
+          'com volume de ' + fmtV(cmvAbs) + ' em compras/ano, você tem poder de barganha — cada 1% de redução no CMV gera ~' + fmtV(cmv1pct) + ' a mais de lucro bruto', 'alto'),
+        _acao('bom',
+          'Venda mais dos produtos com maior margem',
+          'identifique as categorias mais rentáveis e aumente a participação delas no mix — mudar o mix sem mudar o volume já melhora a margem', 'medio'),
+        _acao('bom',
+          'Monitore o giro de estoque — atual de ' + giroEstoq.toFixed(1).replace('.',',') + 'x/ano',
+          giroEstoq > 8
+            ? 'giro eficiente — mantenha o controle de perdas e obsolescência para proteger a margem'
+            : 'giro abaixo do ideal — estoque parado corrói a margem; identifique os SKUs de menor giro e renegocie prazos com fornecedores', 'medio')
+      ];
+      bodyEl.innerHTML = _acoesHTML(acimaMB ? '3 formas de ampliar esse diferencial competitivo' : '3 ações para recuperar a margem bruta', acimaMB?'bom':'ruim', acoes3,
+        'Potencial: <strong>+' + fmtV(impC3) + '</strong> elevando margem ' + potMBPct.toFixed(0) + ' p.p. — de ' + margemBrutaAt.toFixed(1).replace('.',',') + '% para ' + (margemBrutaAt + potMBPct).toFixed(1).replace('.',',') + '%',
+        acimaMB ? 'Ampliar essa vantagem' : 'Recuperar a margem bruta');
+      var pot3 = bodyEl.querySelector('.potencial');
+      if (pot3) pot3.textContent = acimaMB
+        ? 'Margem bruta de ' + margemBrutaAt.toFixed(1).replace('.',',') + '% está ' + (margemBrutaAt - bMB2).toFixed(1) + ' p.p. acima do benchmark do setor ' + bm2.label + ' (' + bMB2 + '%). Ampliar mais 2 p.p. gera ' + fmtV(impC3) + ' de lucro bruto adicional com a mesma receita.'
+        : 'Margem bruta de ' + margemBrutaAt.toFixed(1).replace('.',',') + '% está abaixo do benchmark do setor ' + bm2.label + ' (' + bMB2 + '%). Renegociar fornecedores e revisar mix de produtos pode recuperar ' + fmtV(impC3) + '/ano.';
+    }
   })();
 
   // c4 — receita e potencial de crescimento
@@ -10700,15 +10770,32 @@ function popularDashboard(dados) {
     var nomeEl = el.querySelector('.ind-nome');
     var valEl  = el.querySelector('.ind-val');
     var medEl  = el.querySelector('.ind-media');
-    var impEl  = el.querySelector('.ind-impacto-r strong');
-    var potEl  = el.querySelector('.potencial');
+    var bodyEl = el.querySelector('.ind-body');
     var lucroAlvoC4 = lucroAtualOF * 1.5;
     var impC4 = lucroAlvoC4 - lucroAtualOF;
+
     if (nomeEl) nomeEl.textContent = 'Receita de ' + fmtV(d.receita_bruta) + ' com margem líquida de ' + (ind.margemLiq||0).toFixed(1).replace('.',',') + '% — potencial de expansão';
     if (valEl) { valEl.className = 'ind-val bom'; valEl.textContent = fmtV(d.receita_bruta) + ' · ' + (dados.ano||''); }
     if (medEl) medEl.textContent = '· sustenta expansão com segurança';
-    if (impEl) impEl.textContent = '+' + fmtV(impC4) + '/ano de potencial incremental';
-    if (potEl) potEl.textContent = 'Com receita de ' + fmtV(d.receita_bruta) + ' e margem líquida de ' + (ind.margemLiq||0).toFixed(1).replace('.',',') + '%, combinando as melhorias identificadas de despesas e margem, o lucro líquido pode chegar a ~' + fmtV(lucroAlvoC4) + ' — ' + (((lucroAlvoC4 / (lucroAtualOF||1)) - 1) * 100).toFixed(0) + '% acima do resultado atual com a mesma base de clientes.';
+
+    if (bodyEl) {
+      var acoes4 = [
+        _acao('bom',
+          'Não deixe as despesas crescerem no mesmo ritmo da receita',
+          'escalar com estrutura enxuta é o que separa empresas que crescem e lucram das que crescem e empobrecem — defina tetos de custo fixo por faixa de receita', 'alto'),
+        _acao('bom',
+          'Concentre o crescimento nos canais com melhor margem',
+          'nem todo cliente ou canal é igual — identifique os 20% que geram 80% da margem e direcione esforço de vendas para replicar esse perfil', 'alto'),
+        _acao('bom',
+          'Use o volume de ' + fmtV(cmvAbs) + ' em compras para renegociar com fornecedores',
+          'mais compras = mais poder de barganha — cada real negociado agora vira margem direta, sem esforço adicional de venda', 'medio')
+      ];
+      bodyEl.innerHTML = _acoesHTML('3 formas de transformar crescimento em lucro real', 'bom', acoes4,
+        'Crescimento com custos controlados pode elevar a margem líquida de ' + (ind.margemLiq||0).toFixed(1).replace('.',',') + '% para <strong>+' + fmtV(impC4) + '/ano</strong> de potencial incremental',
+        'Ver estratégia de crescimento rentável');
+      var pot4 = bodyEl.querySelector('.potencial');
+      if (pot4) pot4.textContent = 'Com receita de ' + fmtV(d.receita_bruta) + ' e margem líquida de ' + (ind.margemLiq||0).toFixed(1).replace('.',',') + '%, combinando as melhorias identificadas de despesas e margem, o lucro líquido pode chegar a ~' + fmtV(lucroAlvoC4) + ' — ' + (((lucroAlvoC4 / (lucroAtualOF||1)) - 1) * 100).toFixed(0) + '% acima do resultado atual com a mesma base de clientes.';
+    }
   })();
 
   // card de oportunidade total (painel topo do O QUE FAZER)
