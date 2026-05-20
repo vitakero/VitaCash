@@ -3470,10 +3470,10 @@ function adminAbrirWhatsApp() {
   <div class="empresa-switcher">
     <div class="empresa-atual" onclick="togEmpresas()">
       <div style="display:flex;align-items:center;gap:10px;">
-        <div style="width:32px;height:32px;border-radius:8px;background:var(--green);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;">GJ</div>
+        <div id="empresa-avatar" style="width:32px;height:32px;border-radius:8px;background:var(--green);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;">—</div>
         <div>
-          <div style="font-size:13px;font-weight:600;color:var(--text);">G JOAO DOS SANTOS</div>
-          <div style="font-size:10px;color:var(--text3);">CNPJ: 12.988.127/0001-40</div>
+          <div id="empresa-nome-sidebar" style="font-size:13px;font-weight:600;color:var(--text);">—</div>
+          <div id="empresa-sub-sidebar" style="font-size:10px;color:var(--text3);">Carregando...</div>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
@@ -10227,6 +10227,21 @@ function popularDashboard(dados) {
     var el = document.getElementById(id);
     if (el) el.innerHTML = html;
   }
+
+  // ── 0. SIDEBAR — empresa atual ───────────────────────────────
+  (function() {
+    var empresa2 = dados.empresa || 'Empresa';
+    var palavras  = empresa2.trim().split(/\s+/);
+    var iniciais  = palavras.length >= 2
+      ? (palavras[0][0] + palavras[1][0]).toUpperCase()
+      : empresa2.slice(0,2).toUpperCase();
+    var av  = document.getElementById('empresa-avatar');
+    var nm  = document.getElementById('empresa-nome-sidebar');
+    var sub = document.getElementById('empresa-sub-sidebar');
+    if (av)  av.textContent  = iniciais;
+    if (nm)  nm.textContent  = empresa2;
+    if (sub) sub.textContent = (dados.setor || '') + (dados.ano ? ' · ' + dados.ano : '');
+  })();
 
   // ── 1. LINHAS DA DRE ─────────────────────────────────────────
   var linhas = [
