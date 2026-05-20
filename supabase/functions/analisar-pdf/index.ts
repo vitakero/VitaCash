@@ -224,15 +224,17 @@ Deno.serve(async (req) => {
 
     const msg = await anthropic.messages.create({
       model:      'claude-sonnet-4-5',
-      max_tokens: 2000,
+      max_tokens: 4000,
       messages:   [{ role: 'user', content }]
     })
 
     const rawText = (msg.content[0] as Anthropic.TextBlock).text.trim()
+    console.log('🔍 Claude raw (primeiros 800 chars):', rawText.substring(0, 800))
 
     // Limpa possível markdown residual
     const jsonText = rawText.replace(/^```(?:json)?\n?/,'').replace(/\n?```$/,'')
     const extraido = JSON.parse(jsonText)
+    console.log('📊 receita_bruta_ant extraída:', extraido.dre?.receita_bruta_ant)
 
     // ── 4. Calcular indicadores ────────────────────────────────
     const indicadores = benchmarksPorSetor(
