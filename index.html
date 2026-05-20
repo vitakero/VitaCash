@@ -11701,6 +11701,12 @@ async function gerarRecomendacoesIA(dados) {
     'Despesas op. típicas: ' + (bm2.despOp||25) + '% da receita',
     'CMV típico: ' + (bm2.cmv||65) + '% da receita',
     '',
+    'ANÁLISE PRÉVIA (use para determinar tipo bom/ruim):',
+    'Margem bruta: ' + (ind.margemBruta||0).toFixed(1) + '% vs benchmark ' + (bm2.mb||30) + '% → ' + ((ind.margemBruta||0) >= (bm2.mb||30) ? '✅ SUPERA benchmark — classifique como BOM' : (ind.margemBruta||0) >= (bm2.mb||30) * 0.90 ? '🟡 Próximo do benchmark (' + (((ind.margemBruta||0)/(bm2.mb||30))*100).toFixed(0) + '%) — classifique como BOM (quase lá)' : '❌ Abaixo do benchmark — classifique como RUIM'),
+    'Margem op.: ' + (ind.margemOp||0).toFixed(1) + '% vs benchmark ' + (bm2.mo||8) + '% → ' + ((ind.margemOp||0) >= (bm2.mo||8) ? '✅ SUPERA — BOM' : '❌ Abaixo — RUIM'),
+    'ROE: ' + (ind.roe||0).toFixed(1) + '% → ' + ((ind.roe||0) >= 15 ? '✅ SUPERA custo de capital — BOM' : '❌ Abaixo — RUIM'),
+    'Liquidez: ' + (ind.liquidez||0).toFixed(2) + 'x → ' + ((ind.liquidez||0) >= 1.5 ? '✅ Saudável — BOM' : '❌ Abaixo — RUIM'),
+    '',
     'Retorne APENAS este JSON:',
     '{',
     '  "potencial_realista": <número inteiro em R$ — soma conservadora e real das oportunidades, SEM dupla contagem>,',
@@ -11728,6 +11734,8 @@ async function gerarRecomendacoesIA(dados) {
     '- Compare com os benchmarks do setor informado',
     '- potencial_realista: estimativa conservadora e honesta, sem dupla contagem entre os 4 cards',
     '- Se a empresa supera o benchmark, classifique como "bom" e celebre — não finja problemas inexistentes',
+    '- OBRIGATÓRIO: se a ANÁLISE PRÉVIA acima mostrar qualquer ✅ ou 🟡, inclua PELO MENOS 1 card com tipo "bom" entre os 4. Não é aceitável retornar 4 cards "ruim" quando há pontos fortes reais.',
+    '- Para o card "bom": o titulo deve celebrar a força, acoes devem mostrar como ampliar essa vantagem, chip deve ser "Ponto forte"',
     '- Exatamente 4 recomendações, máximo 3 ações cada',
     '- CAPITAL PRESO NO CICLO DE CAIXA: use sempre NCG pelo balanço = Contas_a_receber + Estoques − Fornecedores (NÃO use receita × dias nem CMV × dias — esses métodos dão resultados divergentes)'
   ].join('\n');
