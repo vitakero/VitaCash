@@ -5472,8 +5472,8 @@ function adminAbrirWhatsApp() {
       <div class="ind-head">
         <div class="ind-status bom">✓</div>
         <div class="ind-info">
-          <div class="ind-nome">Liquidez imediata excelente (1,83x)</div>
-          <div class="ind-vals"><span class="ind-val bom">R$ 5,48 mi em caixa</span><span class="ind-media">· R$ 2,99 mi de passivo circulante</span></div>
+          <div id="bp1-nome" class="ind-nome">Liquidez imediata excelente (1,83x)</div>
+          <div class="ind-vals"><span id="bp1-val" class="ind-val bom">R$ 5,48 mi em caixa</span><span id="bp1-media" class="ind-media">· R$ 2,99 mi de passivo circulante</span></div>
         </div>
         <div class="ind-arrow">▼</div>
       </div>
@@ -5491,8 +5491,8 @@ function adminAbrirWhatsApp() {
       <div class="ind-head">
         <div class="ind-status bom">✓</div>
         <div class="ind-info">
-          <div class="ind-nome">Giro de estoque excelente (20,3x = ~18 dias)</div>
-          <div class="ind-vals"><span class="ind-val bom">R$ 1,78 mi em estoques</span><span class="ind-media">· renova a cada ~18 dias</span></div>
+          <div id="bp2-nome" class="ind-nome">Giro de estoque excelente (20,3x = ~18 dias)</div>
+          <div class="ind-vals"><span id="bp2-val" class="ind-val bom">R$ 1,78 mi em estoques</span><span id="bp2-media" class="ind-media">· renova a cada ~18 dias</span></div>
         </div>
         <div class="ind-arrow">▼</div>
       </div>
@@ -5510,8 +5510,8 @@ function adminAbrirWhatsApp() {
       <div class="ind-head">
         <div class="ind-status bom">✓</div>
         <div class="ind-info">
-          <div class="ind-nome">Endividamento muito saudável (31,2%)</div>
-          <div class="ind-vals"><span class="ind-val bom">PL representa 68,8% do passivo</span><span class="ind-media">· dívidas totais: apenas R$ 212 mil</span></div>
+          <div id="bp3-nome" class="ind-nome">Endividamento muito saudável (31,2%)</div>
+          <div class="ind-vals"><span id="bp3-val" class="ind-val bom">PL representa 68,8% do passivo</span><span id="bp3-media" class="ind-media">· dívidas totais: apenas R$ 212 mil</span></div>
         </div>
         <div class="ind-arrow">▼</div>
       </div>
@@ -10457,6 +10457,50 @@ function popularDashboard(dados) {
       setText('cv-pl-val',  fmtV(plV2));
       setText('cv-pl-desc', p(plV2) + ' do passivo total ✓ — capital próprio' + (plV2/at > 0.5 ? ' robusto' : ''));
       var cvPLBar = document.getElementById('cv-pl-bar'); if (cvPLBar) cvPLBar.style.width = bw(plV2) + '%';
+    })();
+
+    // ── Cards "Pontos de atenção do balanço" ────────────────────
+    (function() {
+      var at    = Math.abs(b.ativo_total || 1);
+      var pcV   = Math.abs(b.passivo_circulante || 0);
+      var plV   = Math.abs(b.patrimonio_liquido || 0);
+      var estV  = b.estoques || 0;
+      var cxV   = b.caixa || 0;
+      var empCP = Math.abs(b.emprestimos_cp || 0);
+      var empLP = Math.abs(b.emprestimos_lp || 0);
+      var divTot = empCP + empLP;
+
+      // Card 1 — Liquidez imediata
+      var liqImed = pcV > 0 ? (cxV / pcV) : 0;
+      var liqImedStr = liqImed.toFixed(2).replace('.',',') + 'x';
+      var bp1Status = liqImed >= 0.5 ? 'bom' : 'ruim';
+      setText('bp1-nome', 'Liquidez imediata ' + (liqImed >= 1 ? 'excelente' : liqImed >= 0.5 ? 'ok' : 'baixa') + ' (' + liqImedStr + ')');
+      setText('bp1-val',  fmtV(cxV) + ' em caixa');
+      setText('bp1-media', '· ' + fmtV(pcV) + ' de passivo circulante');
+      var bp1ValEl = document.getElementById('bp1-val');
+      if (bp1ValEl) bp1ValEl.className = 'ind-val ' + bp1Status;
+
+      // Card 2 — Giro de estoque
+      var giroE  = estV > 0 && cmvAbs > 0 ? (cmvAbs / estV) : 0;
+      var diasE  = giroE > 0 ? Math.round(365 / giroE) : 0;
+      var giroEStr = giroE.toFixed(1).replace('.',',') + 'x';
+      var bp2Status = giroE >= 8 ? 'bom' : giroE >= 4 ? 'medio' : 'ruim';
+      setText('bp2-nome', 'Giro de estoque ' + (giroE >= 12 ? 'excelente' : giroE >= 6 ? 'bom' : 'baixo') + ' (' + giroEStr + ' = ~' + diasE + ' dias)');
+      setText('bp2-val',  fmtV(estV) + ' em estoques');
+      setText('bp2-media', '· renova a cada ~' + diasE + ' dias');
+      var bp2ValEl = document.getElementById('bp2-val');
+      if (bp2ValEl) bp2ValEl.className = 'ind-val ' + bp2Status;
+
+      // Card 3 — Endividamento
+      var endivG = at > 0 ? (Math.abs(b.passivo_total || 0) / at * 100) : 0;
+      var plPct  = at > 0 ? (plV / at * 100).toFixed(1).replace('.',',') : '—';
+      var endivStr = endivG.toFixed(1).replace('.',',') + '%';
+      var bp3Status = endivG < 40 ? 'bom' : endivG < 60 ? 'medio' : 'ruim';
+      setText('bp3-nome', 'Endividamento ' + (endivG < 40 ? 'muito saudável' : endivG < 60 ? 'moderado' : 'elevado') + ' (' + endivStr + ')');
+      setText('bp3-val',  'PL representa ' + plPct + '% do passivo');
+      setText('bp3-media', '· dívidas financeiras: ' + fmtV(divTot));
+      var bp3ValEl = document.getElementById('bp3-val');
+      if (bp3ValEl) bp3ValEl.className = 'ind-val ' + bp3Status;
     })();
   })();
 
