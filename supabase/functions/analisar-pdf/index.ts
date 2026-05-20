@@ -20,16 +20,12 @@ Retorne APENAS um JSON válido, sem markdown, sem texto antes ou depois, com est
 
 {
   "empresa": "nome da empresa",
-  "ano": "ano do exercício (ex: 2023)",
-  "ano_anterior": "ano anterior se houver coluna comparativa (ex: 2022), senão null",
+  "ano": "ano do exercício mais recente (ex: 2024)",
+  "ano_anterior": "ano da coluna anterior (ex: 2023)",
   "setor": "setor estimado com base nos dados (ex: Comércio Atacadista, Serviços, Varejo, Indústria, etc.)",
-  "comparativo": {
-    "receita_bruta_anterior": 0,
-    "lucro_liquido_anterior": 0,
-    "ebit_anterior": 0
-  },
   "dre": {
     "receita_bruta": 0,
+    "receita_bruta_ant": 0,
     "deducoes": 0,
     "receita_liquida": 0,
     "cmv": 0,
@@ -41,7 +37,9 @@ Retorne APENAS um JSON válido, sem markdown, sem texto antes ou depois, com est
     "resultado_financeiro": 0,
     "resultado_antes_tributos": 0,
     "impostos": 0,
-    "lucro_liquido": 0
+    "lucro_liquido": 0,
+    "lucro_liquido_ant": 0,
+    "ebit_ant": 0
   },
   "balanco": {
     "caixa": 0,
@@ -73,7 +71,7 @@ REGRAS IMPORTANTES:
 - ebit = lucro_bruto + despesas_vendas + despesas_admin + outras_despesas_op (todas negativas)
 - resultado_antes_tributos = ebit + resultado_financeiro
 - lucro_liquido = resultado_antes_tributos + impostos (impostos é negativo)
-- COMPARATIVO (MUITO IMPORTANTE): DFPs brasileiras quase sempre têm duas colunas — o ano atual e o ano anterior lado a lado. Você DEVE procurar ativamente a coluna do ano anterior na DRE e preencher comparativo.receita_bruta_anterior com o valor de Receita de Vendas/Receita Bruta do ano anterior, comparativo.lucro_liquido_anterior com o Lucro Líquido do ano anterior, e comparativo.ebit_anterior com o EBIT/Resultado Operacional do ano anterior. Esses valores devem seguir as mesmas regras de sinal (despesas negativas). Somente deixe 0 se não houver absolutamente nenhum dado do ano anterior no documento.`
+- CAMPOS "_ant" (ANO ANTERIOR): DFPs brasileiras têm duas colunas lado a lado — ano atual e ano anterior. Preencha receita_bruta_ant com a Receita Bruta da coluna do ano anterior, lucro_liquido_ant com o Lucro Líquido do ano anterior, ebit_ant com o EBIT/Resultado Operacional do ano anterior. Se não houver coluna anterior, deixe 0.`
 
 // ── Benchmarks por setor ──────────────────────────────────────────
 function benchmarksPorSetor(setor: string, dre: Record<string,number>, balanco: Record<string,number>) {
@@ -250,7 +248,11 @@ Deno.serve(async (req) => {
       setor:       extraido.setor || 'Empresa',
       dre:         extraido.dre || {},
       balanco:     extraido.balanco || {},
-      comparativo: extraido.comparativo || { receita_bruta_anterior: 0, lucro_liquido_anterior: 0, ebit_anterior: 0 },
+      comparativo: {
+        receita_bruta_anterior: extraido.dre?.receita_bruta_ant || 0,
+        lucro_liquido_anterior: extraido.dre?.lucro_liquido_ant || 0,
+        ebit_anterior:          extraido.dre?.ebit_ant          || 0,
+      },
       indicadores,
       _hashCombo:  hashCombo,
       cache: false
