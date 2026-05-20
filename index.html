@@ -11915,9 +11915,14 @@ function popularDashboard(dados) {
     var impEfet = rat > 0 ? (imp / rat * 100).toFixed(1).replace('.',',') : '—';
     si('l10-valor', '– ' + fmtV(imp));
     si('l10-pct', pctRec(imp) + ' da receita');
-    sh('l10-formula', 'IR + CSLL = Resultado antes tributos × 34% (padrão)<br>= ' + fmtV(rat) + ' × 34% ≈ ' + fmtV(rat * 0.34) + ' esperado<br>Alíquota efetiva: ' + impEfet + '% (diferença = benefícios fiscais)');
+    var impEfetTxt = rat > 0 ? impEfet + '% (diferença = benefícios fiscais)' : '— (base tributável negativa)';
+    sh('l10-formula', 'IR + CSLL = Resultado antes tributos × 34% (padrão)<br>= ' + fmtR(rat) + ' × 34% ≈ ' + fmtR(rat * 0.34) + ' esperado<br>Alíquota efetiva: ' + impEfetTxt);
     si('l10-status', '⚠ Verificar ajustes tributários com o contador'); scl('l10-status', 'atencao');
-    si('l10-dica', '💡 Imposto efetivo de ' + fmtV(imp) + ' (' + impEfet + '% sobre o resultado). ' + (parseFloat(impEfet) > 34 ? 'Alíquota acima de 34% — revisar planejamento tributário.' : 'Alíquota abaixo de 34% — benefícios fiscais aplicados.'));
+    if (rat <= 0) {
+      si('l10-dica', '💡 Resultado antes dos tributos é negativo — tecnicamente não haveria IR a pagar. O imposto registrado (' + fmtV(imp) + ') pode refletir tributos de controladas ou ajustes contábeis. Verificar com o contador.');
+    } else {
+      si('l10-dica', '💡 Imposto efetivo de ' + fmtV(imp) + ' (' + impEfet + '% sobre o resultado). ' + (parseFloat(impEfet) > 34 ? 'Alíquota acima de 34% — revisar planejamento tributário.' : 'Alíquota abaixo de 34% — benefícios fiscais aplicados.'));
+    }
 
     // ── l11 Lucro Líquido ──
     var mlPct = recL > 0 ? ll / recL * 100 : 0;
