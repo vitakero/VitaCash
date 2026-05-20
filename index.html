@@ -3612,9 +3612,9 @@ function adminAbrirWhatsApp() {
           <div style="font-size:10px;opacity:.7;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:.5rem;">Diagnóstico financeiro</div>
           <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:.5rem;">
             <div class="nota-num">8,4</div>
-            <div><div style="font-size:14px;font-weight:700;opacity:.95;">Muito saudável</div><div style="font-size:11px;opacity:.7;">Top 15% — mas R$ 1,25 mi ainda na mesa</div></div>
+            <div><div id="nota-label" style="font-size:14px;font-weight:700;opacity:.95;">Muito saudável</div><div id="nota-sub" style="font-size:11px;opacity:.7;">Top 15% — mas R$ 1,25 mi ainda na mesa</div></div>
           </div>
-          <div class="nota-desc">Você está entre os mais saudáveis do setor — mas ainda perde R$ 1,25 mi todo ano. As 3 ações abaixo mudam isso.</div>
+          <div id="nota-desc" class="nota-desc">Você está entre os mais saudáveis do setor — mas ainda perde R$ 1,25 mi todo ano. As 3 ações abaixo mudam isso.</div>
         </div>
         <div style="text-align:right;position:relative;z-index:1;display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
           <div style="display:flex;gap:3px;align-items:flex-end;">
@@ -10251,10 +10251,35 @@ function popularDashboard(dados) {
     if (pctEl)   pctEl.textContent   = fmtPct(l.val, recL);
   });
 
-  // ── 2. SCORE ─────────────────────────────────────────────────
+  // ── 2. SCORE + DIAGNÓSTICO ───────────────────────────────────
   document.querySelectorAll('.nota-num').forEach(function(el) {
     if (ind.nota) el.textContent = ind.nota.toFixed(1).replace('.',',');
   });
+  (function() {
+    var nota = ind.nota || 5;
+    var label, topPct, corFundo;
+    if      (nota >= 9)   { label = 'Excelente';       topPct = 'Top 5%';  }
+    else if (nota >= 8)   { label = 'Muito saudável';  topPct = 'Top 15%'; }
+    else if (nota >= 7)   { label = 'Saudável';        topPct = 'Top 30%'; }
+    else if (nota >= 6)   { label = 'Razoável';        topPct = 'Top 50%'; }
+    else if (nota >= 4.5) { label = 'Atenção';         topPct = 'Abaixo da média'; }
+    else                  { label = 'Crítico';         topPct = 'Risco alto'; }
+
+    // Total mapeado vem do Radar IA (calculado na seção 8)
+    // Aqui usamos um placeholder que será sobrescrito após a seção 8
+    window._notaLabel  = label;
+    window._notaTopPct = topPct;
+
+    var notaLabelEl = document.getElementById('nota-label');
+    var notaSubEl   = document.getElementById('nota-sub');
+    var notaDescEl  = document.getElementById('nota-desc');
+    if (notaLabelEl) notaLabelEl.textContent = label;
+
+    // nota-sub e nota-desc serão atualizados após calcular totalMapeado (seção 8)
+    // Guardamos referências para uso posterior
+    window._notaSubEl  = notaSubEl;
+    window._notaDescEl = notaDescEl;
+  })();
 
   // ── 3. CICLO DE CAIXA ────────────────────────────────────────
   var ciclo   = ind.ciclo || 0;
@@ -10643,11 +10668,29 @@ function popularDashboard(dados) {
       if (cEl) cEl.textContent = op.cta;
     });
 
-    // Atualiza título e rodapé
+    // Atualiza título e rodapé do Radar
     var radarTitulo = document.getElementById('radar-titulo');
     if (radarTitulo) radarTitulo.textContent = 'RADAR IA · ' + fmtV(totalMapeado) + ' mapeados';
     var radarFooter = document.getElementById('radar-footer');
     if (radarFooter) radarFooter.textContent = 'Você já tem ' + fmtV(totalMapeado) + ' em oportunidades mapeadas. Agora é só executar.';
+
+    // Atualiza sub e desc do card de nota (agora que totalMapeado está calculado)
+    var topPct = window._notaTopPct || 'Top 50%';
+    var nota   = ind.nota || 5;
+    if (window._notaSubEl)  window._notaSubEl.textContent  = topPct + ' — mas ' + fmtV(totalMapeado) + ' ainda na mesa';
+    if (window._notaDescEl) {
+      var nomeEmpresa = dados.empresa || 'Sua empresa';
+      var setor = dados.setor || 'setor';
+      if (nota >= 8) {
+        window._notaDescEl.textContent = nomeEmpresa + ' está entre as mais saudáveis do ' + setor + ' — mas ainda deixa ' + fmtV(totalMapeado) + ' por ano na mesa. As 3 ações abaixo mudam isso.';
+      } else if (nota >= 6) {
+        window._notaDescEl.textContent = nomeEmpresa + ' tem base sólida, mas ' + fmtV(totalMapeado) + ' em oportunidades não capturadas. Corrigir os 3 pontos abaixo pode subir a nota para ' + Math.min(10, nota + 1.5).toFixed(1).replace('.',',') + '.';
+      } else if (nota >= 4.5) {
+        window._notaDescEl.textContent = nomeEmpresa + ' precisa de atenção. ' + fmtV(totalMapeado) + ' em riscos e oportunidades mapeados. Execute as 3 ações abaixo para estabilizar o resultado.';
+      } else {
+        window._notaDescEl.textContent = 'Situação crítica. ' + fmtV(totalMapeado) + ' em riscos identificados. As 3 ações abaixo são prioridade máxima para evitar piora do resultado.';
+      }
+    }
   })();
 
   // Salva globais para simuladores (empréstimo, etc.)
