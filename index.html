@@ -9219,6 +9219,7 @@ function go(id){
         await salvarAnalise();
         if (window._dadosIA && typeof popularDashboard === 'function') {
           popularDashboard(window._dadosIA);
+          gerarRecomendacoesIA(window._dadosIA); // async — não bloqueia a navegação
         }
         window._iaFresh = true; // impede popularFiltroDash de sobrescrever os dados recém-chegados
         go('s-dash');
@@ -11455,6 +11456,183 @@ async function salvarAnalise() {
   }
 }
 
+// ── GERAR RECOMENDAÇÕES PERSONALIZADAS COM CLAUDE (FRONTEND) ─────────
+async function gerarRecomendacoesIA(dados) {
+  // 0. Já tem recomendações personalizadas no cache — nada a fazer
+  if (dados && dados.recomendacoes && Array.isArray(dados.recomendacoes) && dados.recomendacoes.length >= 1) {
+    console.log('✅ Recomendações já no cache — pulando chamada Claude');
+    return;
+  }
+  if (!dados || !dados.dre) return;
+
+  // 1. Loading state nos cards c1–c4
+  ['c1','c2','c3','c4'].forEach(function(id) {
+    var el = document.getElementById(id); if (!el) return;
+    var nomeEl = el.querySelector('.ind-nome');
+    if (nomeEl) nomeEl.innerHTML = '<span style="color:var(--text3);font-style:italic;font-weight:400;">⏳ Gerando análise personalizada...</span>';
+  });
+
+  // 2. Garante que a chave da API está disponível
+  if (!window._VCFG) {
+    try {
+      var _sRec = await sb.auth.getSession();
+      var _tokRec = _sRec?.data?.session?.access_token;
+      if (_tokRec) {
+        var _rRec = await fetch('https://asrecwsocneepipvfymx.supabase.co/functions/v1/get-config', {
+          headers: { 'Authorization': 'Bearer ' + _tokRec, 'apikey': 'sb_publishable_mPLOadOpzna9wpDKjtB1-w_OwjwRwVW' }
+        });
+        if (_rRec.ok) { var _jRec = await _rRec.json(); window._VCFG = _jRec.k || ''; }
+      }
+    } catch(_) {}
+  }
+  if (!window._VCFG) {
+    console.warn('gerarRecomendacoesIA: chave API não disponível — mantendo template');
+    return;
+  }
+
+  // 3. Monta prompt com dados REAIS da empresa
+  var d   = dados.dre      || {};
+  var b   = dados.balanco  || {};
+  var ind = dados.indicadores || {};
+  var bm2 = (typeof _getBenchmark === 'function') ? _getBenchmark(dados.setor || '') : {};
+  var fN  = function(n) { return (n || 0).toLocaleString('pt-BR', { maximumFractionDigits: 0 }); };
+
+  var promptRec = [
+    'Você é o analisador financeiro do VitaCash. Analise os dados abaixo e retorne APENAS um JSON válido, sem markdown, sem texto fora do JSON.',
+    '',
+    'EMPRESA: ' + (dados.empresa || ''),
+    'SETOR: ' + (dados.setor || 'Não informado'),
+    'ANO: ' + (dados.ano || ''),
+    '',
+    'DRE (R$):',
+    'Receita bruta: ' + fN(d.receita_bruta),
+    'Receita líquida: ' + fN(d.receita_liquida),
+    'CMV: ' + fN(d.cmv) + ' (negativo = custo)',
+    'Lucro bruto: ' + fN(d.lucro_bruto),
+    'Despesas de vendas: ' + fN(d.despesas_vendas),
+    'Despesas administrativas: ' + fN(d.despesas_admin),
+    'Outras despesas op.: ' + fN(d.outras_despesas_op),
+    'EBIT: ' + fN(d.ebit),
+    'Resultado financeiro: ' + fN(d.resultado_financeiro),
+    'Impostos: ' + fN(d.impostos),
+    'Lucro líquido: ' + fN(d.lucro_liquido),
+    '',
+    'BALANÇO (R$):',
+    'Caixa: ' + fN(b.caixa),
+    'Contas a receber: ' + fN(b.contas_a_receber),
+    'Estoques: ' + fN(b.estoques),
+    'Ativo circulante: ' + fN(b.ativo_circulante),
+    'Ativo total: ' + fN(b.ativo_total),
+    'Fornecedores: ' + fN(b.fornecedores),
+    'Empréstimos CP: ' + fN(b.emprestimos_cp),
+    'Passivo circulante: ' + fN(b.passivo_circulante),
+    'Empréstimos LP: ' + fN(b.emprestimos_lp),
+    'Passivo total: ' + fN(b.passivo_total),
+    'Patrimônio líquido: ' + fN(b.patrimonio_liquido),
+    '',
+    'INDICADORES:',
+    'Margem bruta: ' + (ind.margemBruta||0).toFixed(1) + '%',
+    'Margem operacional: ' + (ind.margemOp||0).toFixed(1) + '%',
+    'Margem líquida: ' + (ind.margemLiq||0).toFixed(1) + '%',
+    'ROE: ' + (ind.roe||0).toFixed(1) + '%',
+    'Liquidez corrente: ' + (ind.liquidez||0).toFixed(2) + 'x',
+    'Endividamento geral: ' + (ind.endividamento||0).toFixed(1) + '%',
+    'Ciclo de caixa: ' + (ind.ciclo||0) + ' dias',
+    'PMR: ' + (ind.pmr||0) + ' dias | PME: ' + (ind.pme||0) + ' dias | PMP: ' + (ind.pmp||0) + ' dias',
+    '',
+    'BENCHMARKS DO SETOR (' + (bm2.label || dados.setor || 'geral') + '):',
+    'Margem bruta média: ' + (bm2.mb||30) + '%',
+    'Margem operacional média: ' + (bm2.mo||8) + '%',
+    'Margem líquida média: ' + (bm2.ml||5) + '%',
+    'Despesas op. típicas: ' + (bm2.despOp||25) + '% da receita',
+    'CMV típico: ' + (bm2.cmv||65) + '% da receita',
+    '',
+    'Retorne APENAS este JSON:',
+    '{',
+    '  "potencial_realista": <número inteiro em R$ — soma conservadora e real das oportunidades, SEM dupla contagem>,',
+    '  "potencial_descricao": "<1 frase curta explicando de onde vem esse valor>",',
+    '  "recomendacoes": [',
+    '    {',
+    '      "tipo": "ruim" ou "bom",',
+    '      "titulo": "<frase objetiva com o problema/oportunidade E o valor em R$ real>",',
+    '      "ind_val": "<valor atual ex: 3,7% ou R$ 52 mi>",',
+    '      "ind_media": "<ex: média do setor: 5%>",',
+    '      "chip": "Comece por aqui" ou "Prioridade alta" ou "Ponto forte" ou "Oportunidade",',
+    '      "acoes_titulo": "<título da seção de ações>",',
+    '      "acoes": [',
+    '        { "titulo": "<ação com número real>", "desc": "<contexto real>", "impacto": "alto" ou "medio" ou "baixo" }',
+    '      ],',
+    '      "impacto_estimado": "<ex: Impacto estimado: +R$ 1,2 mi/ano de lucro líquido>",',
+    '      "potencial": "<1-2 frases com situação real e o que muda — números concretos>",',
+    '      "cta": "<texto do botão>"',
+    '    }',
+    '  ]',
+    '}',
+    '',
+    'REGRAS OBRIGATÓRIAS:',
+    '- Use SEMPRE os números reais da empresa — NUNCA invente valores',
+    '- Compare com os benchmarks do setor informado',
+    '- potencial_realista: estimativa conservadora e honesta, sem dupla contagem entre os 4 cards',
+    '- Se a empresa supera o benchmark, classifique como "bom" e celebre — não finja problemas inexistentes',
+    '- Exatamente 4 recomendações, máximo 3 ações cada'
+  ].join('\n');
+
+  try {
+    console.log('🤖 Gerando recomendações personalizadas (Claude Haiku)...');
+    var recResp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': window._VCFG,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-3-5-haiku-20241022',
+        max_tokens: 4000,
+        messages: [{ role: 'user', content: promptRec }]
+      })
+    });
+
+    if (!recResp.ok) {
+      var _errRec = await recResp.text();
+      throw new Error('HTTP ' + recResp.status + ': ' + _errRec.slice(0,200));
+    }
+
+    var recJson = await recResp.json();
+    var recText = recJson.content[0].text.trim().replace(/^```(?:json)?\n?/,'').replace(/\n?```$/,'');
+    var recData = JSON.parse(recText);
+
+    if (!recData.recomendacoes || !Array.isArray(recData.recomendacoes) || recData.recomendacoes.length < 1) {
+      throw new Error('JSON sem recomendacoes válidas');
+    }
+
+    // 4. Injeta as recomendações no objeto dados e re-popula o dashboard
+    dados.recomendacoes     = recData.recomendacoes;
+    dados.potencial_realista  = recData.potencial_realista  || 0;
+    dados.potencial_descricao = recData.potencial_descricao || '';
+    window._dadosIA = dados;
+
+    popularDashboard(dados); // re-renderiza com os dados personalizados
+
+    // 5. Salva no Supabase para que a próxima visita use o cache
+    try {
+      if (currentUser && dados._hashCombo) {
+        await sb.from('analyses')
+          .update({ dados_extraidos: dados })
+          .eq('hash_combo', dados._hashCombo)
+          .eq('user_id', currentUser.id);
+        console.log('✅ Recomendações salvas no Supabase');
+      }
+    } catch (_saveErr) { console.warn('Aviso: não foi possível salvar recomendações no cache:', _saveErr); }
+
+    console.log('✅ Recomendações personalizadas prontas:', recData.recomendacoes.length, 'cards');
+  } catch(e) {
+    console.error('❌ gerarRecomendacoesIA erro:', e.message);
+    // Template do popularDashboard já está no DOM — não sobrescreve
+  }
+}
+
 async function carregarAnalises() {
   if (!currentUser) return [];
   var { data, error } = await sb
@@ -11591,6 +11769,7 @@ async function dashFilterChange(id) {
   if (data.dados_extraidos && typeof popularDashboard === 'function') {
     window._dadosIA = data.dados_extraidos;
     popularDashboard(data.dados_extraidos);
+    gerarRecomendacoesIA(data.dados_extraidos); // async — gera se ainda não tem cache de recomendações
   }
 }
 
