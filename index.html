@@ -3577,24 +3577,24 @@ function adminAbrirWhatsApp() {
         <div style="display:flex;flex-direction:column;gap:6px;">
           <div style="display:flex;align-items:center;justify-content:space-between;padding:.5rem .75rem;background:var(--surface2);border-radius:var(--radius);border:.5px solid var(--border);">
             <div style="font-size:11px;color:var(--text2);">Margem bruta</div>
-            <div style="display:flex;align-items:center;gap:5px;"><div style="width:6px;height:6px;border-radius:50%;background:var(--green);"></div><div style="font-size:12px;font-weight:600;color:var(--green);">21,7%</div></div>
+            <div style="display:flex;align-items:center;gap:5px;"><div id="sf-mb-dot" style="width:6px;height:6px;border-radius:50%;background:var(--green);"></div><div id="sf-mb" style="font-size:12px;font-weight:600;color:var(--green);">21,7%</div></div>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;padding:.5rem .75rem;background:var(--surface2);border-radius:var(--radius);border:.5px solid var(--border);">
             <div style="font-size:11px;color:var(--text2);">Margem líquida</div>
-            <div style="display:flex;align-items:center;gap:5px;"><div style="width:6px;height:6px;border-radius:50%;background:var(--green);"></div><div style="font-size:12px;font-weight:600;color:var(--green);">3,7%</div></div>
+            <div style="display:flex;align-items:center;gap:5px;"><div id="sf-ml-dot" style="width:6px;height:6px;border-radius:50%;background:var(--green);"></div><div id="sf-ml" style="font-size:12px;font-weight:600;color:var(--green);">3,7%</div></div>
           </div>
           <div class="pro-only" style="display:flex;align-items:center;justify-content:space-between;padding:.5rem .75rem;background:var(--surface2);border-radius:var(--radius);border:.5px solid var(--border);">
             <div style="font-size:11px;color:var(--text2);">Endividamento</div>
-            <div style="display:flex;align-items:center;gap:5px;"><div style="width:6px;height:6px;border-radius:50%;background:var(--green);"></div><div style="font-size:12px;font-weight:600;color:var(--green);">31,2%</div></div>
+            <div style="display:flex;align-items:center;gap:5px;"><div id="sf-end-dot" style="width:6px;height:6px;border-radius:50%;background:var(--green);"></div><div id="sf-end" style="font-size:12px;font-weight:600;color:var(--green);">31,2%</div></div>
           </div>
           <div class="growth-only" style="display:flex;align-items:center;justify-content:space-between;padding:.5rem .75rem;background:var(--surface2);border-radius:var(--radius);border:.5px solid var(--border);">
             <div style="font-size:11px;color:var(--text2);">ROE</div>
-            <div style="display:flex;align-items:center;gap:5px;"><div style="width:6px;height:6px;border-radius:50%;background:var(--green);"></div><div style="font-size:12px;font-weight:600;color:var(--green);">25,3%</div></div>
+            <div style="display:flex;align-items:center;gap:5px;"><div id="sf-roe-dot" style="width:6px;height:6px;border-radius:50%;background:var(--green);"></div><div id="sf-roe" style="font-size:12px;font-weight:600;color:var(--green);">25,3%</div></div>
           </div>
         </div>
-        <div style="margin-top:.875rem;padding:.625rem .75rem;background:var(--green-light);border:.5px solid var(--green-mid);border-radius:var(--radius);display:flex;align-items:center;gap:6px;">
-          <div style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;"></div>
-          <div style="font-size:11px;color:var(--green-dark);font-weight:600;">Saúde geral: Excelente</div>
+        <div id="sf-saude-box" style="margin-top:.875rem;padding:.625rem .75rem;background:var(--green-light);border:.5px solid var(--green-mid);border-radius:var(--radius);display:flex;align-items:center;gap:6px;">
+          <div id="sf-saude-dot" style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;"></div>
+          <div id="sf-saude" style="font-size:11px;color:var(--green-dark);font-weight:600;">Saúde geral: Excelente</div>
         </div>
       </div>
     </div>
@@ -10532,6 +10532,36 @@ function popularDashboard(dados) {
       if (abEl) { abEl.classList.remove('aok'); abEl.classList.add('awarn'); }
     }
   }
+
+  // ── Saúde Financeira (sidebar) ────────────────────────────────
+  (function() {
+    function sfSet(idVal, idDot, valor, isGood) {
+      var v = document.getElementById(idVal), dot = document.getElementById(idDot);
+      var cor = isGood ? 'var(--green)' : 'var(--amber)';
+      if (v)   { v.textContent = valor; v.style.color = cor; }
+      if (dot) dot.style.background = cor;
+    }
+    var mbBom  = (ind.margemBruta||0) >= (bm2.mb || 20);
+    var mlBom  = (ind.margemLiq||0)   >= (bm2.ml || 3);
+    var endBom = endivGeral < 60;
+    var roeBom = roe >= 15;
+    sfSet('sf-mb',  'sf-mb-dot',  (ind.margemBruta||0).toFixed(1).replace('.',',') + '%', mbBom);
+    sfSet('sf-ml',  'sf-ml-dot',  (ind.margemLiq||0).toFixed(1).replace('.',',')   + '%', mlBom);
+    sfSet('sf-end', 'sf-end-dot', endivGeral.toFixed(1).replace('.',',')            + '%', endBom);
+    sfSet('sf-roe', 'sf-roe-dot', roe.toFixed(1).replace('.',',')                  + '%', roeBom);
+    // Saúde geral
+    var pontos = (mbBom?1:0) + (mlBom?1:0) + (endBom?1:0) + (roeBom?1:0);
+    var saudeLabel = pontos === 4 ? 'Excelente' : pontos === 3 ? 'Muito boa' : pontos === 2 ? 'Razoável' : 'Atenção necessária';
+    var saudeCor   = pontos >= 3 ? 'var(--green)' : pontos === 2 ? 'var(--amber)' : 'var(--red)';
+    var saudeBg    = pontos >= 3 ? 'var(--green-light)' : pontos === 2 ? '#FFFBEB' : '#FEF2F2';
+    var saudeBord  = pontos >= 3 ? 'var(--green-mid)'   : pontos === 2 ? '#FDE68A'  : '#FECACA';
+    var sfBox  = document.getElementById('sf-saude-box');
+    var sfDot  = document.getElementById('sf-saude-dot');
+    var sfTxt  = document.getElementById('sf-saude');
+    if (sfBox) { sfBox.style.background = saudeBg; sfBox.style.borderColor = saudeBord; }
+    if (sfDot) sfDot.style.background = saudeCor;
+    if (sfTxt) { sfTxt.textContent = 'Saúde geral: ' + saudeLabel; sfTxt.style.color = saudeCor; }
+  })();
 
   // Endividamento — com pills dinâmicos
   var limitePctRec = d.receita_bruta > 0 ? (limiteMax / Math.abs(d.receita_bruta) * 100).toFixed(0) : '—';
