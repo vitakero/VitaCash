@@ -3944,7 +3944,7 @@ function adminAbrirWhatsApp() {
 
           <!-- Por que não vale mais -->
           <div style="margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:.5px solid var(--border);">
-            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px;">Por que vale R$ 14,4 mi faturando R$ 52,6 mi?</div>
+            <div id="val-edu-h2" style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px;">Por que vale R$ 14,4 mi faturando R$ 52,6 mi?</div>
             <div style="font-size:12px;color:var(--text2);line-height:1.8;margin-bottom:.875rem;">
               O valuation <strong>não é calculado sobre o faturamento</strong> — é calculado sobre o <strong>lucro</strong> e as <strong>margens</strong>. Uma empresa que fatura muito mas lucra pouco vale menos do que uma que fatura menos mas lucra muito.
             </div>
@@ -3952,7 +3952,7 @@ function adminAbrirWhatsApp() {
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:.875rem;">
               <div style="background:var(--surface2);border-radius:var(--radius);padding:.875rem;border:.5px solid var(--border);">
                 <div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:600;">Empresa A (atacado)</div>
-                <div style="font-size:12px;color:var(--text2);line-height:1.7;">Fatura: R$ 52,6 mi<br>Margem líquida: <strong style="color:var(--amber);">3,7%</strong><br>Lucro: R$ 1,70 mi<br>Valuation: <strong style="color:var(--text);">R$ 14,4 mi</strong><br>Múltiplo receita: <strong>0,27x</strong></div>
+                <div id="val-edu-emp-a" style="font-size:12px;color:var(--text2);line-height:1.7;">Fatura: R$ 52,6 mi<br>Margem líquida: <strong style="color:var(--amber);">3,7%</strong><br>Lucro: R$ 1,70 mi<br>Valuation: <strong style="color:var(--text);">R$ 14,4 mi</strong><br>Múltiplo receita: <strong>0,27x</strong></div>
               </div>
               <div style="background:var(--surface2);border-radius:var(--radius);padding:.875rem;border:.5px solid var(--border);">
                 <div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:600;">Empresa de software</div>
@@ -3973,7 +3973,7 @@ function adminAbrirWhatsApp() {
               <div style="font-size:12px;color:var(--text2);line-height:1.7;">
                 <strong style="color:var(--text);">P/BV — Valor pelo Patrimônio (R$ 13,5 mi)</strong><br>
                 Pega o <strong>patrimônio líquido</strong> (o que pertence aos sócios) e multiplica pela média do que o mercado paga por empresas parecidas.<br>
-                <span style="background:var(--surface2);display:inline-block;padding:3px 8px;border-radius:var(--radius);font-family:monospace;font-size:11px;margin-top:4px;">R$ 6,73 mi × 2,0x = R$ 13,5 mi</span>
+                <span id="val-edu-pbv-calc" style="background:var(--surface2);display:inline-block;padding:3px 8px;border-radius:var(--radius);font-family:monospace;font-size:11px;margin-top:4px;">R$ 6,73 mi × 2,0x = R$ 13,5 mi</span>
               </div>
             </div>
 
@@ -3982,7 +3982,7 @@ function adminAbrirWhatsApp() {
               <div style="font-size:12px;color:var(--text2);line-height:1.7;">
                 <strong style="color:var(--text);">P/L — Valor pelo Lucro (R$ 17,0 mi)</strong><br>
                 Pergunta: <em>"Quantos anos de lucro vale a empresa?"</em> No atacado, o padrão é 8–12 anos. Usamos 10x.<br>
-                <span style="background:var(--surface2);display:inline-block;padding:3px 8px;border-radius:var(--radius);font-family:monospace;font-size:11px;margin-top:4px;">R$ 1,70 mi × 10x = R$ 17,0 mi</span>
+                <span id="val-edu-pl-calc" style="background:var(--surface2);display:inline-block;padding:3px 8px;border-radius:var(--radius);font-family:monospace;font-size:11px;margin-top:4px;">R$ 1,70 mi × 10x = R$ 17,0 mi</span>
               </div>
             </div>
 
@@ -3991,7 +3991,7 @@ function adminAbrirWhatsApp() {
               <div style="font-size:12px;color:var(--text2);line-height:1.7;">
                 <strong style="color:var(--text);">EV/EBITDA — Valor pelo lucro operacional (R$ 20,3 mi)</strong><br>
                 O método favorito de grandes compradores. Usa o EBITDA (lucro antes de juros, impostos e depreciação) porque é mais difícil de manipular.<br>
-                <span style="background:var(--surface2);display:inline-block;padding:3px 8px;border-radius:var(--radius);font-family:monospace;font-size:11px;margin-top:4px;">EBITDA R$ 3,38 mi × 6x = R$ 20,3 mi</span>
+                <span id="val-edu-ev-calc" style="background:var(--surface2);display:inline-block;padding:3px 8px;border-radius:var(--radius);font-family:monospace;font-size:11px;margin-top:4px;">EBITDA R$ 3,38 mi × 6x = R$ 20,3 mi</span>
               </div>
             </div>
 
@@ -4000,7 +4000,7 @@ function adminAbrirWhatsApp() {
               <div style="font-size:12px;color:var(--text2);line-height:1.7;">
                 <strong style="color:var(--text);">PSR — Valor pela Receita (R$ 18,4 mi)</strong><br>
                 Multiplica a receita total por uma fração. No atacado, o padrão é pagar 30–50 centavos por cada R$1 de faturamento.<br>
-                <span style="background:var(--surface2);display:inline-block;padding:3px 8px;border-radius:var(--radius);font-family:monospace;font-size:11px;margin-top:4px;">R$ 46,1 mi × 0,4x = R$ 18,4 mi</span>
+                <span id="val-edu-psr-calc" style="background:var(--surface2);display:inline-block;padding:3px 8px;border-radius:var(--radius);font-family:monospace;font-size:11px;margin-top:4px;">R$ 46,1 mi × 0,4x = R$ 18,4 mi</span>
               </div>
             </div>
           </div>
@@ -4011,11 +4011,11 @@ function adminAbrirWhatsApp() {
             <div style="display:flex;flex-direction:column;gap:8px;">
               <div style="display:flex;gap:10px;align-items:flex-start;padding:.75rem;background:var(--surface2);border-radius:var(--radius);border:.5px solid var(--border);">
                 <div style="flex-shrink:0;display:flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
-                <div style="font-size:12px;color:var(--text2);line-height:1.6;"><strong style="color:var(--text);">Aumentar a margem líquida de 3,7% para 6%</strong> — reduziria despesas operacionais e aumentaria o lucro de R$ 1,70 mi para R$ 2,76 mi → valuation sobe para <strong style="color:var(--green);">~R$ 22,5 mi (+56%)</strong></div>
+                <div id="val-edu-aum1" style="font-size:12px;color:var(--text2);line-height:1.6;"><strong style="color:var(--text);">Aumentar a margem líquida de 3,7% para 6%</strong> — reduziria despesas operacionais e aumentaria o lucro de R$ 1,70 mi para R$ 2,76 mi → valuation sobe para <strong style="color:var(--green);">~R$ 22,5 mi (+56%)</strong></div>
               </div>
               <div style="display:flex;gap:10px;align-items:flex-start;padding:.75rem;background:var(--surface2);border-radius:var(--radius);border:.5px solid var(--border);">
                 <div style="flex-shrink:0;display:flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></div>
-                <div style="font-size:12px;color:var(--text2);line-height:1.6;"><strong style="color:var(--text);">Crescer a receita para R$ 80 mi mantendo margens</strong> — o EBITDA subiria proporcionalmente → valuation sobe para <strong style="color:var(--green);">~R$ 30 mi</strong></div>
+                <div id="val-edu-aum2" style="font-size:12px;color:var(--text2);line-height:1.6;"><strong style="color:var(--text);">Crescer a receita para R$ 80 mi mantendo margens</strong> — o EBITDA subiria proporcionalmente → valuation sobe para <strong style="color:var(--green);">~R$ 30 mi</strong></div>
               </div>
               <div style="display:flex;gap:10px;align-items:flex-start;padding:.75rem;background:var(--surface2);border-radius:var(--radius);border:.5px solid var(--border);">
                 <div style="flex-shrink:0;display:flex;align-items:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
@@ -4023,7 +4023,7 @@ function adminAbrirWhatsApp() {
               </div>
             </div>
             <div style="background:var(--green-light);border-left:3px solid var(--green);border-radius:0 var(--radius) var(--radius) 0;padding:.65rem .875rem;margin-top:.875rem;font-size:12px;color:var(--green-dark);line-height:1.6;">
-              <strong>Resumo:</strong> a empresa vale R$ 14,4 mi não porque fatura "pouco", mas porque o setor atacadista tem margens baixas por natureza. O caminho para um valuation maior passa pela <strong>melhora das margens</strong>, não só pelo crescimento do faturamento.
+              <span id="val-edu-resumo"><strong>Resumo:</strong> a empresa vale R$ 14,4 mi não porque fatura "pouco", mas porque o setor atacadista tem margens baixas por natureza. O caminho para um valuation maior passa pela <strong>melhora das margens</strong>, não só pelo crescimento do faturamento.</span>
             </div>
           </div>
 
@@ -11696,6 +11696,53 @@ function popularDashboard(dados) {
     // Atualiza título do painel educativo
     var eduTit = document.getElementById('val-edu-titulo');
     if (eduTit) eduTit.textContent = 'Por que a empresa vale ' + fmtV(media) + ' faturando ' + fmtV(recBr) + '?';
+
+    // Atualiza conteúdo interno do painel educativo
+    var mlPct  = recBr > 0 ? (lucro / recBr * 100).toFixed(1).replace('.',',') : '—';
+    var mlMeta = (parseFloat(mlPct.replace(',','.')) * 1.6).toFixed(1).replace('.',',');
+    var multiRec = recBr > 0 ? (media / recBr).toFixed(2).replace('.',',') : '—';
+    var valMeta  = lucro > 0 ? fmtV(lucro * 1.6 * multPL) : '—';
+    var recMeta  = fmtV(recBr * 1.5);
+
+    var h2 = document.getElementById('val-edu-h2');
+    if (h2) h2.textContent = 'Por que vale ' + fmtV(media) + ' faturando ' + fmtV(recBr) + '?';
+
+    var empA = document.getElementById('val-edu-emp-a');
+    var setor2 = (dados.setor || 'setor').split(' ')[0];
+    if (empA) empA.innerHTML =
+      'Fatura: ' + fmtV(recBr) + '<br>' +
+      'Margem líquida: <strong style="color:var(--amber);">' + mlPct + '%</strong><br>' +
+      'Lucro: ' + fmtV(lucro) + '<br>' +
+      'Valuation: <strong style="color:var(--text);">' + fmtV(media) + '</strong><br>' +
+      'Múltiplo receita: <strong>' + multiRec + 'x</strong>';
+
+    var pbvCalc = document.getElementById('val-edu-pbv-calc');
+    if (pbvCalc) pbvCalc.textContent = fmtV(pl) + ' × ' + multPBV + 'x = ' + fmtV(vPBV);
+
+    var plCalc = document.getElementById('val-edu-pl-calc');
+    if (plCalc) plCalc.textContent = fmtV(lucro) + ' × ' + multPL + 'x = ' + fmtV(vPL);
+
+    var evCalc = document.getElementById('val-edu-ev-calc');
+    if (evCalc) evCalc.textContent = 'EBIT ' + fmtV(ebit) + ' × ' + multEV + 'x = ' + fmtV(vEV);
+
+    var psrCalc = document.getElementById('val-edu-psr-calc');
+    if (psrCalc) psrCalc.textContent = fmtV(recBr) + ' × ' + multPSR + 'x = ' + fmtV(vPSR);
+
+    var aum1 = document.getElementById('val-edu-aum1');
+    if (aum1) aum1.innerHTML =
+      '<strong style="color:var(--text);">Aumentar a margem líquida de ' + mlPct + '% para ' + mlMeta + '%</strong>' +
+      ' — reduzir despesas operacionais aumentaria o lucro de ' + fmtV(lucro) + ' para ' + fmtV(lucro * 1.6) +
+      ' → valuation sobe para <strong style="color:var(--green);">~' + valMeta + ' (+60%)</strong>';
+
+    var aum2 = document.getElementById('val-edu-aum2');
+    if (aum2) aum2.innerHTML =
+      '<strong style="color:var(--text);">Crescer a receita para ' + recMeta + ' mantendo margens</strong>' +
+      ' — o EBIT subiria proporcionalmente → valuation sobe para <strong style="color:var(--green);">~' + fmtV(media * 1.5) + '</strong>';
+
+    var resumoEl = document.getElementById('val-edu-resumo');
+    if (resumoEl) resumoEl.innerHTML =
+      '<strong>Resumo:</strong> a ' + (dados.empresa || 'empresa').split(' ')[0] + ' vale ' + fmtV(media) +
+      ' com margem líquida de ' + mlPct + '%. O caminho para um valuation maior passa pela <strong>melhora das margens</strong> e crescimento da receita.';
   })();
 
   // ── tag de arquivos analisados ────────────────────────────────
