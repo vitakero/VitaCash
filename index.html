@@ -10623,6 +10623,47 @@ function popularDashboard(dados) {
   var bMB2         = bm2.mb || 35;
   var margemBrutaAt = ind.margemBruta || 0;
 
+  // ── Se Claude gerou recomendações personalizadas, usa elas ───
+  if (dados.recomendacoes && Array.isArray(dados.recomendacoes) && dados.recomendacoes.length >= 1) {
+    var ids = ['c1','c2','c3','c4'];
+    dados.recomendacoes.forEach(function(rec, i) {
+      var el = document.getElementById(ids[i]); if (!el) return;
+      var statusEl = el.querySelector('.ind-status');
+      var nomeEl   = el.querySelector('.ind-nome');
+      var valEl    = el.querySelector('.ind-val');
+      var medEl    = el.querySelector('.ind-media');
+      var chipEl   = el.querySelector('.chip');
+      var bodyEl   = el.querySelector('.ind-body');
+
+      if (statusEl) { statusEl.className = 'ind-status ' + rec.tipo; statusEl.textContent = rec.tipo === 'ruim' ? '↓' : '↑'; }
+      if (nomeEl)   nomeEl.textContent = rec.titulo;
+      if (valEl)    { valEl.className = 'ind-val ' + rec.tipo; valEl.textContent = rec.ind_val; }
+      if (medEl)    medEl.textContent = '· ' + rec.ind_media;
+      if (chipEl)   { chipEl.textContent = rec.chip; chipEl.className = 'chip ' + (rec.chip === 'Comece por aqui' || rec.chip === 'Prioridade alta' ? 'impact' : 'quick'); }
+
+      if (bodyEl) {
+        var acoesHTML = (rec.acoes || []).map(function(a, j) {
+          return '<div class="acao-item"><div class="acao-num ' + rec.tipo + '">' + (j+1) + '</div>' +
+            '<div class="acao-texto"><strong>' + a.titulo + '</strong> — ' + a.desc +
+            '<div><span class="impacto ' + (a.impacto||'medio') + '">' +
+            (a.impacto==='alto'?'Impacto alto':a.impacto==='medio'?'Impacto médio':'Impacto baixo') +
+            '</span></div></div></div>';
+        }).join('');
+
+        bodyEl.innerHTML =
+          '<div class="acoes-section">' +
+          '<div class="acoes-titulo ' + rec.tipo + '">' + (rec.acoes_titulo||'Ações recomendadas') + '</div>' +
+          acoesHTML +
+          '<div class="ind-impacto-r"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>' +
+          (rec.impacto_estimado||'') + '</div>' +
+          '<div class="potencial">' + (rec.potencial||'') + '</div>' +
+          '<div style="display:flex;gap:8px;margin-top:.75rem;"><span class="ind-cta ' + (rec.tipo==='ruim'?'urgente':'') + '">' + (rec.cta||'Ver mais') + ' →</span></div>' +
+          '</div>';
+      }
+    });
+    // pula o bloco de geração manual dos cards
+  } else {
+
   // helper: gera HTML de acao-item
   function _acao(tipo, txt, sub, impacto) {
     return '<div class="acao-item"><div class="acao-num ' + tipo + '">•</div>' +
@@ -10806,6 +10847,8 @@ function popularDashboard(dados) {
       el.textContent = fmtV(potencialLucro > 0 ? potencialLucro : lucroAtualOF * 0.5);
     }
   });
+
+  } // fim do else (sem recomendacoes personalizadas)
 
   // ── 8. RADAR IA — análise financeira real, rankeada por impacto ──────
   (function() {
