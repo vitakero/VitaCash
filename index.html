@@ -4731,7 +4731,7 @@ function adminAbrirWhatsApp() {
     <p style="font-size:11px;color:var(--text3);line-height:1.4;margin:-0.5rem 0 0.875rem;">8 indicadores extraídos do balanço — use os filtros acima para segmentar por categoria</p>
     <div class="pro-only" style="display:flex;align-items:flex-start;gap:10px;background:#f0fdf4;border:.5px solid #86efac;border-radius:var(--radius);padding:.75rem .875rem;margin-bottom:1rem;">
       <svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:1px"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#15803d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <div style="font-size:12px;color:#15803d;line-height:1.5;"><strong>Balanço muito saudável:</strong> liquidez corrente de 2,46x (acima do ideal de 1,5–2,0x), endividamento em apenas 31,2% e giro de estoque de 20,3x — muito acima da média do setor. Todos os 8 indicadores no verde.</div>
+      <div id="bp-banner-txt" style="font-size:12px;color:#15803d;line-height:1.5;"><strong>Balanço muito saudável:</strong> liquidez corrente de 2,46x (acima do ideal de 1,5–2,0x), endividamento em apenas 31,2% e giro de estoque de 20,3x — muito acima da média do setor. Todos os 8 indicadores no verde.</div>
     </div>
     <div class="mg mg-section-pro" data-plan-required="pro" style="margin-bottom:1.5rem;">
 
@@ -10912,14 +10912,61 @@ function popularDashboard(dados) {
   });
 
   // Balanço — cards de liquidez e estrutura
-  setMC('Liquidez corrente', liqCorr.toFixed(2).replace('.',',') + 'x', liqCorr >= 1.5 ? verde : amber);
-  setMC('Liquidez seca',     liqSeca.toFixed(2).replace('.',',') + 'x', liqSeca >= 1 ? verde : amber);
-  setMC('Liquidez imediata', liqImed.toFixed(2).replace('.',',') + 'x', liqImed >= 0.5 ? verde : amber);
-  setMC('Endividamento geral',    endivGeral.toFixed(1).replace('.',',') + '%', endivGeral < 60 ? verde : 'var(--red)');
-  setMC('Endividamento / pl',     endivPL.toFixed(2).replace('.',',') + 'x',   endivPL < 1 ? verde : amber);
-  setMC('Giro do ativo',          giroAtivo.toFixed(2).replace('.',',') + 'x', verde);
-  setMC('Giro do estoque',        giroEstoq.toFixed(1).replace('.',',') + 'x', verde);
-  setMC('Imobilização do pl',     imobPL.toFixed(1).replace('.',',') + '%',    imobPL < 80 ? verde : amber);
+  var liqCorrStr = liqCorr.toFixed(2).replace('.',',') + 'x';
+  var liqSecaStr = liqSeca.toFixed(2).replace('.',',') + 'x';
+  var liqImedStr = liqImed.toFixed(2).replace('.',',') + 'x';
+  var endivStr   = endivGeral.toFixed(1).replace('.',',') + '%';
+  var endivPLStr = endivPL.toFixed(2).replace('.',',') + 'x';
+  var giroAStr   = giroAtivo.toFixed(2).replace('.',',') + 'x';
+  var giroEStr   = giroEstoq.toFixed(1).replace('.',',') + 'x';
+  var imobStr    = imobPL.toFixed(1).replace('.',',') + '%';
+
+  setMC('Liquidez corrente', liqCorrStr, liqCorr >= 1.5 ? verde : amber,
+    liqCorr >= 2 ? '▲ excelente' : liqCorr >= 1.5 ? '▲ muito bom' : liqCorr >= 1 ? '▲ ok' : '▼ atenção',
+    'Você: ' + liqCorrStr, 'Ideal: 1,5–2,0x');
+  setMC('Liquidez seca', liqSecaStr, liqSeca >= 1 ? verde : amber,
+    liqSeca >= 1.5 ? '▲ excelente' : liqSeca >= 1 ? '▲ muito bom' : '▼ atenção',
+    'Você: ' + liqSecaStr, 'Ideal: acima de 1,0x');
+  setMC('Liquidez imediata', liqImedStr, liqImed >= 0.5 ? verde : amber,
+    liqImed >= 1 ? '▲ excelente — caixa robusto' : liqImed >= 0.5 ? '▲ ok' : '▼ atenção',
+    'Você: ' + liqImedStr, 'Ideal: acima de 0,5x');
+  setMC('Endividamento geral', endivStr, endivGeral < 60 ? verde : 'var(--red)',
+    endivGeral < 40 ? '▲ muito saudável' : endivGeral < 60 ? '▲ saudável' : '▼ elevado',
+    'Você: ' + endivStr, 'Ideal: abaixo 60%');
+  setMC('Endividamento / pl', endivPLStr, endivPL < 1 ? verde : amber,
+    endivPL < 0.5 ? '▲ excelente' : endivPL < 1 ? '▲ ok' : '▼ atenção',
+    'Você: ' + endivPLStr, 'Ideal: abaixo 1x');
+  setMC('Giro do ativo', giroAStr, verde,
+    giroAtivo >= 2 ? '▲ excelente giro' : '▲ bom giro',
+    'Você: ' + giroAStr, 'Média: 2–4x');
+  setMC('Giro do estoque', giroEStr, verde,
+    giroEstoq >= 12 ? '▲ estoque girando muito bem' : '▲ giro ok',
+    'Você: ' + giroEStr, 'Ideal: 8–15x/ano');
+  setMC('Imobilização do pl', imobStr, imobPL < 80 ? verde : amber,
+    imobPL < 80 ? '▲ ótimo — PL bem acima do ativo não circ.' : '▼ PL muito comprometido',
+    'Você: ' + imobStr, 'Ideal: abaixo 100%');
+
+  // Banner resumo do Balanço
+  (function() {
+    var bpBanner = document.getElementById('bp-banner-txt');
+    if (!bpBanner) return;
+    var bpEl = bpBanner.closest('.pro-only') || bpBanner.parentElement;
+    var icon = bpEl ? bpEl.querySelector('svg') : null;
+    var ruim = liqCorr < 1 || endivGeral > 70;
+    var atenc = liqCorr < 1.5 || endivGeral > 60;
+    if (ruim) {
+      bpBanner.innerHTML = '<strong>Atenção no balanço:</strong> liquidez corrente de ' + liqCorrStr + ' e endividamento de ' + endivStr + '. Revisar estrutura de capital é prioridade.';
+      bpBanner.style.color = '#b91c1c';
+      if (bpEl) { bpEl.style.background = '#fef2f2'; bpEl.style.borderColor = '#fca5a5'; }
+      if (icon) icon.style.stroke = '#b91c1c';
+    } else if (atenc) {
+      bpBanner.innerHTML = '<strong>Balanço em atenção:</strong> liquidez corrente de ' + liqCorrStr + ', endividamento de ' + endivStr + ' e giro de estoque de ' + giroEStr + '. Monitorar indicadores de liquidez.';
+      bpBanner.style.color = '#92400e';
+      if (bpEl) { bpEl.style.background = '#fffbeb'; bpEl.style.borderColor = '#fde68a'; }
+    } else {
+      bpBanner.innerHTML = '<strong>Balanço saudável:</strong> liquidez corrente de ' + liqCorrStr + ' (acima do ideal de 1,5–2,0x), endividamento de ' + endivStr + ' e giro de estoque de ' + giroEStr + ' — acima da média do setor.';
+    }
+  })();
 
   // ── 7. "O QUE FAZER" — atualiza c1-c4 com dados reais ──────
   var empresa2     = dados.empresa || 'A empresa';
