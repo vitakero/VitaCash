@@ -4202,8 +4202,8 @@ function adminAbrirWhatsApp() {
       </div>
     </div>
     <div class="sl">Como melhorar o capital de giro</div>
-    <p style="font-size:11px;color:var(--text3);line-height:1.4;margin:-0.5rem 0 0.875rem;">Ações para manter a vantagem de caixa e aproveitar o excesso disponível</p>
-    <div class="card mg-section-pro" data-plan-required="pro">
+    <p id="cg-melhorar-sub" style="font-size:11px;color:var(--text3);line-height:1.4;margin:-0.5rem 0 0.875rem;">Ações para manter a vantagem de caixa e aproveitar o excesso disponível</p>
+    <div id="cg-melhorar-card" class="card mg-section-pro" data-plan-required="pro">
       <div style="display:flex;align-items:flex-start;gap:10px;background:#f0fdf4;border:.5px solid #86efac;border-radius:var(--radius);padding:.75rem .875rem;margin-bottom:1rem;">
         <svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:1px"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#15803d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <div style="font-size:12px;color:#15803d;line-height:1.5;"><strong>Situação privilegiada:</strong> empresa recebe antes de pagar — ciclo negativo de -3 dias. O foco é manter essa vantagem e usar bem o excesso de R$ 5,13 mi parado no caixa.</div>
@@ -10397,6 +10397,79 @@ function popularDashboard(dados) {
   document.querySelectorAll('.cm-dias').forEach(function(el, i) {
     if (i === 0) el.textContent = '= ' + ciclo + ' dias';
   });
+
+  // ── "Como melhorar o capital de giro" — dinâmico ──────────────
+  (function() {
+    var cgCard = document.getElementById('cg-melhorar-card');
+    var cgSub  = document.getElementById('cg-melhorar-sub');
+    if (!cgCard) return;
+
+    var dividaTotal = Math.abs(b.emprestimos_cp||0) + Math.abs(b.emprestimos_lp||0);
+    var roe = ind.roe || 0;
+    var giroEst = cmvAbs > 0 && (b.estoques||0) > 0 ? (cmvAbs / b.estoques) : 0;
+    var excessoAplicar = excesso > 0 ? excesso : caixa;
+
+    var dica = function(cor, titulo, chip, chipCor, desc) {
+      return '<div class="dica-item"><div class="dica-dot ' + (cor||'') + '"></div><div class="dica-text">' +
+        '<div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-bottom:3px;">' +
+        '<strong>' + titulo + '</strong>' +
+        (chip ? '<span class="chip ' + (chipCor||'quick') + '">' + chip + '</span>' : '') +
+        '</div>' + desc + '</div></div>';
+    };
+    var secTit = function(cor, txt) {
+      return '<div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text);margin-bottom:.75rem;">' +
+        '<div style="width:3px;height:16px;background:' + cor + ';border-radius:99px;flex-shrink:0;"></div>' + txt + '</div>';
+    };
+    var sep = '<div style="border-top:.5px solid var(--border);margin:.875rem 0;"></div>';
+
+    var html = '';
+
+    if (ciclo <= 0) {
+      if (cgSub) cgSub.textContent = 'Ações para manter a vantagem de caixa e aproveitar o excesso disponível';
+      html += '<div style="display:flex;align-items:flex-start;gap:10px;background:#f0fdf4;border:.5px solid #86efac;border-radius:var(--radius);padding:.75rem .875rem;margin-bottom:1rem;">' +
+        '<svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:1px"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#15803d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+        '<div style="font-size:12px;color:#15803d;line-height:1.5;"><strong>Situação privilegiada:</strong> empresa recebe antes de pagar — ciclo negativo de ' + ciclo + ' dias. O foco é manter essa vantagem e usar bem o excesso de ' + fmtV(excessoAplicar) + ' parado no caixa.</div></div>';
+      html += secTit('var(--green)', 'Manter a vantagem competitiva');
+      html += dica('r', 'Negocie mais prazo com fornecedores', 'Fácil', 'quick', 'Atualmente ' + pmp + ' dias. Ir para ' + (pmp + 15) + '+ dias libera ainda mais caixa e fortalece o ciclo negativo.');
+      html += dica('r', 'Mantenha o giro de estoque' + (giroEst > 0 ? ' (' + giroEst.toFixed(1).replace('.',',') + 'x/ano)' : ''), 'Alto impacto', 'impact', 'É um diferencial competitivo enorme. Cada queda no giro aumenta o capital de giro necessário.');
+      html += dica('r', 'Continue vendendo com prazo curto (' + pmr + ' dia' + (pmr !== 1 ? 's' : '') + ')', 'Já está fazendo', 'quick', 'Evite ampliar o prazo ao cliente — cada dia a mais aumenta o capital de giro necessário.');
+      html += sep;
+      html += secTit('#3b82f6', 'Aplicar o excesso de ' + fmtV(excessoAplicar));
+      html += dica('', 'Aplique em renda fixa', '+' + fmtV(Math.round(excessoAplicar * 0.1375)) + '/ano', 'gain', 'À Selic de 13,75% a.a., ' + fmtV(excessoAplicar) + ' rendem aproximadamente ' + fmtV(Math.round(excessoAplicar * 0.1375)) + ' por ano sem risco.');
+      html += dica('', 'Distribua como dividendos', 'Geração de valor', 'gain', 'Com ROE de ' + (roe > 0 ? roe.toFixed(1).replace('.',',') + '%' : '?') + ', parte do excesso pode retornar aos sócios — avalie o planejamento tributário.');
+      if (dividaTotal > 0) {
+        html += dica('', 'Quite as dívidas (' + fmtV(dividaTotal) + ')', 'Rápida quitação', 'quick', 'Liquidar elimina despesas financeiras e simplifica o balanço.');
+      }
+    } else {
+      if (cgSub) cgSub.textContent = 'Ações para liberar capital preso no ciclo operacional e reduzir a NCG';
+      var corAlerta = excesso >= 0 ? '#f0fdf4' : '#fff7ed';
+      var borderAlerta = excesso >= 0 ? '#86efac' : '#fed7aa';
+      var strokeAlerta = excesso >= 0 ? '#15803d' : '#c2410c';
+      html += '<div style="display:flex;align-items:flex-start;gap:10px;background:' + corAlerta + ';border:.5px solid ' + borderAlerta + ';border-radius:var(--radius);padding:.75rem .875rem;margin-bottom:1rem;">' +
+        '<svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:1px"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke="' + strokeAlerta + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+        '<div style="font-size:12px;color:' + strokeAlerta + ';line-height:1.5;"><strong>Capital preso no ciclo:</strong> com ' + ciclo + ' dias de ciclo operacional, <strong>' + fmtV(ncgBalanco||ncg) + '</strong> está imobilizado na operação. Reduzir o ciclo em 20% libera <strong>' + fmtV(Math.round((ncgBalanco||ncg) * 0.2)) + '</strong> imediatamente.</div></div>';
+      html += secTit('#ef4444', 'Reduzir o ciclo (' + ciclo + ' dias → meta: ' + Math.round(ciclo * 0.8) + ' dias)');
+      if (pmr > 30) {
+        html += dica('r', 'Cobrar mais rápido: PMR ' + pmr + ' → ' + Math.round(pmr * 0.8) + ' dias', 'Alto impacto', 'impact', 'Antecipar recebíveis ou oferecer desconto para pagamento à vista libera ' + fmtV(Math.round((b.contas_a_receber||0) * 0.2)) + ' de caixa imediatamente.');
+      }
+      if (pme > 60) {
+        html += dica('r', 'Reduzir estoque: PME ' + pme + ' → ' + Math.round(pme * 0.8) + ' dias' + (giroEst > 0 ? ' (' + giroEst.toFixed(1).replace('.',',') + 'x/ano)' : ''), 'Prioridade', 'impact', 'Estoque parado por ' + pme + ' dias trava ' + fmtV(b.estoques||0) + ' em capital. Revisão de mix e gestão de compras pode reduzir significativamente.');
+      }
+      html += dica('r', 'Ampliar prazo com fornecedores: PMP ' + pmp + ' → ' + (pmp + 30) + '+ dias', 'Fácil', 'quick', 'Renegociar prazos sem custo adicional reduz o ciclo e libera caixa diretamente.');
+      if (excesso > 0) {
+        html += sep;
+        html += secTit('#3b82f6', 'Usar o excesso de caixa (' + fmtV(excesso) + ')');
+        html += dica('', 'Aplique em renda fixa', '+' + fmtV(Math.round(excesso * 0.1375)) + '/ano', 'gain', 'Caixa acima da NCG. À Selic de 13,75% a.a. renderia ' + fmtV(Math.round(excesso * 0.1375)) + ' por ano.');
+        if (dividaTotal > 0) html += dica('', 'Amortize a dívida (' + fmtV(dividaTotal) + ')', 'Reduz juros', 'impact', 'Usar o excesso para amortizar dívida reduz despesas financeiras e melhora a cobertura de juros.');
+      } else if (dividaTotal > 0) {
+        html += sep;
+        html += secTit('#f59e0b', 'Atenção: NCG maior que o caixa disponível');
+        html += dica('r', 'Caixa de ' + fmtV(caixa) + ' vs NCG de ' + fmtV(ncgBalanco||ncg), 'Risco de liquidez', 'impact', 'O capital de giro necessário supera o caixa atual. Manter linha de crédito e priorizar a redução do ciclo são ações imediatas.');
+        html += dica('r', 'Refinancie a dívida de ' + fmtV(dividaTotal), 'Urgente', 'impact', 'Com despesas financeiras consumindo o EBIT, buscar melhores taxas é prioridade. Considere debêntures ou linhas BNDES.');
+      }
+    }
+    cgCard.innerHTML = html;
+  })();
 
   // ── 4. BARRAS DE BENCHMARK ───────────────────────────────────
   var brs = document.querySelectorAll('.br2');
