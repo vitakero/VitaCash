@@ -9360,7 +9360,85 @@ function filtrar(tipo,btn){
 
 
 function showTip(el, titulo, def, val, obs){
-  // Verificar se o painel desta caixa já está aberto ANTES de fechar tudo
+  // ── Sobrescreve val/obs com dados reais da análise atual ──────────
+  var _d = window._dadosIA;
+  if (_d && _d.balanco) {
+    var _b = _d.balanco, _dr = _d.dre || {};
+    var _at = Math.abs(_b.ativo_total || 1);
+    var _pt = Math.abs(_b.passivo_total || 0);
+    var _cmv = Math.abs(_dr.cmv || 0);
+    var _rec = Math.abs(_dr.receita_bruta || 1);
+    function _p(v){ return _at>0?(Math.abs(v||0)/_at*100).toFixed(1)+'%':'—'; }
+    function _pp(v){ return _pt>0?(Math.abs(v||0)/_pt*100).toFixed(1)+'%':'—'; }
+    var _acV  = Math.abs(_b.ativo_circulante||0);
+    var _pcV  = Math.abs(_b.passivo_circulante||0);
+    var _liq  = _pcV>0?(_acV/_pcV).toFixed(2):'—';
+    var _giro = _b.estoques>0&&_cmv>0?(_cmv/_b.estoques).toFixed(1)+'x/ano':'—';
+    var _dias = _b.estoques>0&&_cmv>0?Math.round(_b.estoques/_cmv*365):'—';
+    var _pmp  = _b.fornecedores>0&&_cmv>0?Math.round(Math.abs(_b.fornecedores)/_cmv*365):'—';
+    var _empTot = Math.abs(_b.emprestimos_cp||0)+Math.abs(_b.emprestimos_lp||0);
+    var _cxCob = _empTot>0&&_b.caixa>0?Math.round(_b.caixa/_empTot)+'x':'alto';
+    var _overrides = {
+      'Caixa e Equivalentes': {
+        val: fmtV(_b.caixa||0)+' · '+_p(_b.caixa)+' do ativo',
+        obs: (_b.caixa||0)>_pcV*0.3?'✓ Caixa saudável em relação ao passivo circulante':'⚠ Caixa baixo — monitorar liquidez'
+      },
+      'Aplicações Financeiras': {
+        val: fmtV(0)+' · —',
+        obs: '— Incluído no caixa e equivalentes'
+      },
+      'Contas a Receber e Créditos': {
+        val: fmtV(_b.contas_a_receber||0)+' · '+_p(_b.contas_a_receber)+' do ativo',
+        obs: _b.contas_a_receber>0&&_rec>0?(_b.contas_a_receber/_rec*365).toFixed(0)+' dias médios de recebimento':'—'
+      },
+      'Estoques': {
+        val: fmtV(_b.estoques||0)+' · '+_p(_b.estoques)+' do ativo',
+        obs: '✓ Giro de '+_giro+' — renova a cada ~'+_dias+' dias'
+      },
+      'Despesas Antecipadas': {
+        val: fmtV(_b.outros_ativo_circ||0)+' · '+_p(_b.outros_ativo_circ)+' do ativo',
+        obs: 'Outros ativos circulantes — tributos a recuperar e despesas antecipadas'
+      },
+      'Fornecedores': {
+        val: fmtV(_b.fornecedores||0)+' · '+_pp(_b.fornecedores)+' do passivo total',
+        obs: '✓ Prazo médio de pagamento: ~'+_pmp+' dias — crédito gratuito dos fornecedores'
+      },
+      'Empréstimos Bancários CP': {
+        val: fmtV(_b.emprestimos_cp||0)+' · '+_pp(_b.emprestimos_cp)+' do passivo total',
+        obs: _pcV>0?'Liquidez corrente de '+_liq+'x — '+(_acV/_pcV>=1.5?'✓ cobre bem o passivo circulante':'⚠ atenção à cobertura'):'—'
+      },
+      'Obrigações Trabalhistas e Fiscais': {
+        val: fmtV(_b.outros_passivo_circ||0)+' · '+_pp(_b.outros_passivo_circ)+' do passivo total',
+        obs: 'Obrigações regulares de operação — salários, INSS, FGTS e tributos'
+      },
+      'Imobilizado (Bruto)': {
+        val: fmtV(_b.ativo_nao_circulante||0)+' · '+_p(_b.ativo_nao_circulante)+' do ativo',
+        obs: 'Ativos de longo prazo — imobilizado e intangível'
+      },
+      'Imobilizado Líquido': {
+        val: fmtV(_b.ativo_nao_circulante||0)+' · '+_p(_b.ativo_nao_circulante)+' do ativo',
+        obs: 'Valor contábil dos ativos não circulantes após depreciação'
+      },
+      'Financiamentos a Longo Prazo': {
+        val: fmtV(_b.emprestimos_lp||0)+' · '+_pp(_b.emprestimos_lp)+' do passivo total',
+        obs: Math.abs(_b.emprestimos_lp||0)<_at*0.1?'✓ Dívida de longo prazo controlada':'⚠ Dívida LP relevante — acompanhar'
+      },
+      'Outras Obrigações LP': {
+        val: fmtV(_b.passivo_nao_circulante||0)+' · '+_pp(_b.passivo_nao_circulante)+' do passivo total',
+        obs: 'Outras obrigações de longo prazo'
+      },
+      'Capital Social': {
+        val: 'Capital dos sócios — base do patrimônio',
+        obs: '✓ Capital próprio — não gera juros nem obrigação de pagamento'
+      },
+      'Lucros Acumulados': {
+        val: fmtV(_b.patrimonio_liquido||0)+' · '+_p(_b.patrimonio_liquido)+' do ativo',
+        obs: '✓ PL acumulado ao longo dos anos — resultado de reinvestimento dos lucros'
+      }
+    };
+    if (_overrides[titulo]) { val = _overrides[titulo].val; obs = _overrides[titulo].obs; }
+  }
+  // ── Verificar se o painel desta caixa já está aberto ANTES de fechar tudo
   let panel = el.querySelector('.bp-panel');
   const jaEstaAberto = panel && panel.style.maxHeight && panel.style.maxHeight !== '0px';
 
