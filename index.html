@@ -1807,7 +1807,7 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
       </div>
     </div>
     <div style="background:var(--bg);border:.5px solid var(--border);border-radius:20px;padding:1.5rem;box-shadow:0 8px 32px rgba(0,0,0,.06);">
-      <div style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:1rem;">Exemplo real · G JOAO DOS SANTOS</div>
+      <div id="dre-edu-empresa-ref" style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:1rem;">Exemplo real · G JOAO DOS SANTOS</div>
       <div style="background:linear-gradient(135deg,#1D9E75,#0a6e50);border-radius:14px;padding:1.25rem;color:#fff;margin-bottom:1rem;">
         <div style="font-size:10px;opacity:.75;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Saúde financeira</div>
         <div style="font-family:'Sora',sans-serif;font-size:40px;font-weight:800;letter-spacing:-2px;line-height:1;">8,4<span style="font-size:16px;opacity:.8;">/10</span></div>
@@ -3951,7 +3951,7 @@ function adminAbrirWhatsApp() {
 
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:.875rem;">
               <div style="background:var(--surface2);border-radius:var(--radius);padding:.875rem;border:.5px solid var(--border);">
-                <div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:600;">G JOAO (atacado)</div>
+                <div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:600;">Empresa A (atacado)</div>
                 <div style="font-size:12px;color:var(--text2);line-height:1.7;">Fatura: R$ 52,6 mi<br>Margem líquida: <strong style="color:var(--amber);">3,7%</strong><br>Lucro: R$ 1,70 mi<br>Valuation: <strong style="color:var(--text);">R$ 14,4 mi</strong><br>Múltiplo receita: <strong>0,27x</strong></div>
               </div>
               <div style="background:var(--surface2);border-radius:var(--radius);padding:.875rem;border:.5px solid var(--border);">
@@ -4711,11 +4711,11 @@ function adminAbrirWhatsApp() {
   <div class="tc2" id="tbp">
     <div class="pdf-tab-btn"><button onclick="checkPremium('Exportar relatórios completos em PDF para apresentar ou enviar ao contador', exportarPDF)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Exportar relatório</button></div>
 
-    <div class="sl">Balanço Patrimonial — G JOAO DOS SANTOS · 31/12/2022</div>
-    <p style="font-size:11px;color:var(--text3);line-height:1.4;margin:-0.5rem 0 0.875rem;">Retrato financeiro da empresa em 31/12/2022 — ativos, passivos e indicadores de solidez patrimonial</p>
+    <div id="bp-titulo-sl" class="sl">Balanço Patrimonial — G JOAO DOS SANTOS · 31/12/2022</div>
+    <p id="bp-subtitulo" style="font-size:11px;color:var(--text3);line-height:1.4;margin:-0.5rem 0 0.875rem;">Retrato financeiro da empresa em 31/12/2022 — ativos, passivos e indicadores de solidez patrimonial</p>
     <div class="ab aok" style="margin-bottom:1.25rem;">
       <div style="flex-shrink:0;margin-top:1px;"><svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="at">Dados extraídos automaticamente dos PDFs enviados (DRE + Balanço). CNPJ: 12.988.127/0001-40.</div>
+      <div class="at">Dados extraídos automaticamente dos PDFs enviados (DRE + Balanço). Análise gerada por IA.</div>
     </div>
 
     <!-- FILTROS -->
@@ -4883,7 +4883,7 @@ function adminAbrirWhatsApp() {
           <div style="display:flex;align-items:center;gap:10px;">
             <div style="width:32px;height:32px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
             <div>
-              <div style="font-size:13px;font-weight:600;color:var(--green-dark);">Entenda o Balanço Patrimonial da G JOAO</div>
+              <div id="bp-edu-titulo" style="font-size:13px;font-weight:600;color:var(--green-dark);">Entenda o Balanço Patrimonial da G JOAO</div>
               <div style="font-size:11px;color:var(--green-bg);margin-top:1px;">Clique para ler a explicação de cada parte — baseada nos seus dados reais</div>
             </div>
           </div>
@@ -4896,7 +4896,7 @@ function adminAbrirWhatsApp() {
           <!-- O que é o balanço -->
           <div style="margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:.5px solid var(--border);">
             <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;">📊 O que é o Balanço Patrimonial?</div>
-            <div style="font-size:12px;color:var(--text2);line-height:1.8;">
+            <div id="bp-edu-igualdade" style="font-size:12px;color:var(--text2);line-height:1.8;">
               O Balanço Patrimonial mostra <strong>de onde veio o dinheiro</strong> e <strong>para onde ele foi</strong> na sua empresa.<br><br>
               <strong>Lado esquerdo (verde) = ATIVO:</strong> para onde o dinheiro foi — caixa, estoque, equipamentos.<br>
               <strong>Lado direito (azul) = PASSIVO + PL:</strong> de onde veio o dinheiro — fornecedores, bancos ou os próprios sócios.<br><br>
@@ -4914,25 +4914,25 @@ function adminAbrirWhatsApp() {
             <div style="display:flex;gap:8px;margin-bottom:10px;align-items:flex-start;">
               <div style="width:22px;height:22px;border-radius:50%;background:var(--green-light);color:var(--green-dark);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">1</div>
               <div style="font-size:12px;color:var(--text2);line-height:1.6;"><strong style="color:var(--text);">Ativo Circulante (R$ 7,38 mi · 75,3%)</strong> — tudo que a empresa consegue transformar em dinheiro em menos de 12 meses: caixa, estoques e contas a receber.<br>
-              <span style="background:var(--green-light);color:var(--green-dark);font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;margin-top:3px;display:inline-block;">G JOAO: 75% do ativo é circulante — empresa muito líquida ✓</span></div>
+              <span class="bp-edu-pill" style="background:var(--green-light);color:var(--green-dark);font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;margin-top:3px;display:inline-block;">G JOAO: 75% do ativo é circulante — empresa muito líquida ✓</span></div>
             </div>
 
             <div style="display:flex;gap:8px;margin-bottom:10px;align-items:flex-start;">
               <div style="width:22px;height:22px;border-radius:50%;background:var(--green-light);color:var(--green-dark);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">2</div>
               <div style="font-size:12px;color:var(--text2);line-height:1.6;"><strong style="color:var(--text);">Caixa e equivalentes (R$ 5,48 mi · 56%)</strong> — dinheiro disponível agora: caixa, bancos e aplicações de resgate imediato. É o dinheiro que a empresa pode usar hoje.<br>
-              <span style="background:var(--green-light);color:var(--green-dark);font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;margin-top:3px;display:inline-block;">G JOAO: 56% do ativo em caixa — posição muito acima do normal ✓✓</span></div>
+              <span class="bp-edu-pill" style="background:var(--green-light);color:var(--green-dark);font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;margin-top:3px;display:inline-block;">G JOAO: 56% do ativo em caixa — posição muito acima do normal ✓✓</span></div>
             </div>
 
             <div style="display:flex;gap:8px;margin-bottom:10px;align-items:flex-start;">
               <div style="width:22px;height:22px;border-radius:50%;background:var(--green-light);color:var(--green-dark);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">3</div>
               <div style="font-size:12px;color:var(--text2);line-height:1.6;"><strong style="color:var(--text);">Estoques (R$ 1,78 mi · 18,2%)</strong> — produtos comprados mas ainda não vendidos. Quanto mais rápido girar, melhor.<br>
-              <span style="background:var(--green-light);color:var(--green-dark);font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;margin-top:3px;display:inline-block;">G JOAO: giro de 20x/ano (~18 dias). Média do setor: 8–15x ✓✓</span></div>
+              <span class="bp-edu-pill" style="background:var(--green-light);color:var(--green-dark);font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;margin-top:3px;display:inline-block;">G JOAO: giro de 20x/ano (~18 dias). Média do setor: 8–15x ✓✓</span></div>
             </div>
 
             <div style="display:flex;gap:8px;align-items:flex-start;">
               <div style="width:22px;height:22px;border-radius:50%;background:var(--green-light);color:var(--green-dark);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">4</div>
               <div style="font-size:12px;color:var(--text2);line-height:1.6;"><strong style="color:var(--text);">Ativo Não Circulante (R$ 2,41 mi · 24,7%)</strong> — bens que a empresa dificilmente vai converter em dinheiro em menos de 12 meses: veículos, caminhões e equipamentos.<br>
-              <span style="background:var(--green-light);color:var(--green-dark);font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;margin-top:3px;display:inline-block;">G JOAO: R$ 4,86 mi de imobilizado bruto, já 50,3% depreciado ✓</span></div>
+              <span class="bp-edu-pill" style="background:var(--green-light);color:var(--green-dark);font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;margin-top:3px;display:inline-block;">G JOAO: R$ 4,86 mi de imobilizado bruto, já 50,3% depreciado ✓</span></div>
             </div>
           </div>
 
@@ -4943,19 +4943,19 @@ function adminAbrirWhatsApp() {
             <div style="display:flex;gap:8px;margin-bottom:10px;align-items:flex-start;">
               <div style="width:22px;height:22px;border-radius:50%;background:#E6F1FB;color:#1A3A6B;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">1</div>
               <div style="font-size:12px;color:var(--text2);line-height:1.6;"><strong style="color:var(--text);">Passivo Circulante (R$ 2,99 mi · 30,6%)</strong> — dívidas que vencem em até 12 meses: fornecedores, salários, impostos e empréstimos de curto prazo.<br>
-              <span style="background:#E6F1FB;color:#1A3A6B;font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;margin-top:3px;display:inline-block;">G JOAO: Liquidez corrente de 2,46x — para cada R$1 de dívida CP, tem R$2,46 disponível ✓✓</span></div>
+              <span class="bp-edu-pill" style="background:#E6F1FB;color:#1A3A6B;font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;margin-top:3px;display:inline-block;">G JOAO: Liquidez corrente de 2,46x — para cada R$1 de dívida CP, tem R$2,46 disponível ✓✓</span></div>
             </div>
 
             <div style="display:flex;gap:8px;margin-bottom:10px;align-items:flex-start;">
               <div style="width:22px;height:22px;border-radius:50%;background:#E6F1FB;color:#1A3A6B;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">2</div>
               <div style="font-size:12px;color:var(--text2);line-height:1.6;"><strong style="color:var(--text);">Fornecedores (R$ 2,18 mi · 22,2%)</strong> — mercadorias compradas mas ainda não pagas. É um <strong>crédito gratuito</strong>: enquanto não paga, o dinheiro fica na empresa rendendo.<br>
-              <span style="background:#E6F1FB;color:#1A3A6B;font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;margin-top:3px;display:inline-block;">G JOAO: R$ 2,18 mi com fornecedores = prazo médio de ~22 dias ✓</span></div>
+              <span class="bp-edu-pill" style="background:#E6F1FB;color:#1A3A6B;font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;margin-top:3px;display:inline-block;">G JOAO: R$ 2,18 mi com fornecedores = prazo médio de ~22 dias ✓</span></div>
             </div>
 
             <div style="display:flex;gap:8px;align-items:flex-start;">
               <div style="width:22px;height:22px;border-radius:50%;background:#E6F1FB;color:#1A3A6B;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">3</div>
               <div style="font-size:12px;color:var(--text2);line-height:1.6;"><strong style="color:var(--text);">Empréstimos (R$ 212 mil total)</strong> — R$ 148 mil no curto prazo e R$ 63,9 mil no longo prazo. Valor muito baixo em relação ao caixa.<br>
-              <span style="background:var(--green-light);color:var(--green-dark);font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;margin-top:3px;display:inline-block;">G JOAO: caixa (R$ 5,48 mi) cobre 25x os empréstimos totais ✓✓</span></div>
+              <span class="bp-edu-pill" style="background:var(--green-light);color:var(--green-dark);font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;margin-top:3px;display:inline-block;">G JOAO: caixa (R$ 5,48 mi) cobre 25x os empréstimos totais ✓✓</span></div>
             </div>
           </div>
 
@@ -4966,16 +4966,16 @@ function adminAbrirWhatsApp() {
             <div style="display:flex;gap:8px;margin-bottom:10px;align-items:flex-start;">
               <div style="width:22px;height:22px;border-radius:50%;background:#E8EEF8;color:#0A2240;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">1</div>
               <div style="font-size:12px;color:var(--text2);line-height:1.6;"><strong style="color:var(--text);">Capital Social (R$ 140 mil)</strong> — valor que os sócios investiram diretamente ao abrir a empresa. Não gera juros nem obrigação de pagamento.<br>
-              <span style="background:#E8EEF8;color:#0A2240;font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;margin-top:3px;display:inline-block;">G JOAO: apenas R$ 140 mil de capital inicial — empresa cresceu com lucros próprios</span></div>
+              <span class="bp-edu-pill" style="background:#E8EEF8;color:#0A2240;font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;margin-top:3px;display:inline-block;">G JOAO: apenas R$ 140 mil de capital inicial — empresa cresceu com lucros próprios</span></div>
             </div>
 
             <div style="display:flex;gap:8px;align-items:flex-start;">
               <div style="width:22px;height:22px;border-radius:50%;background:#E8EEF8;color:#0A2240;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">2</div>
               <div style="font-size:12px;color:var(--text2);line-height:1.6;"><strong style="color:var(--text);">Lucros Acumulados (R$ 6,59 mi · 67,4%)</strong> — lucros que a empresa gerou ao longo dos anos e optou por manter no negócio em vez de distribuir. São os juros compostos do empresário.<br>
-              <span style="background:var(--green-light);color:var(--green-dark);font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;margin-top:3px;display:inline-block;">G JOAO: saiu de R$ 140 mil para R$ 6,73 mi de PL — cresceu 48x com capital próprio ✓✓</span></div>
+              <span class="bp-edu-pill" style="background:var(--green-light);color:var(--green-dark);font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;margin-top:3px;display:inline-block;">G JOAO: saiu de R$ 140 mil para R$ 6,73 mi de PL — cresceu 48x com capital próprio ✓✓</span></div>
             </div>
 
-            <div style="background:var(--green-light);border-left:3px solid var(--green);border-radius:0 var(--radius) var(--radius) 0;padding:.65rem .875rem;margin-top:.875rem;font-size:12px;color:var(--green-dark);line-height:1.6;">
+            <div id="bp-edu-resumo" style="background:var(--green-light);border-left:3px solid var(--green);border-radius:0 var(--radius) var(--radius) 0;padding:.65rem .875rem;margin-top:.875rem;font-size:12px;color:var(--green-dark);line-height:1.6;">
               🏆 <strong>Resumo da G JOAO:</strong> empresa com PL de R$ 6,73 mi (68,8% do passivo), caixa robusto de R$ 5,48 mi, dívidas mínimas de R$ 212 mil e estoque girando 20x ao ano. <strong>Estrutura financeira sólida e saudável.</strong>
             </div>
           </div>
@@ -4986,7 +4986,7 @@ function adminAbrirWhatsApp() {
 
     <!-- BALANÇO VISUAL ILUSTRATIVO -->
     <div class="sl" style="margin-top:1.5rem;">Balanço patrimonial — visualização ilustrativa</div>
-    <div style="font-size:12px;color:var(--text2);margin-bottom:1rem;line-height:1.6;">Passe o cursor em cada caixa para entender o que representa. Os tamanhos são proporcionais aos dados reais da G JOAO DOS SANTOS 2022.</div>
+    <div id="bp-treemap-desc" style="font-size:12px;color:var(--text2);margin-bottom:1rem;line-height:1.6;">Passe o cursor em cada caixa para entender o que representa. Os tamanhos são proporcionais aos dados reais da G JOAO DOS SANTOS 2022.</div>
 
     <div class="mg-section-pro" data-plan-required="pro" style="display:grid;grid-template-columns:1fr 1fr;gap:3px;border-radius:var(--radius-lg);overflow:hidden;border:.5px solid var(--border2);">
 
@@ -5344,7 +5344,7 @@ function adminAbrirWhatsApp() {
 
 
 
-    <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:.75rem;margin-bottom:1.25rem;">
+    <div id="bp-treemap-label" style="font-size:10px;color:var(--text3);text-align:center;margin-top:.75rem;margin-bottom:1.25rem;">
       Clique em cada caixa para ver a explicação · G JOAO DOS SANTOS · 31/12/2022
     </div>
 
@@ -5524,8 +5524,8 @@ function adminAbrirWhatsApp() {
       </div></div>
     </div>
     </div>
-    <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:1rem;">
-      G JOAO DOS SANTOS INDUSTRIA E COMERCIO · CNPJ: 12.988.127/0001-40 · 31/12/2022
+    <div id="bp-footer-label" style="font-size:10px;color:var(--text3);text-align:center;margin-top:1rem;">
+      G JOAO DOS SANTOS · 31/12/2022
     </div>
 
   </div>
@@ -9436,7 +9436,7 @@ function imprimirRelatorio() {
 
   // Tenta pegar nome da empresa dinamicamente
   var empresaNome = (document.querySelector('.empresa-atual .font-semibold, .empresa-atual [style*="font-weight:600"], .empresa-atual [style*="font-weight: 600"]') || {}).textContent
-    || (document.querySelector('[style*="G JOAO"]') || {}).textContent
+    || (window._dadosIA && window._dadosIA.empresa) || ''
     || 'Empresa';
   var dataEmissao = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
   var anoExercicio = new Date().getFullYear();
@@ -10241,6 +10241,53 @@ function popularDashboard(dados) {
     if (av)  av.textContent  = iniciais;
     if (nm)  nm.textContent  = empresa2;
     if (sub) sub.textContent = (dados.setor || '') + (dados.ano ? ' · ' + dados.ano : '');
+  })();
+
+  // ── 0b. BALANÇO — títulos e pills educativas ─────────────────
+  (function() {
+    var empresa2 = dados.empresa || 'Empresa';
+    var bm2 = _getBenchmark(dados.setor || '');
+
+    // Seção "Exemplo real" na DRE educativa
+    setText('dre-edu-empresa-ref', 'Exemplo real · ' + empresa2);
+
+    // Cabeçalho da aba Balanço
+    setText('bp-titulo-sl', 'Balanço Patrimonial — ' + empresa2 + ' · ' + (dados.ano || ''));
+    setText('bp-subtitulo', 'Retrato financeiro da empresa em ' + (dados.ano || '') + ' — ativos, passivos e indicadores de solidez patrimonial');
+
+    // Título educativo
+    setText('bp-edu-titulo', 'Entenda o Balanço Patrimonial da ' + empresa2);
+
+    // Equilíbrio do balanço
+    var atFmt = fmtV(Math.abs(b.ativo_total || 0));
+    var eduIgualdade = document.getElementById('bp-edu-igualdade');
+    if (eduIgualdade) {
+      eduIgualdade.innerHTML =
+        'O Balanço Patrimonial mostra <strong>de onde veio o dinheiro</strong> e <strong>para onde ele foi</strong> na sua empresa.<br><br>' +
+        '<strong>Lado esquerdo (verde) = ATIVO:</strong> para onde o dinheiro foi — caixa, estoque, equipamentos.<br>' +
+        '<strong>Lado direito (azul) = PASSIVO + PL:</strong> de onde veio o dinheiro — fornecedores, bancos ou os próprios sócios.<br><br>' +
+        'Os dois lados <strong>sempre se igualam</strong> — no caso da ' + empresa2 + ': <strong>' + atFmt + ' = ' + atFmt + ' ✓</strong>';
+    }
+
+    // Pills educativas
+    var nomeAbrev = empresa2.split(' ')[0];
+    document.querySelectorAll('.bp-edu-pill').forEach(function(el) {
+      el.textContent = el.textContent.replace(/^G JOAO/, nomeAbrev);
+    });
+
+    // Resumo final
+    var plPct = b.ativo_total > 0 ? ((b.patrimonio_liquido || 0) / b.ativo_total * 100).toFixed(1).replace('.', ',') : '—';
+    var empTotal = Math.abs(b.emprestimos_cp || 0) + Math.abs(b.emprestimos_lp || 0);
+    var liqCorr = ind.liquidez || 0;
+    var resumoEl = document.getElementById('bp-edu-resumo');
+    if (resumoEl) {
+      resumoEl.innerHTML = '🏆 <strong>Resumo da ' + empresa2 + ':</strong> empresa com PL de ' + fmtV(b.patrimonio_liquido || 0) + ' (' + plPct + '% do ativo), caixa de ' + fmtV(b.caixa || 0) + ', dívidas de ' + fmtV(empTotal) + ' e liquidez corrente de ' + liqCorr.toFixed(2).replace('.', ',') + 'x. <strong>Análise baseada nos documentos enviados.</strong>';
+    }
+
+    // Labels do treemap
+    setText('bp-treemap-desc', 'Passe o cursor em cada caixa para entender o que representa. Os tamanhos são proporcionais aos dados reais da ' + empresa2 + ' ' + (dados.ano || ''));
+    setText('bp-treemap-label', 'Clique em cada caixa para ver a explicação · ' + empresa2 + ' · ' + (dados.ano || ''));
+    setText('bp-footer-label', empresa2 + ' · ' + (dados.ano || ''));
   })();
 
   // ── 1. LINHAS DA DRE ─────────────────────────────────────────
@@ -12436,7 +12483,7 @@ function okComecarAgora(){
           <div style="font-size:10px;color:var(--text3);">Resposta em até 2 horas</div>
         </div>
       </a>
-      <a href="mailto:suporte@vitacash.com.br?subject=Suporte Premium — G JOAO DOS SANTOS" style="display:flex;align-items:center;gap:10px;padding:14px;border:1.5px solid var(--border);border-radius:10px;text-decoration:none;transition:all .2s;background:#fff;">
+      <a href="mailto:suporte@vitacash.com.br?subject=Suporte Premium VitaCash" style="display:flex;align-items:center;gap:10px;padding:14px;border:1.5px solid var(--border);border-radius:10px;text-decoration:none;transition:all .2s;background:#fff;">
         <div style="width:36px;height:36px;border-radius:8px;background:var(--surface2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
         </div>
