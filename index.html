@@ -3921,7 +3921,7 @@ function adminAbrirWhatsApp() {
           <div style="display:flex;align-items:center;gap:10px;">
             <div style="width:32px;height:32px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
             <div>
-              <div style="font-size:13px;font-weight:600;color:var(--green-dark);">Por que a empresa vale R$ 14,4 mi faturando R$ 52,6 mi?</div>
+              <div id="val-edu-titulo" style="font-size:13px;font-weight:600;color:var(--green-dark);">Por que a empresa vale R$ 14,4 mi faturando R$ 52,6 mi?</div>
               <div style="font-size:11px;color:var(--green-bg);margin-top:1px;">Clique para entender como o valuation é calculado</div>
             </div>
           </div>
@@ -4043,11 +4043,11 @@ function adminAbrirWhatsApp() {
         <div style="position:absolute;top:-4px;left:98%;width:2px;height:18px;background:var(--border2);border-radius:2px;"></div>
       </div>
       <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:500;color:var(--text2);margin-top:1rem;gap:8px;">
-        <span>Mínimo<br><strong style="color:var(--text);font-size:13px;font-weight:600;">R$ 10,1 mi</strong></span>
-        <span style="text-align:center;">Conservador<br><strong style="color:var(--text);font-size:13px;font-weight:600;">R$ 13,5 mi</strong></span>
-        <span style="text-align:center;">Estimativa central<br><strong style="color:var(--green);font-size:14px;font-weight:700;">R$ 14,4 mi</strong></span>
-        <span style="text-align:center;">Otimista<br><strong style="color:var(--text);font-size:13px;font-weight:600;">R$ 18,4 mi</strong></span>
-        <span style="text-align:right;">Máximo<br><strong style="color:var(--text);font-size:13px;font-weight:600;">R$ 20,3 mi</strong></span>
+        <span>Mínimo<br><strong id="val-bar-min" style="color:var(--text);font-size:13px;font-weight:600;">R$ 10,1 mi</strong></span>
+        <span style="text-align:center;">Conservador<br><strong id="val-bar-conserv" style="color:var(--text);font-size:13px;font-weight:600;">R$ 13,5 mi</strong></span>
+        <span style="text-align:center;">Estimativa central<br><strong id="val-bar-central" style="color:var(--green);font-size:14px;font-weight:700;">R$ 14,4 mi</strong></span>
+        <span style="text-align:center;">Otimista<br><strong id="val-bar-otim" style="color:var(--text);font-size:13px;font-weight:600;">R$ 18,4 mi</strong></span>
+        <span style="text-align:right;">Máximo<br><strong id="val-bar-max" style="color:var(--text);font-size:13px;font-weight:600;">R$ 20,3 mi</strong></span>
       </div>
       <div style="background:var(--amber-light);border:.5px solid var(--amber-border);border-radius:var(--radius);padding:.65rem .875rem;margin-top:.875rem;font-size:11px;color:var(--amber-dark);line-height:1.6;">
         ⚠ Este é um valuation <strong>estimado por múltiplos de mercado</strong>. O valor real depende de fatores como localização, carteira de clientes, contratos, potencial de crescimento e condições de negociação. Para uma venda ou captação real, consulte um especialista em M&A.
@@ -10736,6 +10736,20 @@ function popularDashboard(dados) {
     setMC('P/L',  vPL  > 0 ? fmtV(vPL)  : '—', verde, 'Lucro × ' + multPL + 'x');
     setMC('EV/EBITDA', vEV > 0 ? fmtV(vEV) : '—', verde, 'EBIT × ' + multEV + 'x');
     setMC('PSR',  vPSR > 0 ? fmtV(vPSR) : '—', verde, 'Receita × ' + multPSR + 'x');
+
+    // Atualiza barra de faixas
+    var vConserv = minV;
+    var vOtim    = maxV;
+    var s2 = function(id,v){ var e=document.getElementById(id); if(e) e.textContent=fmtV(v); };
+    s2('val-bar-min',    minV * 0.7);
+    s2('val-bar-conserv',vConserv);
+    s2('val-bar-central',media);
+    s2('val-bar-otim',   vOtim);
+    s2('val-bar-max',    maxV * 1.2);
+
+    // Atualiza título do painel educativo
+    var eduTit = document.getElementById('val-edu-titulo');
+    if (eduTit) eduTit.textContent = 'Por que a empresa vale ' + fmtV(media) + ' faturando ' + fmtV(recBr) + '?';
   })();
 
   // ── tag de arquivos analisados ────────────────────────────────
