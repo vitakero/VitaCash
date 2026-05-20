@@ -4127,23 +4127,23 @@ function adminAbrirWhatsApp() {
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:.875rem;">
       <div style="background:var(--green-light);border:.5px solid var(--green-mid);border-radius:12px;padding:.875rem;">
         <div style="font-size:10px;color:var(--green-dark);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Disponível para recuperar</div>
-        <div style="font-family:'Sora',sans-serif;font-size:18px;font-weight:800;color:var(--green);">R$ 2,1 mi</div>
+        <div id="painel-total" style="font-family:'Sora',sans-serif;font-size:18px;font-weight:800;color:var(--green);">R$ 2,1 mi</div>
         <div style="font-size:10px;color:var(--green-bg);margin-top:3px;">por ano · com as ações abaixo</div>
       </div>
       <div style="background:var(--surface2);border-radius:12px;padding:.875rem;border:.5px solid var(--border);">
         <div style="font-size:10px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Ações identificadas</div>
-        <div style="font-family:'Sora',sans-serif;font-size:18px;font-weight:800;color:var(--text);">4</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:3px;">2 críticas · 2 para potencializar</div>
+        <div id="painel-acoes-num" style="font-family:'Sora',sans-serif;font-size:18px;font-weight:800;color:var(--text);">4</div>
+        <div id="painel-acoes-sub" style="font-size:10px;color:var(--text3);margin-top:3px;">2 críticas · 2 para potencializar</div>
       </div>
       <div style="background:var(--surface2);border-radius:12px;padding:.875rem;border:.5px solid var(--border);">
         <div style="font-size:10px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Pontos fortes</div>
-        <div style="font-family:'Sora',sans-serif;font-size:18px;font-weight:800;color:var(--text);">3</div>
+        <div id="painel-pontos-num" style="font-family:'Sora',sans-serif;font-size:18px;font-weight:800;color:var(--text);">3</div>
         <div style="font-size:10px;color:var(--text3);margin-top:3px;">aproveite essas vantagens</div>
       </div>
     </div>
     <div class="plano-progress">
       <div>
-        <div class="plano-progress-label"><strong>Plano de ação ativo</strong> — execute na ordem abaixo para recuperar R$ 2,1 mi</div>
+        <div class="plano-progress-label"><strong>Plano de ação ativo</strong> — execute na ordem abaixo para recuperar <span id="painel-plano-valor">R$ 2,1 mi</span></div>
         <div class="plano-progress-bar"><div class="plano-progress-fill" style="width:0%;"></div></div>
       </div>
       <div style="font-size:11px;color:var(--text3);font-weight:600;white-space:nowrap;margin-left:12px;">0 de 4 concluídas</div>
@@ -10839,14 +10839,31 @@ function popularDashboard(dados) {
     }
   })();
 
-  // card de oportunidade total (painel topo do O QUE FAZER)
+  // ── Painel resumo topo "O QUE FAZER" ─────────────────────────
+  // Calcula críticas vs pontos fortes baseado nos cards c1-c4
+  var recsCriticas = 0, recsBoas = 0;
+  if (dados.recomendacoes && Array.isArray(dados.recomendacoes)) {
+    dados.recomendacoes.forEach(function(r) {
+      if (r.tipo === 'ruim') recsCriticas++; else recsBoas++;
+    });
+  } else {
+    recsCriticas = diffDespOp2 > 0 ? 2 : 1;
+    recsBoas     = 4 - recsCriticas;
+  }
   var potencialLucro = impactoDesp2 + recL * (Math.max(0, bMB2 - margemBrutaAt) / 100);
-  document.querySelectorAll('[style*="font-size:18px"][style*="font-weight:800"]').forEach(function(el) {
-    var txt = el.textContent.trim();
-    if (txt.includes('R$') && el.closest('[style*="green-light"]')) {
-      el.textContent = fmtV(potencialLucro > 0 ? potencialLucro : lucroAtualOF * 0.5);
-    }
-  });
+  var potencialTotal = potencialLucro > 0 ? potencialLucro : lucroAtualOF * 0.5;
+
+  var pTotal = document.getElementById('painel-total');
+  var pAcoesNum = document.getElementById('painel-acoes-num');
+  var pAcoesSub = document.getElementById('painel-acoes-sub');
+  var pPontosNum = document.getElementById('painel-pontos-num');
+  var pPlanoVal = document.getElementById('painel-plano-valor');
+
+  if (pTotal)    pTotal.textContent = fmtV(potencialTotal);
+  if (pAcoesNum) pAcoesNum.textContent = '4';
+  if (pAcoesSub) pAcoesSub.textContent = recsCriticas + ' crítica' + (recsCriticas !== 1 ? 's' : '') + ' · ' + recsBoas + ' para potencializar';
+  if (pPontosNum) pPontosNum.textContent = recsBoas;
+  if (pPlanoVal) pPlanoVal.textContent = fmtV(potencialTotal);
 
   } // fim do else (sem recomendacoes personalizadas)
 
