@@ -11607,13 +11607,81 @@ async function gerarRecomendacoesIA(dados) {
       throw new Error('JSON sem recomendacoes válidas');
     }
 
-    // 4. Injeta as recomendações no objeto dados e re-popula o dashboard
-    dados.recomendacoes     = recData.recomendacoes;
+    // 4. Injeta as recomendações no objeto dados e atualiza APENAS os cards c1-c4 e o painel
+    //    (sem chamar popularDashboard — evita re-render total que reseta scroll e fecha cards)
+    dados.recomendacoes       = recData.recomendacoes;
     dados.potencial_realista  = recData.potencial_realista  || 0;
     dados.potencial_descricao = recData.potencial_descricao || '';
     window._dadosIA = dados;
 
-    popularDashboard(dados); // re-renderiza com os dados personalizados
+    // Helper de formatação local (fmtV está dentro de popularDashboard)
+    function _fmtV(v) {
+      if (v === null || v === undefined) return '—';
+      var abs = Math.abs(v); var pfx = v < 0 ? '– R$ ' : 'R$ ';
+      if (abs >= 1e9) return pfx + (abs/1e9).toFixed(2).replace('.',',') + ' bi';
+      if (abs >= 1e6) return pfx + (abs/1e6).toFixed(2).replace('.',',') + ' mi';
+      if (abs >= 1e3) return pfx + Math.round(abs).toLocaleString('pt-BR');
+      return pfx + abs.toFixed(2).replace('.',',');
+    }
+
+    // Atualiza c1–c4 com recomendações personalizadas
+    var _svgTrend = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>';
+    var _ids = ['c1','c2','c3','c4'];
+    recData.recomendacoes.forEach(function(rec, i) {
+      var el = document.getElementById(_ids[i]); if (!el) return;
+      var statusEl = el.querySelector('.ind-status');
+      var nomeEl   = el.querySelector('.ind-nome');
+      var valEl    = el.querySelector('.ind-val');
+      var medEl    = el.querySelector('.ind-media');
+      var chipEl   = el.querySelector('.chip');
+      var bodyEl   = el.querySelector('.ind-body');
+
+      if (statusEl) { statusEl.className = 'ind-status ' + rec.tipo; statusEl.textContent = rec.tipo === 'ruim' ? '↓' : '↑'; }
+      if (nomeEl)   nomeEl.textContent = rec.titulo;
+      if (valEl)    { valEl.className = 'ind-val ' + rec.tipo; valEl.textContent = rec.ind_val; }
+      if (medEl)    medEl.textContent = '· ' + rec.ind_media;
+      if (chipEl)   { chipEl.textContent = rec.chip; chipEl.className = 'chip ' + (rec.chip === 'Comece por aqui' || rec.chip === 'Prioridade alta' ? 'impact' : 'quick'); }
+      if (bodyEl) {
+        var acoesHTML = (rec.acoes || []).map(function(a, j) {
+          return '<div class="acao-item"><div class="acao-num ' + rec.tipo + '">' + (j+1) + '</div>' +
+            '<div class="acao-texto"><strong>' + a.titulo + '</strong> — ' + a.desc +
+            '<div><span class="impacto ' + (a.impacto||'medio') + '">' +
+            (a.impacto==='alto'?'Impacto alto':a.impacto==='medio'?'Impacto médio':'Impacto baixo') +
+            '</span></div></div></div>';
+        }).join('');
+        bodyEl.innerHTML =
+          '<div class="acoes-section">' +
+          '<div class="acoes-titulo ' + rec.tipo + '">' + (rec.acoes_titulo||'Ações recomendadas') + '</div>' +
+          acoesHTML +
+          '<div class="ind-impacto-r">' + _svgTrend + (rec.impacto_estimado||'') + '</div>' +
+          '<div class="potencial">' + (rec.potencial||'') + '</div>' +
+          '<div style="display:flex;gap:8px;margin-top:.75rem;"><span class="ind-cta ' + (rec.tipo==='ruim'?'urgente':'') + '">' + (rec.cta||'Ver mais') + ' →</span></div>' +
+          '</div>';
+      }
+    });
+
+    // Atualiza painel resumo "O que fazer"
+    var _recsCrit = 0, _recsBoas = 0;
+    recData.recomendacoes.forEach(function(r) { if (r.tipo === 'ruim') _recsCrit++; else _recsBoas++; });
+    var _valorExibir = (dados.potencial_realista > 0) ? dados.potencial_realista : 0;
+    var _pTotal    = document.getElementById('painel-total');
+    var _pAcoesSub = document.getElementById('painel-acoes-sub');
+    var _pPontos   = document.getElementById('painel-pontos-num');
+    var _pPlano    = document.getElementById('painel-plano-valor');
+    if (_pTotal    && _valorExibir > 0) _pTotal.textContent    = _fmtV(_valorExibir);
+    if (_pAcoesSub) _pAcoesSub.textContent = _recsCrit + ' crítica' + (_recsCrit !== 1 ? 's' : '') + ' · ' + _recsBoas + ' para potencializar';
+    if (_pPontos)   _pPontos.textContent   = _recsBoas;
+    if (_pPlano  && _valorExibir > 0) _pPlano.textContent    = _fmtV(_valorExibir);
+
+    // Nota de transparência sobre o potencial estimado
+    if (dados.potencial_descricao && _pTotal) {
+      var _pWrap = _pTotal.closest('div');
+      if (_pWrap) {
+        var _nota = _pWrap.querySelector('.painel-nota');
+        if (!_nota) { _nota = document.createElement('div'); _nota.className = 'painel-nota'; _nota.style.cssText = 'font-size:9px;color:var(--green-bg);margin-top:4px;line-height:1.4;opacity:.85;'; _pWrap.appendChild(_nota); }
+        _nota.textContent = '↳ ' + dados.potencial_descricao;
+      }
+    }
 
     // 5. Salva no Supabase para que a próxima visita use o cache
     try {
