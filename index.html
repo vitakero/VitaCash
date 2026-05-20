@@ -9388,6 +9388,37 @@ function showTip(el, titulo, def, val, obs){
     var _pmp  = _b.fornecedores>0&&_cmv>0?Math.round(Math.abs(_b.fornecedores)/_cmv*365):'—';
     var _empTot = Math.abs(_b.emprestimos_cp||0)+Math.abs(_b.emprestimos_lp||0);
     var _cxCob = _empTot>0&&_b.caixa>0?Math.round(_b.caixa/_empTot)+'x':'alto';
+    // Descrições específicas por setor
+    var _s = (_d.setor||'').toLowerCase();
+    var _isVarejo    = _s.includes('varejo') || _s.includes('moda') || _s.includes('calçado') || _s.includes('vestuário') || _s.includes('roupa');
+    var _isAtacado   = _s.includes('atacad') || _s.includes('distribuição') || _s.includes('distribuicao');
+    var _isServico   = _s.includes('serviço') || _s.includes('servico') || _s.includes('consultoria') || _s.includes('tecnologia') || _s.includes('software') || _s.includes('tech');
+    var _isIndustria = _s.includes('indústria') || _s.includes('industria') || _s.includes('fabricação') || _s.includes('fabricacao') || _s.includes('manufatura');
+    var _isConstru   = _s.includes('construção') || _s.includes('construcao') || _s.includes('incorporação') || _s.includes('imobiliária');
+    var _defCR  = _isVarejo    ? 'Vendas a prazo para lojistas, franqueados e clientes finais ainda não recebidas.'
+                : _isAtacado  ? 'Vendas a prazo para distribuidores e revendedores ainda não liquidadas.'
+                : _isServico  ? 'Honorários e serviços prestados ainda não recebidos dos clientes.'
+                : _isIndustria? 'Vendas a prazo para distribuidores e clientes industriais ainda não recebidas.'
+                : _isConstru  ? 'Recebíveis de imóveis vendidos e contratos de obra em andamento.'
+                : 'Valores a receber de clientes por vendas e serviços já realizados.';
+    var _defEst = _isVarejo    ? 'Produtos acabados nas lojas próprias, franquias e em trânsito para entrega.'
+                : _isAtacado  ? 'Mercadorias adquiridas para revenda armazenadas nos centros de distribuição.'
+                : _isServico  ? 'Materiais e insumos utilizados na prestação dos serviços.'
+                : _isIndustria? 'Matérias-primas, produtos em processo e produtos acabados aguardando venda.'
+                : _isConstru  ? 'Imóveis em construção e terrenos adquiridos para incorporação.'
+                : 'Mercadorias e produtos disponíveis para venda ou uso na operação.';
+    var _defForn = _isVarejo    ? 'Compras de produtos, coleções e mercadorias ainda não pagas aos fornecedores.'
+                 : _isAtacado  ? 'Mercadorias adquiridas para revenda com pagamento ainda pendente.'
+                 : _isServico  ? 'Serviços e insumos contratados ainda não pagos aos prestadores.'
+                 : _isIndustria? 'Matérias-primas e insumos de produção com pagamento pendente aos fornecedores.'
+                 : _isConstru  ? 'Materiais de construção e serviços de empreiteiros ainda não pagos.'
+                 : 'Compras de mercadorias e serviços com pagamento ainda pendente aos fornecedores.';
+    var _defImob = _isVarejo    ? 'Lojas próprias, equipamentos de ponto de venda, sistemas de TI e ativos de franquia.'
+                 : _isAtacado  ? 'Galpões de armazenagem, frotas de veículos de entrega e sistemas logísticos.'
+                 : _isServico  ? 'Equipamentos de TI, móveis de escritório e infraestrutura de atendimento.'
+                 : _isIndustria? 'Máquinas, equipamentos de produção, galpões industriais e instalações fabris.'
+                 : _isConstru  ? 'Máquinas de construção, veículos de obra e equipamentos de canteiro.'
+                 : 'Bens físicos da empresa — equipamentos, instalações e veículos usados na operação.';
     var _overrides = {
       'Caixa e Equivalentes': {
         val: _fmtV(_b.caixa||0)+' · '+_p(_b.caixa)+' do ativo',
@@ -9398,10 +9429,12 @@ function showTip(el, titulo, def, val, obs){
         obs: '— Incluído no caixa e equivalentes'
       },
       'Contas a Receber e Créditos': {
+        def: _defCR,
         val: _fmtV(_b.contas_a_receber||0)+' · '+_p(_b.contas_a_receber)+' do ativo',
         obs: _b.contas_a_receber>0&&_rec>0?(_b.contas_a_receber/_rec*365).toFixed(0)+' dias médios de recebimento':'—'
       },
       'Estoques': {
+        def: _defEst,
         val: _fmtV(_b.estoques||0)+' · '+_p(_b.estoques)+' do ativo',
         obs: '✓ Giro de '+_giro+' — renova a cada ~'+_dias+' dias'
       },
@@ -9410,6 +9443,7 @@ function showTip(el, titulo, def, val, obs){
         obs: 'Outros ativos circulantes — tributos a recuperar e despesas antecipadas'
       },
       'Fornecedores': {
+        def: _defForn,
         val: _fmtV(_b.fornecedores||0)+' · '+_pp(_b.fornecedores)+' do passivo total',
         obs: '✓ Prazo médio de pagamento: ~'+_pmp+' dias — crédito gratuito dos fornecedores'
       },
@@ -9422,10 +9456,12 @@ function showTip(el, titulo, def, val, obs){
         obs: 'Obrigações regulares de operação — salários, INSS, FGTS e tributos'
       },
       'Imobilizado (Bruto)': {
+        def: _defImob,
         val: _fmtV(_b.ativo_nao_circulante||0)+' · '+_p(_b.ativo_nao_circulante)+' do ativo',
         obs: 'Ativos de longo prazo — imobilizado e intangível'
       },
       'Imobilizado Líquido': {
+        def: _defImob,
         val: _fmtV(_b.ativo_nao_circulante||0)+' · '+_p(_b.ativo_nao_circulante)+' do ativo',
         obs: 'Valor contábil dos ativos não circulantes após depreciação'
       },
@@ -9446,7 +9482,7 @@ function showTip(el, titulo, def, val, obs){
         obs: '✓ PL acumulado ao longo dos anos — resultado de reinvestimento dos lucros'
       }
     };
-    if (_overrides[titulo]) { val = _overrides[titulo].val; obs = _overrides[titulo].obs; }
+    if (_overrides[titulo]) { if(_overrides[titulo].def) def = _overrides[titulo].def; val = _overrides[titulo].val; obs = _overrides[titulo].obs; }
   }
   // ── Verificar se o painel desta caixa já está aberto ANTES de fechar tudo
   let panel = el.querySelector('.bp-panel');
