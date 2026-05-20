@@ -189,14 +189,15 @@ Deno.serve(async (req) => {
       .not('dados_extraidos', 'is', null)
       .maybeSingle()
 
-    if (cached?.dados_extraidos && cached.dados_extraidos.comparativo !== undefined) {
+    const compOk = cached?.dados_extraidos?.comparativo?.receita_bruta_anterior
+    if (cached?.dados_extraidos && compOk) {
       console.log('✅ Cache hit:', hashCombo)
       return new Response(JSON.stringify({ ...cached.dados_extraidos, _hashCombo: hashCombo, cache: true }), {
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
       })
     }
     if (cached?.dados_extraidos) {
-      console.log('🔄 Cache desatualizado (sem comparativo) — re-analisando:', hashCombo)
+      console.log('🔄 Cache desatualizado (comparativo ausente/zerado) — re-analisando:', hashCombo)
     }
 
     // ── 3. Chamar Claude API ────────────────────────────────────
