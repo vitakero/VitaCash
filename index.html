@@ -5028,7 +5028,7 @@ function adminAbrirWhatsApp() {
         </div>
 
         <!-- Aplicações -->
-        <div class="bp-box" style="border-bottom:.5px solid #C5E8D5;padding:.65rem 1rem;background:#F0FAF5;cursor:pointer;transition:background .15s;"
+        <div id="tm-aplic-box" class="bp-box" style="border-bottom:.5px solid #C5E8D5;padding:.65rem 1rem;background:#F0FAF5;cursor:pointer;transition:background .15s;"
              onclick="showTip(this,'Aplicações Financeiras','Dinheiro investido em aplicações de liquidez imediata.','R$ 2,1 mil · 0,02% do ativo','✓ Boa reserva — rende à Selic enquanto aguarda uso')"
              >
           <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -10423,8 +10423,12 @@ function popularDashboard(dados) {
       var cBar = document.getElementById('tm-caixa-bar');
       if (cBar) cBar.style.width = bar(b.caixa) + '%';
 
-      setText('tm-aplic-val',  fmtV(0));  // não extraído separado — mantém 0
-      setText('tm-aplic-pct',  '—');
+      // Aplicações financeiras — esconde se zero (consolidado no caixa)
+      var aplicVal = b.aplicacoes_financeiras || 0;
+      var aplicBox = document.getElementById('tm-aplic-box');
+      if (aplicBox) aplicBox.style.display = aplicVal ? '' : 'none';
+      setText('tm-aplic-val', fmtV(aplicVal));
+      setText('tm-aplic-pct', aplicVal ? pct(aplicVal) : '—');
 
       setText('tm-cr-val',   fmtV(b.contas_a_receber || 0));
       setText('tm-cr-pct',   pct(b.contas_a_receber || 0));
