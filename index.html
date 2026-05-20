@@ -4623,24 +4623,24 @@ function adminAbrirWhatsApp() {
           <span class="mc-sub" style="margin-bottom:0;">Margem bruta</span>
           <div class="help-icon"><svg width="9" height="9" viewBox="0 0 10 10"><text x="2.5" y="8.5" font-size="9" fill="var(--text2)" font-family="sans-serif" font-weight="600">?</text></svg><div class="tooltip" style="left:0;right:auto;"><div class="tt-titulo">Margem Bruta</div><div class="tt-def">Quanto sobra da receita depois de pagar só os custos diretos dos produtos (CMV). Indica a eficiência da precificação e controle de custos diretos.</div><div class="tt-formula">= Lucro Bruto / Receita × 100<br>= 9.998.128 / 52.646.612 = 21,7%</div><span class="tt-bench">Atacado/distribuição: média 18–25% · Empresa: 21,7% ✓</span></div></div>
         </div>
-        <div style="font-size:20px;font-weight:700;color:var(--green);">21,7%</div>
-        <span class="chip quick" style="margin-top:6px;display:inline-flex;">✓ Ok</span>
+        <div id="dre-mb-val" style="font-size:20px;font-weight:700;color:var(--green);">21,7%</div>
+        <span id="dre-mb-chip" class="chip quick" style="margin-top:6px;display:inline-flex;">✓ Ok</span>
       </div>
       <div style="background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;box-shadow:var(--shadow-sm);text-align:center;">
         <div style="display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:4px;">
           <span class="mc-sub" style="margin-bottom:0;">Margem EBIT</span>
           <div class="help-icon"><svg width="9" height="9" viewBox="0 0 10 10"><text x="2.5" y="8.5" font-size="9" fill="var(--text2)" font-family="sans-serif" font-weight="600">?</text></svg><div class="tooltip" style="left:50%;transform:translateX(-50%);right:auto;"><div class="tt-titulo">Margem EBIT (Operacional)</div><div class="tt-def">Lucro da operação pura antes de juros e impostos. Mede a eficiência operacional — quanto a empresa gera por cada R$100 vendidos após pagar todos os custos e despesas operacionais.</div><div class="tt-formula">= EBIT / Receita × 100<br>= 2.907.853 / 52.646.612 = 6,3%</div><span class="tt-bench">Atacado/distribuição: média 4–8% · Empresa: 6,3% — dentro da faixa</span></div></div>
         </div>
-        <div style="font-size:20px;font-weight:700;color:var(--amber);">6,3%</div>
-        <span class="chip impact" style="margin-top:6px;display:inline-flex;">⚠ Atenção</span>
+        <div id="dre-mebit-val" style="font-size:20px;font-weight:700;color:var(--amber);">6,3%</div>
+        <span id="dre-mebit-chip" class="chip impact" style="margin-top:6px;display:inline-flex;">⚠ Atenção</span>
       </div>
       <div style="background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;box-shadow:var(--shadow-sm);text-align:center;">
         <div style="display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:4px;">
           <span class="mc-sub" style="margin-bottom:0;">Margem líquida</span>
           <div class="help-icon"><svg width="9" height="9" viewBox="0 0 10 10"><text x="2.5" y="8.5" font-size="9" fill="var(--text2)" font-family="sans-serif" font-weight="600">?</text></svg><div class="tooltip" style="right:0;left:auto;"><div class="tt-titulo">Margem Líquida</div><div class="tt-def">O resultado final da empresa — o que sobra depois de pagar absolutamente tudo: custos, despesas operacionais, juros e impostos.</div><div class="tt-formula">= Lucro Líquido / Receita × 100<br>= 1.702.316 / 52.646.612 = 3,7%</div><span class="tt-bench">Atacado/distribuição: média 2–5% · Empresa: 3,7% ✓ dentro da faixa</span></div></div>
         </div>
-        <div style="font-size:20px;font-weight:700;color:var(--amber);">3,7%</div>
-        <span class="chip quick" style="margin-top:6px;display:inline-flex;">✓ Ok no setor</span>
+        <div id="dre-ml-val" style="font-size:20px;font-weight:700;color:var(--amber);">3,7%</div>
+        <span id="dre-ml-chip" class="chip quick" style="margin-top:6px;display:inline-flex;">✓ Ok no setor</span>
       </div>
     </div>
 
@@ -10674,6 +10674,42 @@ function popularDashboard(dados) {
     (ind.margemLiq||0) >= ml ? '▲ Dentro da média' : '▼ Abaixo da média',
     'Você: ' + (ind.margemLiq||0).toFixed(1).replace('.',',') + '%',
     'Média: ' + ml + '%');
+
+  // Cards de margem na aba DRE (Margem bruta / EBIT / Líquida)
+  (function() {
+    function chipDRE(el, valPct, bench, labelBom, labelAtenc) {
+      if (!el) return;
+      if (valPct >= bench) {
+        el.textContent = labelBom || '✓ Acima do setor';
+        el.className = 'chip quick';
+      } else if (valPct >= bench * 0.75) {
+        el.textContent = labelAtenc || '✓ Ok no setor';
+        el.className = 'chip quick';
+      } else if (valPct >= 0) {
+        el.textContent = '⚠ Atenção';
+        el.className = 'chip impact';
+      } else {
+        el.textContent = '↓ Negativa';
+        el.className = 'chip ruim';
+      }
+    }
+    var corBom  = 'var(--green)', corAtenc = 'var(--amber)', corRuim = 'var(--red)';
+    var mbVal   = document.getElementById('dre-mb-val');
+    var mbChip  = document.getElementById('dre-mb-chip');
+    var meVal   = document.getElementById('dre-mebit-val');
+    var meChip  = document.getElementById('dre-mebit-chip');
+    var mlVal   = document.getElementById('dre-ml-val');
+    var mlChip  = document.getElementById('dre-ml-chip');
+    var mbPct   = +(ind.margemBruta||0).toFixed(1);
+    var moPct   = +(ind.margemOp||0).toFixed(1);
+    var mlPct   = +(ind.margemLiq||0).toFixed(1);
+    if (mbVal) { mbVal.textContent = mbPct.toString().replace('.',',') + '%'; mbVal.style.color = mbPct >= mb ? corBom : mbPct >= 0 ? corAtenc : corRuim; }
+    if (meVal) { meVal.textContent = moPct.toString().replace('.',',') + '%'; meVal.style.color = moPct >= mo ? corBom : moPct >= 0 ? corAtenc : corRuim; }
+    if (mlVal) { mlVal.textContent = mlPct.toString().replace('.',',') + '%'; mlVal.style.color = mlPct >= ml ? corBom : mlPct >= 0 ? corAtenc : corRuim; }
+    chipDRE(mbChip, mbPct, mb, '✓ Acima do setor', '✓ Ok no setor');
+    chipDRE(meChip, moPct, mo, '✓ Acima do setor', '✓ Ok no setor');
+    chipDRE(mlChip, mlPct, ml, '✓ Acima do setor', '✓ Ok no setor');
+  })();
 
   setMC('Lucro líquido',
     fmtV(d.lucro_liquido),
