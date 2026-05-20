@@ -4488,7 +4488,7 @@ function adminAbrirWhatsApp() {
         <div style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span style="font-weight:500;color:var(--text);">Bradesco Empresas</span><span style="color:var(--red);font-weight:600;">+R$ 197.000/ano</span></div><div style="height:6px;background:var(--surface2);border-radius:99px;"><div style="height:100%;width:59%;background:var(--red);border-radius:99px;"></div></div></div>
         <div style="margin-bottom:0;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span style="font-weight:500;color:var(--text);">Santander Empresas</span><span style="color:var(--red);font-weight:600;">+R$ 277.000/ano</span></div><div style="height:6px;background:var(--surface2);border-radius:99px;"><div style="height:100%;width:83%;background:var(--red);border-radius:99px;"></div></div></div>
       </div>
-      <div style="background:var(--green-light);border-left:3px solid var(--green);border-radius:0 var(--radius) var(--radius) 0;padding:.65rem .875rem;margin-top:1rem;font-size:12px;color:var(--green-dark);line-height:1.6;">
+      <div style="background:var(--green-light);border-left:3px solid var(--green);border-radius:0 var(--radius) var(--radius) 0;padding:.65rem .875rem;margin-top:1rem;font-size:12px;color:var(--green-dark);line-height:1.6;" id="dif-bancos-dica">
         💡 A diferença entre o Santander e o BNDES para um empréstimo de R$ 1 milhão é de <strong>R$ 277 mil por ano</strong>. Para R$ 5,8 mi (limite da G Joao), a diferença de taxa representa um custo relevante.
       </div>
     </div>
@@ -10634,6 +10634,17 @@ function popularDashboard(dados) {
       label.style.left  = pos + '%';
       label.style.color = cor;
     })();
+  })();
+
+  // "Quanto pagaria a mais vs. BNDES" — substitui "limite da G Joao" pelo nome e limite real
+  (function() {
+    var dica = document.getElementById('dif-bancos-dica');
+    if (!dica) return;
+    var nomeEmp  = (dados.empresa || 'sua empresa').split(' ').slice(0,2).join(' ');
+    var limStr   = limiteMax >= 1e9 ? 'R$ ' + (limiteMax/1e9).toFixed(2).replace('.',',') + ' bi'
+                 : limiteMax >= 1e6 ? 'R$ ' + Math.round(limiteMax/1e6) + ' mi'
+                 : 'R$ ' + Math.round(limiteMax).toLocaleString('pt-BR');
+    dica.innerHTML = '💡 A diferença entre o Santander e o BNDES para um empréstimo de R$ 1 milhão é de <strong>R$ 277 mil por ano</strong>. Para ' + limStr + ' (limite da ' + nomeEmp + '), a diferença de taxa representa um custo muito relevante.';
   })();
 
   var verde = 'var(--green)', amber = 'var(--amber)';
