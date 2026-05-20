@@ -10533,11 +10533,34 @@ function popularDashboard(dados) {
     }
   }
 
-  // Endividamento
-  setMC('Limite máximo seguro', fmtV(limiteMax), verde);
-  setMC('Dívida atual',         dividaAtual > 0 ? fmtV(dividaAtual) : 'R$ 0', verde);
-  setMC('Espaço disponível',    fmtV(Math.max(0, espacoDisp)), verde);
-  setMC('Cobertura de juros',   cobJurosStr, verde);
+  // Endividamento — com pills dinâmicos
+  var limitePctRec = d.receita_bruta > 0 ? (limiteMax / Math.abs(d.receita_bruta) * 100).toFixed(0) : '—';
+  setMC('Limite máximo seguro', fmtV(limiteMax), verde,
+    'mantendo cobertura 2x',
+    limitePctRec + '% da receita',
+    'Limite: Dívida/EBIT ≤ 4x');
+
+  var dividaEbitRatio = Math.abs(d.ebit||0) > 0 ? (dividaAtual / Math.abs(d.ebit||0)).toFixed(1).replace('.',',') + 'x' : '—';
+  var dividaStatus2   = dividaAtual === 0 ? '▲ sem dívida' : dividaAtual < limiteMax * 0.3 ? '▲ muito baixa' : dividaAtual < limiteMax * 0.7 ? '▲ saudável' : dividaAtual < limiteMax ? '▼ atenção' : '▼ elevada';
+  setMC('Dívida atual', dividaAtual > 0 ? fmtV(dividaAtual) : 'R$ 0',
+    dividaAtual < limiteMax ? verde : 'var(--red)',
+    dividaStatus2,
+    'Dívida/EBIT: ' + dividaEbitRatio,
+    'Ideal: abaixo 3x');
+
+  var espacoPct2 = limiteMax > 0 ? (dividaAtual / limiteMax * 100).toFixed(1).replace('.',',') + '% do limite' : '0% do limite';
+  var espacoStatus2 = espacoDisp > 0 ? '▲ amplo espaço' : '▼ limite ultrapassado';
+  setMC('Espaço disponível', fmtV(Math.max(0, espacoDisp)),
+    espacoDisp > 0 ? verde : 'var(--red)',
+    espacoStatus2,
+    espacoPct2,
+    'Margem mínima recomendada: 20%');
+
+  setMC('Cobertura de juros', cobJurosStr,
+    cobJuros >= 3 ? verde : cobJuros >= 2 ? verde : cobJuros >= 1 ? amber : 'var(--red)',
+    cobJuros >= 3 ? '▲ excelente' : cobJuros >= 2 ? '▲ saudável' : cobJuros >= 1 ? '▼ atenção' : '▼ risco',
+    'Você: ' + cobJurosStr,
+    'Ideal: 2–3x');
 
   // Alerta endividamento
   document.querySelectorAll('.ab .at').forEach(function(el) {
@@ -10557,13 +10580,113 @@ function popularDashboard(dados) {
   setMC('Giro do estoque',        giroEstoq.toFixed(1).replace('.',',') + 'x', verde);
   setMC('Imobilização do pl',     imobPL.toFixed(1).replace('.',',') + '%',    imobPL < 80 ? verde : amber);
 
-  // ── 7. "O QUE FAZER" — atualiza números-chave nos cards ──────
-  // Atualiza o card de oportunidade total
-  var potencialLucro = Math.abs(recL * 0.04 - Math.abs(d.lucro_liquido||0));
+  // ── 7. "O QUE FAZER" — atualiza c1-c4 com dados reais ──────
+  var empresa2     = dados.empresa || 'A empresa';
+  var lucroAtualOF = Math.abs(d.lucro_liquido||0);
+  var despVendasAbs2 = Math.abs(d.despesas_vendas||0);
+  var despAdminAbs2  = Math.abs(d.despesas_admin||0);
+  var despOpTotalAbs2 = despVendasAbs2 + despAdminAbs2 + Math.abs(d.outras_despesas_op||0);
+  var despOpPctOF  = recL > 0 ? (despOpTotalAbs2 / recL * 100) : 0;
+  var bDespOp2     = bm2.despOp || 25;
+  var diffDespOp2  = despOpPctOF - bDespOp2;
+  var impactoDesp2 = recL * Math.max(0, diffDespOp2) / 100;
+  var bMB2         = bm2.mb || 35;
+  var margemBrutaAt = ind.margemBruta || 0;
+
+  // c1 — despesas operacionais
+  (function() {
+    var el = document.getElementById('c1'); if (!el) return;
+    var nomeEl = el.querySelector('.ind-nome');
+    var valEl  = el.querySelector('.ind-val');
+    var medEl  = el.querySelector('.ind-media');
+    var impEl  = el.querySelector('.ind-impacto-r strong');
+    var potEl  = el.querySelector('.potencial');
+    var impC1  = impactoDesp2 > 0 ? impactoDesp2 : recL * 0.015;
+    if (nomeEl) nomeEl.textContent = diffDespOp2 > 0
+      ? 'Despesas operacionais ' + diffDespOp2.toFixed(0) + ' p.p. acima do setor — ' + fmtV(impC1) + ' a recuperar por ano'
+      : 'Despesas operacionais controladas — margem líquida pode crescer mais ' + fmtV(recL * 0.01);
+    if (valEl) { valEl.className = 'ind-val ' + (diffDespOp2 > 0 ? 'ruim' : 'bom'); valEl.textContent = 'margem op.: ' + (ind.margemOp||0).toFixed(1).replace('.',',') + '%'; }
+    if (medEl) medEl.textContent = '· meta: acima de ' + bm2.mo + '%';
+    if (impEl) impEl.textContent = '+' + fmtV(impC1) + '/ano';
+    if (potEl) {
+      var lucroAlvoC1 = lucroAtualOF + impC1;
+      potEl.textContent = empresa2 + ' fatura ' + fmtV(d.receita_bruta) + ' e fica com ' + fmtV(lucroAtualOF) + ' de lucro líquido. ' +
+        (diffDespOp2 > 0
+          ? 'Reduzindo despesas de ' + despOpPctOF.toFixed(1).replace('.',',') + '% para ' + bDespOp2 + '% da receita, o lucro sobe para ~' + fmtV(lucroAlvoC1) + ' — ' + ((lucroAlvoC1 / (lucroAtualOF||1) - 1) * 100).toFixed(0) + '% a mais com a mesma receita.'
+          : 'As despesas estão bem controladas. Mantenha essa disciplina ao crescer para que o lucro acompanhe a receita.');
+    }
+  })();
+
+  // c2 — despesas de vendas
+  (function() {
+    var el = document.getElementById('c2'); if (!el) return;
+    var nomeEl = el.querySelector('.ind-nome');
+    var valEl  = el.querySelector('.ind-val');
+    var medEl  = el.querySelector('.ind-media');
+    var impEl  = el.querySelector('.ind-impacto-r strong');
+    var potEl  = el.querySelector('.potencial');
+    var dvPct  = recL > 0 ? (despVendasAbs2 / recL * 100) : 0;
+    var dvBench = bDespOp2 * 0.55;
+    var impC2  = recL * Math.max(0, dvPct - dvBench) / 100;
+    if (nomeEl) nomeEl.textContent = dvPct > dvBench
+      ? 'Despesas com vendas de ' + dvPct.toFixed(1).replace('.',',') + '% — ' + fmtV(impC2) + ' a recuperar otimizando canais'
+      : 'Despesas com vendas bem controladas em ' + dvPct.toFixed(1).replace('.',',') + '% da receita';
+    if (valEl) { valEl.className = 'ind-val ' + (dvPct > dvBench ? 'ruim' : 'bom'); valEl.textContent = dvPct.toFixed(1).replace('.',',') + '% da receita'; }
+    if (medEl) medEl.textContent = '· média do setor: ~' + dvBench.toFixed(0) + '%';
+    if (impEl) impEl.textContent = impC2 > 0 ? '+' + fmtV(impC2) + '/ano' : 'manter benchmark';
+    if (potEl) potEl.textContent = empresa2 + ' tem ' + fmtV(despVendasAbs2) + ' em despesas de vendas (' + dvPct.toFixed(1).replace('.',',') + '% da receita). ' +
+      (dvPct > dvBench
+        ? 'Otimizar comissões, canais e estrutura comercial pode recuperar até ' + fmtV(impC2) + ' direto no resultado.'
+        : 'Essa eficiência é um diferencial competitivo. Escale receita mantendo esse percentual para multiplicar o lucro.');
+  })();
+
+  // c3 — margem bruta
+  (function() {
+    var el = document.getElementById('c3'); if (!el) return;
+    var nomeEl   = el.querySelector('.ind-nome');
+    var valEl    = el.querySelector('.ind-val');
+    var medEl    = el.querySelector('.ind-media');
+    var impEl    = el.querySelector('.ind-impacto-r strong');
+    var potEl    = el.querySelector('.potencial');
+    var statusEl = el.querySelector('.ind-status');
+    var acimaMB  = margemBrutaAt >= bMB2;
+    var potMBPct = acimaMB ? 2 : Math.max(1, bMB2 - margemBrutaAt);
+    var impC3    = recL * potMBPct / 100;
+    if (statusEl) { statusEl.className = 'ind-status ' + (acimaMB ? 'bom' : 'ruim'); statusEl.textContent = acimaMB ? '↑' : '↓'; }
+    if (nomeEl) nomeEl.textContent = acimaMB
+      ? 'Margem bruta acima da média — ' + fmtV(impC3) + ' adicionais ainda disponíveis para ampliar'
+      : 'Margem bruta ' + (bMB2 - margemBrutaAt).toFixed(1) + ' p.p. abaixo da média — recuperar ' + fmtV(impC3) + ' renegociando fornecedores';
+    if (valEl) { valEl.className = 'ind-val ' + (acimaMB ? 'bom' : 'ruim'); valEl.textContent = margemBrutaAt.toFixed(1).replace('.',',') + '% atual'; }
+    if (medEl) medEl.textContent = '· média do setor: ' + bMB2 + '%';
+    if (impEl) impEl.textContent = '+' + fmtV(impC3) + ' elevando margem ' + potMBPct.toFixed(0) + ' p.p.';
+    if (potEl) potEl.textContent = acimaMB
+      ? 'Margem bruta de ' + margemBrutaAt.toFixed(1).replace('.',',') + '% está ' + (margemBrutaAt - bMB2).toFixed(1) + ' p.p. acima do benchmark do setor ' + bm2.label + ' (' + bMB2 + '%). Ampliar mais 2 p.p. gera ' + fmtV(impC3) + ' de lucro bruto adicional com a mesma receita.'
+      : 'Margem bruta de ' + margemBrutaAt.toFixed(1).replace('.',',') + '% está abaixo do benchmark do setor ' + bm2.label + ' (' + bMB2 + '%). Renegociar fornecedores e revisar mix de produtos pode recuperar ' + fmtV(impC3) + '/ano.';
+  })();
+
+  // c4 — receita e potencial de crescimento
+  (function() {
+    var el = document.getElementById('c4'); if (!el) return;
+    var nomeEl = el.querySelector('.ind-nome');
+    var valEl  = el.querySelector('.ind-val');
+    var medEl  = el.querySelector('.ind-media');
+    var impEl  = el.querySelector('.ind-impacto-r strong');
+    var potEl  = el.querySelector('.potencial');
+    var lucroAlvoC4 = lucroAtualOF * 1.5;
+    var impC4 = lucroAlvoC4 - lucroAtualOF;
+    if (nomeEl) nomeEl.textContent = 'Receita de ' + fmtV(d.receita_bruta) + ' com margem líquida de ' + (ind.margemLiq||0).toFixed(1).replace('.',',') + '% — potencial de expansão';
+    if (valEl) { valEl.className = 'ind-val bom'; valEl.textContent = fmtV(d.receita_bruta) + ' · ' + (dados.ano||''); }
+    if (medEl) medEl.textContent = '· sustenta expansão com segurança';
+    if (impEl) impEl.textContent = '+' + fmtV(impC4) + '/ano de potencial incremental';
+    if (potEl) potEl.textContent = 'Com receita de ' + fmtV(d.receita_bruta) + ' e margem líquida de ' + (ind.margemLiq||0).toFixed(1).replace('.',',') + '%, combinando as melhorias identificadas de despesas e margem, o lucro líquido pode chegar a ~' + fmtV(lucroAlvoC4) + ' — ' + (((lucroAlvoC4 / (lucroAtualOF||1)) - 1) * 100).toFixed(0) + '% acima do resultado atual com a mesma base de clientes.';
+  })();
+
+  // card de oportunidade total (painel topo do O QUE FAZER)
+  var potencialLucro = impactoDesp2 + recL * (Math.max(0, bMB2 - margemBrutaAt) / 100);
   document.querySelectorAll('[style*="font-size:18px"][style*="font-weight:800"]').forEach(function(el) {
     var txt = el.textContent.trim();
-    if (txt.includes('R$') && txt.includes('mi') && el.closest('[style*="green-light"]')) {
-      el.textContent = fmtV(potencialLucro > 0 ? potencialLucro : Math.abs(d.lucro_liquido||0) * 0.5);
+    if (txt.includes('R$') && el.closest('[style*="green-light"]')) {
+      el.textContent = fmtV(potencialLucro > 0 ? potencialLucro : lucroAtualOF * 0.5);
     }
   });
 
