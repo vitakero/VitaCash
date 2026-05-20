@@ -3811,10 +3811,10 @@ function adminAbrirWhatsApp() {
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:center;">
         <div>
           <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:600;margin-bottom:.5rem;">Valor estimado da empresa</div>
-          <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:32px;font-weight:700;color:var(--green);letter-spacing:-1px;line-height:1.1;">R$ 14,4 mi</div>
+          <div id="val-total" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:32px;font-weight:700;color:var(--green);letter-spacing:-1px;line-height:1.1;">R$ 14,4 mi</div>
           <div style="font-size:12px;color:var(--text2);margin-top:6px;">média de 4 métodos de valuation</div>
           <div style="display:flex;gap:6px;margin-top:.75rem;flex-wrap:wrap;">
-            <span style="font-size:10px;background:var(--green-light);color:var(--green-dark);border:.5px solid var(--green-mid);border-radius:99px;padding:2px 8px;font-weight:600;">Faixa: R$ 10,1 mi – R$ 18,4 mi</span>
+            <span id="val-faixa" style="font-size:10px;background:var(--green-light);color:var(--green-dark);border:.5px solid var(--green-mid);border-radius:99px;padding:2px 8px;font-weight:600;">Faixa: R$ 10,1 mi – R$ 18,4 mi</span>
           </div>
         </div>
         <div>
@@ -3822,19 +3822,19 @@ function adminAbrirWhatsApp() {
           <div style="display:flex;flex-direction:column;gap:6px;">
             <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;">
               <span style="color:var(--text2);">P/BV (patrimônio)</span>
-              <span style="font-weight:600;color:var(--text);">R$ 13,5 mi</span>
+              <span id="val-pbv-inline" style="font-weight:600;color:var(--text);">R$ 13,5 mi</span>
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;">
               <span style="color:var(--text2);">P/L (lucros)</span>
-              <span style="font-weight:600;color:var(--text);">R$ 17,0 mi</span>
+              <span id="val-pl-inline" style="font-weight:600;color:var(--text);">R$ 17,0 mi</span>
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;">
               <span style="color:var(--text2);">EV/EBITDA</span>
-              <span style="font-weight:600;color:var(--text);">R$ 20,3 mi</span>
+              <span id="val-ev-inline" style="font-weight:600;color:var(--text);">R$ 20,3 mi</span>
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;">
               <span style="color:var(--text2);">PSR (receita)</span>
-              <span style="font-weight:600;color:var(--text);">R$ 18,4 mi</span>
+              <span id="val-psr-inline" style="font-weight:600;color:var(--text);">R$ 18,4 mi</span>
             </div>
           </div>
         </div>
@@ -10691,6 +10691,51 @@ function popularDashboard(dados) {
         window._notaDescEl.textContent = 'Situação crítica. ' + fmtV(totalMapeado) + ' em riscos identificados. As 3 ações abaixo são prioridade máxima para evitar piora do resultado.';
       }
     }
+  })();
+
+  // ── 9. VALUATION — calcula com dados reais ───────────────────
+  (function() {
+    var bm = _getBenchmark(dados.setor || '');
+    // Múltiplos por setor (P/BV, P/L, EV/EBITDA, PSR)
+    var multPBV  = bm.label.includes('Tecno')||bm.label.includes('SaaS') ? 5  : bm.label.includes('Moda')||bm.label.includes('Varejo') ? 3 : 2;
+    var multPL   = bm.label.includes('Tecno')||bm.label.includes('SaaS') ? 25 : bm.label.includes('Moda')||bm.label.includes('Varejo') ? 15 : 10;
+    var multEV   = bm.label.includes('Tecno')||bm.label.includes('SaaS') ? 20 : bm.label.includes('Moda')||bm.label.includes('Varejo') ? 10 : 6;
+    var multPSR  = bm.label.includes('Tecno')||bm.label.includes('SaaS') ? 5  : bm.label.includes('Moda')||bm.label.includes('Varejo') ? 1.5 : 0.4;
+
+    var pl    = b.patrimonio_liquido || 0;
+    var lucro = Math.abs(d.lucro_liquido || 0);
+    var ebit  = Math.abs(d.ebit || 0);
+    var recBr = Math.abs(d.receita_bruta || 1);
+
+    var vPBV  = pl    > 0 ? pl    * multPBV  : 0;
+    var vPL   = lucro > 0 ? lucro * multPL   : 0;
+    var vEV   = ebit  > 0 ? ebit  * multEV   : 0;
+    var vPSR  = recBr > 0 ? recBr * multPSR  : 0;
+
+    // Média apenas dos métodos com valor > 0
+    var vals = [vPBV, vPL, vEV, vPSR].filter(function(v){ return v > 0; });
+    var media = vals.length > 0 ? vals.reduce(function(a,b){return a+b;},0) / vals.length : 0;
+    var minV  = Math.min.apply(null, vals);
+    var maxV  = Math.max.apply(null, vals);
+
+    // Atualiza card principal
+    var el = document.getElementById('val-total');
+    if (el) el.textContent = fmtV(media);
+    var faixaEl = document.getElementById('val-faixa');
+    if (faixaEl) faixaEl.textContent = 'Faixa: ' + fmtV(minV) + ' – ' + fmtV(maxV);
+
+    // Atualiza lista inline
+    var setText2 = function(id, v) { var e=document.getElementById(id); if(e) e.textContent = v>0 ? fmtV(v) : '—'; };
+    setText2('val-pbv-inline', vPBV);
+    setText2('val-pl-inline',  vPL);
+    setText2('val-ev-inline',  vEV);
+    setText2('val-psr-inline', vPSR);
+
+    // Atualiza cards .mc de valuation
+    setMC('P/BV', vPBV > 0 ? fmtV(vPBV) : '—', verde, 'PL × ' + multPBV + 'x');
+    setMC('P/L',  vPL  > 0 ? fmtV(vPL)  : '—', verde, 'Lucro × ' + multPL + 'x');
+    setMC('EV/EBITDA', vEV > 0 ? fmtV(vEV) : '—', verde, 'EBIT × ' + multEV + 'x');
+    setMC('PSR',  vPSR > 0 ? fmtV(vPSR) : '—', verde, 'Receita × ' + multPSR + 'x');
   })();
 
   // ── tag de arquivos analisados ────────────────────────────────
