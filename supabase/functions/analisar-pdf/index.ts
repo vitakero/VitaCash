@@ -21,7 +21,13 @@ Retorne APENAS um JSON válido, sem markdown, sem texto antes ou depois, com est
 {
   "empresa": "nome da empresa",
   "ano": "ano do exercício (ex: 2023)",
+  "ano_anterior": "ano anterior se houver coluna comparativa (ex: 2022), senão null",
   "setor": "setor estimado com base nos dados (ex: Comércio Atacadista, Serviços, Varejo, Indústria, etc.)",
+  "comparativo": {
+    "receita_bruta_anterior": 0,
+    "lucro_liquido_anterior": 0,
+    "ebit_anterior": 0
+  },
   "dre": {
     "receita_bruta": 0,
     "deducoes": 0,
@@ -66,7 +72,8 @@ REGRAS IMPORTANTES:
 - lucro_bruto = receita_liquida + cmv (cmv é negativo)
 - ebit = lucro_bruto + despesas_vendas + despesas_admin + outras_despesas_op (todas negativas)
 - resultado_antes_tributos = ebit + resultado_financeiro
-- lucro_liquido = resultado_antes_tributos + impostos (impostos é negativo)`
+- lucro_liquido = resultado_antes_tributos + impostos (impostos é negativo)
+- comparativo: se o documento tiver coluna do ano anterior (muito comum em DFPs brasileiras), preencha receita_bruta_anterior, lucro_liquido_anterior e ebit_anterior com os valores desse ano anterior. Caso contrário, deixe 0`
 
 // ── Benchmarks por setor ──────────────────────────────────────────
 function benchmarksPorSetor(setor: string, dre: Record<string,number>, balanco: Record<string,number>) {
@@ -235,9 +242,11 @@ Deno.serve(async (req) => {
     const resultado = {
       empresa:     extraido.empresa || 'Empresa',
       ano:         extraido.ano || ano || new Date().getFullYear().toString(),
+      ano_anterior: extraido.ano_anterior || null,
       setor:       extraido.setor || 'Empresa',
       dre:         extraido.dre || {},
       balanco:     extraido.balanco || {},
+      comparativo: extraido.comparativo || { receita_bruta_anterior: 0, lucro_liquido_anterior: 0, ebit_anterior: 0 },
       indicadores,
       _hashCombo:  hashCombo,
       cache: false

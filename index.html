@@ -4645,7 +4645,7 @@ function adminAbrirWhatsApp() {
     </div>
 
     <div class="mg-section-pro" data-plan-required="pro">
-    <div class="dre-linha resultado" data-tipo="resultado" id="l1"><div class="dre-linha-head" onclick="togLinha('l1')"><div class="linha-icone r"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div><div style="flex:1;"><div class="linha-nome">Receita bruta de vendas</div><div class="linha-sub">Ponto de partida da DRE</div></div><div><div class="linha-valor pos">R$ 52.646.612,87</div><div class="linha-pct">100% da receita</div></div><div class="linha-arrow">▼</div></div><div class="dre-linha-body"><div class="exp-def">Todo o dinheiro que entrou pela <strong>venda dos produtos e serviços</strong> no ano, antes de qualquer desconto, devolução ou imposto.</div><div class="exp-formula">Receita Bruta = Total de vendas no período</div><div class="mini-bar-wrap"><div class="mini-bar-label"><span>Crescimento vs 2023</span><span style="color:var(--green);">+14,5%</span></div><div class="mini-bar"><div class="mini-bar-fill" style="width:72%;background:#5DCAA5;"></div></div></div><span class="exp-status ok">✓ Crescimento forte: +14,5% vs 2023</span><div class="exp-dica">💡 A receita cresceu acima da média do setor (~8%). Ponto muito positivo — mas atenção se as despesas cresceram no mesmo ritmo.</div></div></div>
+    <div class="dre-linha resultado" data-tipo="resultado" id="l1"><div class="dre-linha-head" onclick="togLinha('l1')"><div class="linha-icone r"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div><div style="flex:1;"><div class="linha-nome">Receita bruta de vendas</div><div class="linha-sub">Ponto de partida da DRE</div></div><div><div class="linha-valor pos">R$ 52.646.612,87</div><div class="linha-pct">100% da receita</div></div><div class="linha-arrow">▼</div></div><div class="dre-linha-body"><div class="exp-def">Todo o dinheiro que entrou pela <strong>venda dos produtos e serviços</strong> no ano, antes de qualquer desconto, devolução ou imposto.</div><div class="exp-formula">Receita Bruta = Total de vendas no período</div><div class="mini-bar-wrap"><div class="mini-bar-label"><span id="dre-cresc-label">Crescimento vs ano anterior</span><span id="dre-cresc-pct" style="color:var(--green);">—</span></div><div class="mini-bar"><div id="dre-cresc-bar" class="mini-bar-fill" style="width:0%;background:#5DCAA5;"></div></div></div><span id="dre-cresc-status" class="exp-status ok">—</span><div id="dre-cresc-dica" class="exp-dica">💡 Analise o PDF para ver o crescimento da receita.</div></div></div>
 
     <div class="dre-linha custo" data-tipo="custo" id="l2"><div class="dre-linha-head" onclick="togLinha('l2')"><div class="linha-icone c"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div><div style="flex:1;"><div class="linha-nome">Custo dos bens e serviços vendidos (CMV)</div><div class="linha-sub">Custo direto do produto</div></div><div><div class="linha-valor neg">– R$ 36.069.586,67</div><div class="linha-pct">51% da receita</div></div><div class="linha-arrow">▼</div></div><div class="dre-linha-body"><div class="exp-def">Quanto foi gasto para <strong>fabricar ou comprar os produtos</strong> que foram vendidos. Quanto menor, maior a margem bruta.</div><div class="exp-formula">CMV = Estoque inicial + Compras − Estoque final</div><div class="mini-bar-wrap"><div class="mini-bar-label"><span>CMV sobre receita</span><span style="color:var(--green);">51% (ideal: abaixo de 58%)</span></div><div class="mini-bar"><div class="mini-bar-fill" style="width:51%;background:#5DCAA5;"></div></div></div><span class="exp-status ok">✓ CMV controlado — abaixo do limite saudável</span><div class="exp-dica">💡 Com 51% de CMV, cada R$100 vendidos custam R$51 em produto. A média do atacado/distribuição fica entre 75–85%.</div></div></div>
 
@@ -11769,6 +11769,75 @@ function popularDashboard(dados) {
     if (resumoEl) resumoEl.innerHTML =
       '<strong>Resumo:</strong> a ' + (dados.empresa || 'empresa').split(' ')[0] + ' vale ' + fmtV(media) +
       ' com margem líquida de ' + mlPct + '%. O caminho para um valuation maior passa pela <strong>melhora das margens</strong> e crescimento da receita.';
+  })();
+
+  // ── Crescimento da receita (comparativo ano anterior) ────────
+  (function() {
+    var comp = dados.comparativo || {};
+    var recAtual = Math.abs(d.receita_bruta || 0);
+    var recAnt   = Math.abs(comp.receita_bruta_anterior || 0);
+    var anoAtual = dados.ano || '';
+    var anoAnt   = dados.ano_anterior || (anoAtual ? String(parseInt(anoAtual) - 1) : 'anterior');
+
+    var labelEl  = document.getElementById('dre-cresc-label');
+    var pctEl    = document.getElementById('dre-cresc-pct');
+    var barEl    = document.getElementById('dre-cresc-bar');
+    var statusEl = document.getElementById('dre-cresc-status');
+    var dicaEl   = document.getElementById('dre-cresc-dica');
+
+    if (!recAnt || recAnt === 0) {
+      // Sem dado comparativo
+      if (labelEl)  labelEl.textContent  = 'Crescimento vs ano anterior';
+      if (pctEl)    { pctEl.textContent  = '—'; pctEl.style.color = 'var(--text3)'; }
+      if (barEl)    barEl.style.width    = '0%';
+      if (statusEl) { statusEl.textContent = 'Sem dados comparativos disponíveis'; statusEl.className = 'exp-status atencao'; }
+      if (dicaEl)   dicaEl.textContent   = '💡 Para ver o crescimento, analise um PDF que contenha dados dos dois anos (ex: DFP anual com colunas comparativas).';
+      return;
+    }
+
+    var crescPct  = ((recAtual - recAnt) / recAnt) * 100;
+    var crescStr  = (crescPct >= 0 ? '+' : '') + crescPct.toFixed(1).replace('.',',') + '%';
+    var barWidth  = Math.min(95, Math.max(5, Math.abs(crescPct) * 4));
+    var corBar    = crescPct >= 10 ? '#5DCAA5' : crescPct >= 0 ? '#EF9F27' : '#F0997B';
+    var corPct    = crescPct >= 10 ? 'var(--green)' : crescPct >= 0 ? 'var(--amber)' : 'var(--red)';
+
+    // Benchmark de crescimento por setor (~8% varejo, ~5% atacado, ~12% tech)
+    var setorL = (dados.setor || '').toLowerCase();
+    var crescRef = setorL.includes('tech') || setorL.includes('softw') ? 12
+                 : setorL.includes('serv') ? 10
+                 : setorL.includes('varejo') || setorL.includes('moda') ? 8
+                 : setorL.includes('ind') ? 6 : 7;
+    var acimaMédia = crescPct > crescRef;
+
+    if (labelEl)  labelEl.textContent  = 'Crescimento vs ' + anoAnt;
+    if (pctEl)    { pctEl.textContent  = crescStr; pctEl.style.color = corPct; }
+    if (barEl)    { barEl.style.width  = barWidth + '%'; barEl.style.background = corBar; }
+
+    if (statusEl) {
+      if (crescPct >= 15) {
+        statusEl.textContent = '✓ Crescimento forte: ' + crescStr + ' vs ' + anoAnt;
+        statusEl.className   = 'exp-status ok';
+      } else if (crescPct >= 5) {
+        statusEl.textContent = '✓ Crescimento sólido: ' + crescStr + ' vs ' + anoAnt;
+        statusEl.className   = 'exp-status ok';
+      } else if (crescPct >= 0) {
+        statusEl.textContent = '⚠ Crescimento modesto: ' + crescStr + ' vs ' + anoAnt;
+        statusEl.className   = 'exp-status atencao';
+      } else {
+        statusEl.textContent = '▼ Receita caiu ' + crescStr + ' vs ' + anoAnt;
+        statusEl.className   = 'exp-status ruim';
+      }
+    }
+
+    if (dicaEl) {
+      if (acimaMédia) {
+        dicaEl.textContent = '💡 A receita cresceu acima da média do setor (~' + crescRef + '%). Ponto muito positivo — mas atenção se as despesas cresceram no mesmo ritmo.';
+      } else if (crescPct >= 0) {
+        dicaEl.textContent = '💡 Crescimento abaixo da média do setor (~' + crescRef + '%). Vale analisar estratégias para acelerar a expansão de receita.';
+      } else {
+        dicaEl.textContent = '💡 Queda de receita vs ' + anoAnt + '. Investigar se foi pontual (perda de contrato, mercado) ou tendência estrutural.';
+      }
+    }
   })();
 
   // ── tag de arquivos analisados ────────────────────────────────
