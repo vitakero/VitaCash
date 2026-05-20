@@ -10555,7 +10555,7 @@ function popularDashboard(dados) {
   var roce = capitalEmpregado > 0 ? (Math.abs(d.ebit||0) / capitalEmpregado * 100) : 0;
 
   // benchmarks por setor para ROI
-  var bm2 = _getBenchmark(dados.setor||'');
+  var bm2 = _getBenchmark(dados.setor||'', ind);
   var roiBenchLow  = bm2.label.includes('Software') ? 12 : bm2.label.includes('Serviço') ? 10 : bm2.label.includes('Atacad') ? 6 : 6;
   var roiBenchHigh = bm2.label.includes('Software') ? 25 : bm2.label.includes('Serviço') ? 20 : bm2.label.includes('Atacad') ? 10 : 12;
 
@@ -11135,7 +11135,7 @@ function popularDashboard(dados) {
 
   // ── 9. VALUATION — calcula com dados reais ───────────────────
   (function() {
-    var bm = _getBenchmark(dados.setor || '');
+    var bm = _getBenchmark(dados.setor || '', ind);
     // Múltiplos por setor (P/BV, P/L, EV/EBITDA, PSR)
     var multPBV  = bm.label.includes('Tecno')||bm.label.includes('SaaS') ? 5  : bm.label.includes('Moda')||bm.label.includes('Varejo') ? 3 : 2;
     var multPL   = bm.label.includes('Tecno')||bm.label.includes('SaaS') ? 25 : bm.label.includes('Moda')||bm.label.includes('Varejo') ? 15 : 10;
