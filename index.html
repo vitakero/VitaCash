@@ -10612,26 +10612,26 @@ function popularDashboard(dados) {
       }
     }
 
-    // Termômetro — posição do marcador (baseada na cobertura de juros)
-    // Escala: <1x = crítico (88%), 1–1.5x = risco (72%), 1.5–2x = atenção (52%), 2–3x = saudável (25%), >=3x = excelente (8%)
+    // Termômetro — posição proporcional e contínua baseada na cobertura de juros
+    // Âncoras: 0x→93% | 1x→68% | 1,5x→52% | 2x→35% | 3x→18% | 5x+→5%
     (function() {
       var marker = document.getElementById('termo-marker');
       var label  = document.getElementById('termo-label');
       if (!marker || !label) return;
-      var pos, cor;
-      if (cobJuros < 1) {
-        pos = 88; cor = '#dc2626';          // crítico — vermelho
-      } else if (cobJuros < 1.5) {
-        pos = 72; cor = '#ea580c';          // risco — laranja
-      } else if (cobJuros < 2) {
-        pos = 52; cor = '#d97706';          // atenção — âmbar
-      } else if (cobJuros < 3) {
-        pos = 25; cor = '#16a34a';          // saudável — verde
-      } else {
-        pos = 8;  cor = '#15803d';          // excelente — verde escuro
-      }
-      marker.style.left = pos + '%';
-      label.style.left  = pos + '%';
+      var cob = Math.max(0, cobJuros);
+      var pos;
+      // Interpolação linear entre âncoras
+      if (cob >= 5)       { pos = 5; }
+      else if (cob >= 3)  { pos = 18 - (cob - 3) / 2 * 13; }   // 3x→18%, 5x→5%
+      else if (cob >= 2)  { pos = 35 - (cob - 2) / 1 * 17; }   // 2x→35%, 3x→18%
+      else if (cob >= 1.5){ pos = 52 - (cob - 1.5) / 0.5 * 17; }// 1,5x→52%, 2x→35%
+      else if (cob >= 1)  { pos = 68 - (cob - 1) / 0.5 * 16; } // 1x→68%, 1,5x→52%
+      else                { pos = 93 - cob * 25; }               // 0x→93%, 1x→68%
+      pos = Math.max(5, Math.min(93, pos));
+      // Cor proporcional à zona
+      var cor = cob >= 2 ? '#16a34a' : cob >= 1.5 ? '#d97706' : cob >= 1 ? '#ea580c' : '#dc2626';
+      marker.style.left = pos.toFixed(1) + '%';
+      label.style.left  = pos.toFixed(1) + '%';
       label.style.color = cor;
     })();
   })();
