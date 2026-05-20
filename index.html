@@ -4678,30 +4678,30 @@ function adminAbrirWhatsApp() {
       <div style="margin-bottom:.75rem;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
           <span style="font-size:12px;color:var(--text2);">Margem bruta</span>
-          <span class="chip quick">49% — acima da média</span>
+          <span id="mg-mb-chip" class="chip quick">49% — acima da média</span>
         </div>
-        <div style="height:4px;background:var(--surface2);border-radius:99px;overflow:hidden;"><div style="height:100%;width:49%;background:var(--green);border-radius:99px;"></div></div>
+        <div style="height:4px;background:var(--surface2);border-radius:99px;overflow:hidden;"><div id="mg-mb-bar" style="height:100%;width:49%;background:var(--green);border-radius:99px;"></div></div>
       </div>
 
       <div style="margin-bottom:.75rem;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
           <span style="font-size:12px;color:var(--text2);">Margem operacional (EBIT)</span>
-          <span class="chip impact">6,3% — atenção</span>
+          <span id="mg-mo-chip" class="chip impact">6,3% — atenção</span>
         </div>
-        <div style="height:4px;background:var(--surface2);border-radius:99px;overflow:hidden;"><div style="height:100%;width:6%;background:#ef9f27;border-radius:99px;"></div></div>
+        <div style="height:4px;background:var(--surface2);border-radius:99px;overflow:hidden;"><div id="mg-mo-bar" style="height:100%;width:6%;background:#ef9f27;border-radius:99px;"></div></div>
       </div>
 
       <div style="margin-bottom:.875rem;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
           <span style="font-size:12px;color:var(--text2);">Margem líquida</span>
-          <span class="chip quick">3,7% — ok no setor</span>
+          <span id="mg-ml-chip" class="chip quick">3,7% — ok no setor</span>
         </div>
-        <div style="height:4px;background:var(--surface2);border-radius:99px;overflow:hidden;"><div style="height:100%;width:4%;background:var(--green);border-radius:99px;"></div></div>
+        <div style="height:4px;background:var(--surface2);border-radius:99px;overflow:hidden;"><div id="mg-ml-bar" style="height:100%;width:4%;background:var(--green);border-radius:99px;"></div></div>
       </div>
 
       <div style="display:flex;align-items:flex-start;gap:8px;background:#fef2f2;border:.5px solid #fecaca;border-radius:var(--radius);padding:.625rem .875rem;">
         <svg width="14" height="14" fill="none" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:1px"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="#b91c1c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <div style="font-size:12px;color:#b91c1c;line-height:1.5;"><strong>Principal gargalo:</strong> despesas operacionais consumindo 41% da receita. Revisar <strong>despesas com vendas (25,2%)</strong> é o caminho mais direto para aumentar o lucro líquido.</div>
+        <div id="mg-gargalo-txt" style="font-size:12px;color:#b91c1c;line-height:1.5;"><strong>Principal gargalo:</strong> despesas operacionais consumindo 41% da receita. Revisar <strong>despesas com vendas (25,2%)</strong> é o caminho mais direto para aumentar o lucro líquido.</div>
       </div>
     </div>
   </div>
@@ -10709,6 +10709,50 @@ function popularDashboard(dados) {
     chipDRE(mbChip, mbPct, mb, '✓ Acima do setor', '✓ Ok no setor');
     chipDRE(meChip, moPct, mo, '✓ Acima do setor', '✓ Ok no setor');
     chipDRE(mlChip, mlPct, ml, '✓ Acima do setor', '✓ Ok no setor');
+  })();
+
+  // Resumo visual das margens (barras + chips + gargalo)
+  (function() {
+    var mbC = document.getElementById('mg-mb-chip');
+    var mbB = document.getElementById('mg-mb-bar');
+    var moC = document.getElementById('mg-mo-chip');
+    var moB = document.getElementById('mg-mo-bar');
+    var mlC = document.getElementById('mg-ml-chip');
+    var mlB = document.getElementById('mg-ml-bar');
+    var gT  = document.getElementById('mg-gargalo-txt');
+    if (!mbC) return;
+    var mbPct = +(ind.margemBruta||0).toFixed(1);
+    var moPct = +(ind.margemOp||0).toFixed(1);
+    var mlPct = +(ind.margemLiq||0).toFixed(1);
+    var recB  = Math.abs(d.receita_bruta||1);
+    // Chips
+    function setChip(el, val, bench, corBom, corAtenc) {
+      if (!el) return;
+      var str = val.toString().replace('.',',') + '%';
+      if (val >= bench)          { el.textContent = str + ' — acima do setor'; el.className = 'chip quick'; }
+      else if (val >= bench*0.75){ el.textContent = str + ' — ok no setor';    el.className = 'chip quick'; }
+      else if (val >= 0)         { el.textContent = str + ' — atenção';        el.className = 'chip impact'; }
+      else                       { el.textContent = str + ' — negativa';       el.className = 'chip ruim'; }
+    }
+    setChip(mbC, mbPct, mb);
+    setChip(moC, moPct, mo);
+    setChip(mlC, mlPct, ml);
+    // Barras (cap 80% para não ultrapassar visualmente)
+    if (mbB) { mbB.style.width = Math.min(80, Math.max(1, mbPct)) + '%'; mbB.style.background = mbPct >= mb ? 'var(--green)' : '#ef9f27'; }
+    if (moB) { moB.style.width = Math.min(80, Math.max(1, moPct)) + '%'; moB.style.background = moPct >= mo ? 'var(--green)' : '#ef9f27'; }
+    if (mlB) { mlB.style.width = Math.min(80, Math.max(1, mlPct)) + '%'; mlB.style.background = mlPct >= ml ? 'var(--green)' : '#ef9f27'; }
+    // Gargalo — maior despesa operacional
+    if (gT) {
+      var dVendas = Math.abs(d.despesas_vendas||0);
+      var dAdmin  = Math.abs(d.despesas_admin||0);
+      var dOutras = Math.abs(d.outras_despesas_op||0);
+      var dTotal  = dVendas + dAdmin + dOutras;
+      var dTotalPct = (dTotal / recB * 100).toFixed(1).replace('.',',');
+      var maiorNome = dVendas >= dAdmin && dVendas >= dOutras ? 'despesas com vendas'
+                    : dAdmin  >= dOutras ? 'despesas administrativas' : 'outras despesas operacionais';
+      var maiorPct  = (Math.max(dVendas, dAdmin, dOutras) / recB * 100).toFixed(1).replace('.',',');
+      gT.innerHTML = '<strong>Principal gargalo:</strong> despesas operacionais consumindo ' + dTotalPct + '% da receita. Revisar <strong>' + maiorNome + ' (' + maiorPct + '%)</strong> é o caminho mais direto para aumentar o lucro líquido.';
+    }
   })();
 
   setMC('Lucro líquido',
