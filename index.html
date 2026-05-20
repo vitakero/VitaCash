@@ -11366,6 +11366,22 @@ function popularDashboard(dados) {
   window._ebitReal    = d.ebit || 0;
   window._despFinReal = despFinAbs;
 
+  // Simulador de empréstimo — ajusta range e recalcula com dados reais
+  (function() {
+    var slider = document.getElementById('emp-slider');
+    if (!slider) return;
+    var ebitM = Math.abs(d.ebit || 0) / 1e6;
+    // Range proporcional ao EBIT da empresa
+    var sliderMax  = ebitM > 1000 ? 5000 : ebitM > 200 ? 2000 : ebitM > 50 ? 500 : 100;
+    var sliderStep = sliderMax >= 2000 ? 50 : sliderMax >= 500 ? 10 : 5;
+    var sliderVal  = Math.max(sliderStep, Math.round(ebitM * 0.1 / sliderStep) * sliderStep);
+    sliderVal = Math.min(sliderVal, sliderMax / 4);
+    slider.max  = sliderMax;
+    slider.step = sliderStep;
+    slider.value = sliderVal;
+    calcEmp();   // recalcula exibição com EBIT e despFin reais
+  })();
+
   // Salva para o PDF
   window._dadosIA = dados;
   console.log('✅ Dashboard populado — Empresa:', dados.empresa, '| Ano:', dados.ano, '| Ciclo:', ciclo, 'dias | Nota:', ind.nota);
