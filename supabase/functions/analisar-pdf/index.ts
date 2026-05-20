@@ -73,7 +73,7 @@ REGRAS IMPORTANTES:
 - ebit = lucro_bruto + despesas_vendas + despesas_admin + outras_despesas_op (todas negativas)
 - resultado_antes_tributos = ebit + resultado_financeiro
 - lucro_liquido = resultado_antes_tributos + impostos (impostos é negativo)
-- comparativo: se o documento tiver coluna do ano anterior (muito comum em DFPs brasileiras), preencha receita_bruta_anterior, lucro_liquido_anterior e ebit_anterior com os valores desse ano anterior. Caso contrário, deixe 0`
+- COMPARATIVO (MUITO IMPORTANTE): DFPs brasileiras quase sempre têm duas colunas — o ano atual e o ano anterior lado a lado. Você DEVE procurar ativamente a coluna do ano anterior na DRE e preencher comparativo.receita_bruta_anterior com o valor de Receita de Vendas/Receita Bruta do ano anterior, comparativo.lucro_liquido_anterior com o Lucro Líquido do ano anterior, e comparativo.ebit_anterior com o EBIT/Resultado Operacional do ano anterior. Esses valores devem seguir as mesmas regras de sinal (despesas negativas). Somente deixe 0 se não houver absolutamente nenhum dado do ano anterior no documento.`
 
 // ── Benchmarks por setor ──────────────────────────────────────────
 function benchmarksPorSetor(setor: string, dre: Record<string,number>, balanco: Record<string,number>) {
