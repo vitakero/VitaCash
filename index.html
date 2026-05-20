@@ -3796,7 +3796,7 @@ function adminAbrirWhatsApp() {
     <!-- ALERTA RENTABILIDADE -->
     <div class="ab aok growth-only" style="margin-bottom:1.5rem;">
       <div style="font-size:14px;flex-shrink:0;">✓</div>
-      <div class="at">O <strong>ROE de 25,3%</strong> está acima da Selic (13,75% em 2022), o que significa que a empresa está <strong>criando valor</strong> — o dinheiro investido pelos sócios rende mais do que a renda fixa. ROI de 17,4% é muito acima da média do setor.</div>
+      <div class="at" id="alerta-rentabilidade">O <strong>ROE de 25,3%</strong> está acima da Selic (13,75% em 2022), o que significa que a empresa está <strong>criando valor</strong> — o dinheiro investido pelos sócios rende mais do que a renda fixa. ROI de 17,4% é muito acima da média do setor.</div>
     </div>
 
     <!-- VALUATION BY EQUITY -->
@@ -10513,6 +10513,25 @@ function popularDashboard(dados) {
     roce >= 15 ? '▲ excelente' : roce >= 10 ? '▲ bom para o setor' : roce >= 5 ? '▲ razoável' : '▼ abaixo da média',
     'Você: ~' + roce.toFixed(1).replace('.',',') + '%',
     'Média: 10–15%');
+
+  // Alerta rentabilidade
+  var alertaRent = document.getElementById('alerta-rentabilidade');
+  if (alertaRent) {
+    var roeStr  = roe.toFixed(1).replace('.',',') + '%';
+    var roiStr  = roi.toFixed(1).replace('.',',') + '%';
+    var acimaSelic = roe >= 15;
+    var roiBom    = roi >= roiBenchLow;
+    if (acimaSelic) {
+      alertaRent.innerHTML = 'O <strong>ROE de ' + roeStr + '</strong> está acima da Selic (15% a.a.), o que significa que a empresa está <strong>criando valor</strong> — o dinheiro investido pelos sócios rende mais do que a renda fixa.' +
+        (roiBom ? ' ROI de ' + roiStr + ' está acima da média do setor (' + roiBenchLow + '–' + roiBenchHigh + '%).' : ' ROI de ' + roiStr + ' está abaixo da média do setor — há espaço para melhorar o retorno sobre os ativos.');
+    } else {
+      alertaRent.innerHTML = 'O <strong>ROE de ' + roeStr + '</strong> está <strong>abaixo da Selic (15% a.a.)</strong> — o dinheiro dos sócios rende menos do que a renda fixa. Foco em aumentar margens para superar o custo de oportunidade.' +
+        ' ROI de ' + roiStr + ' — referência do setor: ' + roiBenchLow + '–' + roiBenchHigh + '%.';
+      // muda ícone para atenção
+      var abEl = alertaRent.closest('.ab');
+      if (abEl) { abEl.classList.remove('aok'); abEl.classList.add('awarn'); }
+    }
+  }
 
   // Endividamento
   setMC('Limite máximo seguro', fmtV(limiteMax), verde);
