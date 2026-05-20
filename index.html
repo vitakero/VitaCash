@@ -10246,7 +10246,7 @@ function popularDashboard(dados) {
   // ── 0b. BALANÇO — títulos e pills educativas ─────────────────
   (function() {
     var empresa2 = dados.empresa || 'Empresa';
-    var bm2 = _getBenchmark(dados.setor || '');
+    var bm2 = _getBenchmark(dados.setor || '', ind);
 
     // Seção "Exemplo real" na DRE educativa
     setText('dre-edu-empresa-ref', 'Exemplo real · ' + empresa2);
@@ -11307,15 +11307,29 @@ var _BENCHMARKS = {
   '_default':     { mb:35, mo:8,  ml:5,  despOp:25, cmv:65, label:'Empresa' }
 };
 
-function _getBenchmark(setor) {
+function _getBenchmark(setor, ind) {
   var s = (setor||'').toLowerCase()
     .normalize('NFD').replace(/[̀-ͯ]/g,''); // remove acentos para comparação
   // Busca pelo primeiro match nas chaves
   var keys = Object.keys(_BENCHMARKS);
+  var matched = null;
   for (var i=0; i<keys.length; i++) {
-    if (keys[i] !== '_default' && s.includes(keys[i])) return _BENCHMARKS[keys[i]];
+    if (keys[i] !== '_default' && s.includes(keys[i])) { matched = keys[i]; break; }
   }
-  return _BENCHMARKS['_default'];
+  var result = matched ? _BENCHMARKS[matched] : _BENCHMARKS['_default'];
+
+  // Desambiguação por perfil financeiro:
+  // Se o setor veio como varejo/comércio genérico mas a margem bruta é > 45%,
+  // provavelmente é moda/premium — usa benchmark de moda (mais realista)
+  var mb = ind && (ind.margemBruta || ind.mb) || 0;
+  if ((matched === 'varejo' || matched === 'comercio' || !matched) && mb > 45) {
+    return _BENCHMARKS['moda']; // Varejo de Moda: despOp 45%, mb 55%
+  }
+  // Se margem bruta > 65% e setor genérico → provavelmente serviços
+  if (!matched && mb > 65) {
+    return _BENCHMARKS['servico'];
+  }
+  return result;
 }
 
 // ── CÁLCULO DE INDICADORES (browser) ────────────────────────────────
@@ -11561,7 +11575,7 @@ async function gerarRecomendacoesIA(dados) {
   var d   = dados.dre      || {};
   var b   = dados.balanco  || {};
   var ind = dados.indicadores || {};
-  var bm2 = (typeof _getBenchmark === 'function') ? _getBenchmark(dados.setor || '') : {};
+  var bm2 = (typeof _getBenchmark === 'function') ? _getBenchmark(dados.setor || '', ind) : {};
   var fN  = function(n) { return (n || 0).toLocaleString('pt-BR', { maximumFractionDigits: 0 }); };
 
   var promptRec = [
