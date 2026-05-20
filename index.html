@@ -10481,6 +10481,39 @@ function popularDashboard(dados) {
     'Você: ' + roe.toFixed(1).replace('.',',') + '%',
     'Selic: 15% a.a.');
 
+  // ROI, ROIC, ROCE
+  var roi  = b.ativo_total > 0 ? (Math.abs(d.lucro_liquido||0) / b.ativo_total * 100) : 0;
+  var roic = (b.patrimonio_liquido > 0 || dividaAtual > 0)
+    ? (Math.abs(d.ebit||0) * 0.66 / (Math.abs(b.patrimonio_liquido||0) + dividaAtual) * 100) : 0;
+  var capitalEmpregado = b.ativo_total > 0 ? (b.ativo_total - Math.abs(b.ativo_circulante||0)) : 0;
+  var roce = capitalEmpregado > 0 ? (Math.abs(d.ebit||0) / capitalEmpregado * 100) : 0;
+
+  // benchmarks por setor para ROI
+  var bm2 = _getBenchmark(dados.setor||'');
+  var roiBenchLow  = bm2.label.includes('Software') ? 12 : bm2.label.includes('Serviço') ? 10 : bm2.label.includes('Atacad') ? 6 : 6;
+  var roiBenchHigh = bm2.label.includes('Software') ? 25 : bm2.label.includes('Serviço') ? 20 : bm2.label.includes('Atacad') ? 10 : 12;
+
+  setMC('ROI',
+    roi.toFixed(1).replace('.',',') + '%',
+    roi >= roiBenchLow ? verde : amber,
+    roi >= roiBenchHigh ? '▲ excelente' : roi >= roiBenchLow ? '▲ muito bom' : roi > 0 ? '▼ abaixo da média' : '▼ negativo',
+    'Você: ' + roi.toFixed(1).replace('.',',') + '%',
+    'Média: ' + roiBenchLow + '–' + roiBenchHigh + '%');
+
+  setMC('ROIC',
+    '~' + roic.toFixed(1).replace('.',',') + '%',
+    roic >= 20 ? verde : roic >= 10 ? amber : 'var(--red)',
+    roic >= 20 ? '▲ gera valor' : roic >= 10 ? '▲ próximo do custo de capital' : '▼ destrói valor',
+    'Você: ~' + roic.toFixed(1).replace('.',',') + '%',
+    'Custo capital: ~20%');
+
+  setMC('ROCE',
+    '~' + roce.toFixed(1).replace('.',',') + '%',
+    roce >= 10 ? verde : roce >= 5 ? amber : 'var(--red)',
+    roce >= 15 ? '▲ excelente' : roce >= 10 ? '▲ bom para o setor' : roce >= 5 ? '▲ razoável' : '▼ abaixo da média',
+    'Você: ~' + roce.toFixed(1).replace('.',',') + '%',
+    'Média: 10–15%');
+
   // Endividamento
   setMC('Limite máximo seguro', fmtV(limiteMax), verde);
   setMC('Dívida atual',         dividaAtual > 0 ? fmtV(dividaAtual) : 'R$ 0', verde);
