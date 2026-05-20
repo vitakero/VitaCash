@@ -10350,8 +10350,11 @@ function popularDashboard(dados) {
   var pme     = ind.pme   || 0;
   var pmp     = ind.pmp   || 0;
   var caixa   = b.caixa || 0;
-  var gdiar   = cmvAbs > 0 ? Math.round(cmvAbs / 365) : 116952;
-  var ncg     = ciclo > 0 ? gdiar * ciclo : 0;
+  var gdiar   = cmvAbs > 0 ? Math.round(cmvAbs / 365) : Math.round(rec / 365);
+  // NCG pelo balanço patrimonial — fórmula mais correta:
+  // NCG = Contas a receber + Estoques − Fornecedores (capital operacional efetivamente preso)
+  var ncgBalanco = Math.max(0, (b.contas_a_receber||0) + (b.estoques||0) - Math.abs(b.fornecedores||0));
+  var ncg     = ciclo > 0 ? ncgBalanco : 0;
   var excesso = caixa - ncg;
 
   // Atualiza variável global gastosDiarios usada pelo slider recalc()
@@ -11636,7 +11639,8 @@ async function gerarRecomendacoesIA(dados) {
     '- Compare com os benchmarks do setor informado',
     '- potencial_realista: estimativa conservadora e honesta, sem dupla contagem entre os 4 cards',
     '- Se a empresa supera o benchmark, classifique como "bom" e celebre — não finja problemas inexistentes',
-    '- Exatamente 4 recomendações, máximo 3 ações cada'
+    '- Exatamente 4 recomendações, máximo 3 ações cada',
+    '- CAPITAL PRESO NO CICLO DE CAIXA: use sempre NCG pelo balanço = Contas_a_receber + Estoques − Fornecedores (NÃO use receita × dias nem CMV × dias — esses métodos dão resultados divergentes)'
   ].join('\n');
 
   try {
