@@ -3971,7 +3971,7 @@ function adminAbrirWhatsApp() {
             <div style="display:flex;gap:8px;margin-bottom:12px;align-items:flex-start;">
               <div style="width:28px;height:28px;border-radius:50%;background:var(--green-light);color:var(--green-dark);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
               <div style="font-size:12px;color:var(--text2);line-height:1.7;">
-                <strong style="color:var(--text);">P/BV — Valor pelo Patrimônio (R$ 13,5 mi)</strong><br>
+                <strong id="val-edu-pbv-title" style="color:var(--text);">P/BV — Valor pelo Patrimônio (R$ 13,5 mi)</strong><br>
                 Pega o <strong>patrimônio líquido</strong> (o que pertence aos sócios) e multiplica pela média do que o mercado paga por empresas parecidas.<br>
                 <span id="val-edu-pbv-calc" style="background:var(--surface2);display:inline-block;padding:3px 8px;border-radius:var(--radius);font-family:monospace;font-size:11px;margin-top:4px;">R$ 6,73 mi × 2,0x = R$ 13,5 mi</span>
               </div>
@@ -3980,8 +3980,8 @@ function adminAbrirWhatsApp() {
             <div style="display:flex;gap:8px;margin-bottom:12px;align-items:flex-start;">
               <div style="width:28px;height:28px;border-radius:50%;background:var(--green-light);color:var(--green-dark);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
               <div style="font-size:12px;color:var(--text2);line-height:1.7;">
-                <strong style="color:var(--text);">P/L — Valor pelo Lucro (R$ 17,0 mi)</strong><br>
-                Pergunta: <em>"Quantos anos de lucro vale a empresa?"</em> No atacado, o padrão é 8–12 anos. Usamos 10x.<br>
+                <strong id="val-edu-pl-title" style="color:var(--text);">P/L — Valor pelo Lucro (R$ 17,0 mi)</strong><br>
+                Pergunta: <em>"Quantos anos de lucro vale a empresa?"</em> <span id="val-edu-pl-desc">No atacado, o padrão é 8–12 anos. Usamos 10x.</span><br>
                 <span id="val-edu-pl-calc" style="background:var(--surface2);display:inline-block;padding:3px 8px;border-radius:var(--radius);font-family:monospace;font-size:11px;margin-top:4px;">R$ 1,70 mi × 10x = R$ 17,0 mi</span>
               </div>
             </div>
@@ -3989,7 +3989,7 @@ function adminAbrirWhatsApp() {
             <div style="display:flex;gap:8px;margin-bottom:12px;align-items:flex-start;">
               <div style="width:28px;height:28px;border-radius:50%;background:var(--green-light);color:var(--green-dark);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
               <div style="font-size:12px;color:var(--text2);line-height:1.7;">
-                <strong style="color:var(--text);">EV/EBITDA — Valor pelo lucro operacional (R$ 20,3 mi)</strong><br>
+                <strong id="val-edu-ev-title" style="color:var(--text);">EV/EBITDA — Valor pelo lucro operacional (R$ 20,3 mi)</strong><br>
                 O método favorito de grandes compradores. Usa o EBITDA (lucro antes de juros, impostos e depreciação) porque é mais difícil de manipular.<br>
                 <span id="val-edu-ev-calc" style="background:var(--surface2);display:inline-block;padding:3px 8px;border-radius:var(--radius);font-family:monospace;font-size:11px;margin-top:4px;">EBITDA R$ 3,38 mi × 6x = R$ 20,3 mi</span>
               </div>
@@ -3998,8 +3998,8 @@ function adminAbrirWhatsApp() {
             <div style="display:flex;gap:8px;align-items:flex-start;">
               <div style="width:28px;height:28px;border-radius:50%;background:var(--green-light);color:var(--green-dark);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</div>
               <div style="font-size:12px;color:var(--text2);line-height:1.7;">
-                <strong style="color:var(--text);">PSR — Valor pela Receita (R$ 18,4 mi)</strong><br>
-                Multiplica a receita total por uma fração. No atacado, o padrão é pagar 30–50 centavos por cada R$1 de faturamento.<br>
+                <strong id="val-edu-psr-title" style="color:var(--text);">PSR — Valor pela Receita (R$ 18,4 mi)</strong><br>
+                <span id="val-edu-psr-desc">Multiplica a receita total por uma fração. No atacado, o padrão é pagar 30–50 centavos por cada R$1 de faturamento.</span><br>
                 <span id="val-edu-psr-calc" style="background:var(--surface2);display:inline-block;padding:3px 8px;border-radius:var(--radius);font-family:monospace;font-size:11px;margin-top:4px;">R$ 46,1 mi × 0,4x = R$ 18,4 mi</span>
               </div>
             </div>
@@ -11715,6 +11715,32 @@ function popularDashboard(dados) {
       'Lucro: ' + fmtV(lucro) + '<br>' +
       'Valuation: <strong style="color:var(--text);">' + fmtV(media) + '</strong><br>' +
       'Múltiplo receita: <strong>' + multiRec + 'x</strong>';
+
+    // Títulos dos 4 métodos com valores reais
+    var pbvTitle = document.getElementById('val-edu-pbv-title');
+    if (pbvTitle) pbvTitle.textContent = 'P/BV — Valor pelo Patrimônio (' + fmtV(vPBV) + ')';
+
+    var plTitle = document.getElementById('val-edu-pl-title');
+    if (plTitle) plTitle.textContent = 'P/L — Valor pelo Lucro (' + fmtV(vPL) + ')';
+
+    var plDesc = document.getElementById('val-edu-pl-desc');
+    if (plDesc) {
+      var setorNome = (dados.setor || 'setor').toLowerCase();
+      var plRange = multPL >= 20 ? (multPL - 5) + '–' + (multPL + 5) : multPL >= 12 ? (multPL - 3) + '–' + (multPL + 3) : '8–12';
+      plDesc.textContent = 'No ' + setorNome + ', o padrão é ' + plRange + ' anos. Usamos ' + multPL + 'x.';
+    }
+
+    var evTitle = document.getElementById('val-edu-ev-title');
+    if (evTitle) evTitle.textContent = 'EV/EBITDA — Valor pelo lucro operacional (' + fmtV(vEV) + ')';
+
+    var psrTitle = document.getElementById('val-edu-psr-title');
+    if (psrTitle) psrTitle.textContent = 'PSR — Valor pela Receita (' + fmtV(vPSR) + ')';
+
+    var psrDesc = document.getElementById('val-edu-psr-desc');
+    if (psrDesc) {
+      var psrFrac = multPSR >= 3 ? 'pagar ' + multPSR + 'x' : multPSR >= 1 ? 'pagar R$' + multPSR.toString().replace('.',',') + ' por cada R$1' : 'pagar ' + Math.round(multPSR * 100) + '–' + Math.round(multPSR * 100 + 20) + ' centavos por cada R$1';
+      psrDesc.textContent = 'Multiplica a receita total pelo múltiplo do setor. No ' + (dados.setor||'setor').toLowerCase() + ', o padrão é ' + psrFrac + ' de faturamento.';
+    }
 
     var pbvCalc = document.getElementById('val-edu-pbv-calc');
     if (pbvCalc) pbvCalc.textContent = fmtV(pl) + ' × ' + multPBV + 'x = ' + fmtV(vPBV);
