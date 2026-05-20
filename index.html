@@ -3464,7 +3464,7 @@ function adminAbrirWhatsApp() {
 }
 </script>
 
-  <div class="tag-file">📄 DRE_GJoaoDosSantos_2022.pdf + Balanço_Patrimonial_GJoao.pdf · analisados automaticamente</div>
+  <div id="dash-tag-file" class="tag-file">📄 DRE_GJoaoDosSantos_2022.pdf + Balanço_Patrimonial_GJoao.pdf · analisados automaticamente</div>
 
   <!-- SELETOR DE EMPRESA -->
   <div class="empresa-switcher">
@@ -10690,6 +10690,22 @@ function popularDashboard(dados) {
       } else {
         window._notaDescEl.textContent = 'Situação crítica. ' + fmtV(totalMapeado) + ' em riscos identificados. As 3 ações abaixo são prioridade máxima para evitar piora do resultado.';
       }
+    }
+  })();
+
+  // ── tag de arquivos analisados ────────────────────────────────
+  (function() {
+    var tagEl = document.getElementById('dash-tag-file');
+    if (!tagEl) return;
+    var nomeDRE = (window.ndreFiles && window.ndreFiles.dre) ? window.ndreFiles.dre.name : null;
+    var nomeBP  = (window.ndreFiles && window.ndreFiles.bp && window.ndreFiles.bp !== window.ndreFiles.dre) ? window.ndreFiles.bp.name : null;
+    if (nomeDRE) {
+      var txt = '📄 ' + nomeDRE;
+      if (nomeBP && nomeBP !== nomeDRE) txt += ' + ' + nomeBP;
+      txt += ' · analisados automaticamente';
+      tagEl.textContent = txt;
+    } else if (dados.empresa) {
+      tagEl.textContent = '📄 ' + dados.empresa + ' · ' + (dados.ano || '') + ' · analisados automaticamente';
     }
   })();
 
