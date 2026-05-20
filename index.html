@@ -10876,7 +10876,7 @@ function popularDashboard(dados) {
 
     // ② Despesas operacionais acima do benchmark do setor
     var despOpPct = recL > 0 ? despOpAbs / recL * 100 : 0;
-    var despOpBenchmark = ind.benchmarks?.despOp || (mo * 2.5); // benchmark real por nicho
+    var despOpBenchmark = bm2.despOp || (mo * 2.5); // benchmark real do setor via _getBenchmark
     var gapDespOp = despOpAbs - (recL * despOpBenchmark / 100);
     if (gapDespOp > recL * 0.01) { // só mostra se gap > 1% da receita
       ops.push({
@@ -10891,7 +10891,7 @@ function popularDashboard(dados) {
     }
 
     // ③ CMV — renegociação com fornecedores
-    var cmvBenchmark = ind.benchmarks?.cmv || (100 - mb); // benchmark real por nicho
+    var cmvBenchmark = bm2.cmv || (100 - mb); // benchmark real do setor via _getBenchmark
     var gapCMV = cmvAbs - (recL * cmvBenchmark / 100);
     if (gapCMV > 0) {
       var economiaFornecedor = cmvAbs * 0.02; // 2% de desconto de fornecedor
