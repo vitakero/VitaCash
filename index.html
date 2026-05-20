@@ -10859,11 +10859,31 @@ function popularDashboard(dados) {
   var pPontosNum = document.getElementById('painel-pontos-num');
   var pPlanoVal = document.getElementById('painel-plano-valor');
 
-  if (pTotal)    pTotal.textContent = fmtV(potencialTotal);
+  // Usa potencial_realista do Claude se disponível, senão cálculo local
+  var valorExibir = (dados.potencial_realista && dados.potencial_realista > 0)
+    ? dados.potencial_realista
+    : potencialTotal;
+
+  if (pTotal)    pTotal.textContent = fmtV(valorExibir);
   if (pAcoesNum) pAcoesNum.textContent = '4';
   if (pAcoesSub) pAcoesSub.textContent = recsCriticas + ' crítica' + (recsCriticas !== 1 ? 's' : '') + ' · ' + recsBoas + ' para potencializar';
   if (pPontosNum) pPontosNum.textContent = recsBoas;
-  if (pPlanoVal) pPlanoVal.textContent = fmtV(potencialTotal);
+  if (pPlanoVal) pPlanoVal.textContent = fmtV(valorExibir);
+
+  // Adiciona nota de transparência se usando estimativa Claude
+  if (dados.potencial_realista && dados.potencial_descricao) {
+    var pNota = document.querySelector('#painel-total')?.closest('div');
+    if (pNota) {
+      var notaEl = pNota.querySelector('.painel-nota');
+      if (!notaEl) {
+        notaEl = document.createElement('div');
+        notaEl.className = 'painel-nota';
+        notaEl.style.cssText = 'font-size:9px;color:var(--green-bg);margin-top:4px;line-height:1.4;opacity:.85;';
+        pNota.appendChild(notaEl);
+      }
+      notaEl.textContent = '↳ ' + dados.potencial_descricao;
+    }
+  }
 
   } // fim do else (sem recomendacoes personalizadas)
 

@@ -294,6 +294,8 @@ BALANÇO:
 
 Retorne APENAS um JSON válido, sem markdown, com esta estrutura exata:
 {
+  "potencial_realista": 0,
+  "potencial_descricao": "frase curta explicando o potencial ex: redução de 3pp nas despesas de vendas + melhora no ciclo de caixa",
   "recomendacoes": [
     {
       "tipo": "ruim",
@@ -322,7 +324,8 @@ REGRAS CRÍTICAS:
 - O "tipo" deve ser "ruim" para problemas e "bom" para pontos fortes
 - Para o chip use: "Comece por aqui" (1º card crítico), "Prioridade alta" (2º crítico), "Ponto forte" (cards positivos)
 - Cada recomendação deve ser diferente — nunca repita a mesma lógica
-- Considere o ciclo de caixa, sazonalidade e dinâmicas específicas do setor ao dar conselhos`
+- Considere o ciclo de caixa, sazonalidade e dinâmicas específicas do setor ao dar conselhos
+- "potencial_realista" deve ser um número em reais (sem R$) representando o ganho REALISTA e CONSERVADOR que a empresa consegue em 12 meses executando as ações — NÃO o máximo teórico. Considere: o que é operacionalmente viável, o que o setor permite, e evite somar itens que se sobrepõem. Seja honesto — é melhor subestimar e surpreender do que prometer o impossível`
 
     let recomendacoes = null
     try {
@@ -333,14 +336,16 @@ REGRAS CRÍTICAS:
       })
       const rawRec = (msgRec.content[0] as Anthropic.TextBlock).text.trim()
       const jsonRec = rawRec.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '')
-      recomendacoes = JSON.parse(jsonRec).recomendacoes
-      console.log('✅ Recomendações geradas:', recomendacoes?.length)
+      const parsedRec = JSON.parse(jsonRec)
+      recomendacoes = parsedRec.recomendacoes
+      const potencialRealista = parsedRec.potencial_realista || null
+      const potencialDescricao = parsedRec.potencial_descricao || null
+      console.log('✅ Recomendações geradas:', recomendacoes?.length, '| Potencial realista: R$', potencialRealista)
+      resultado = { ...resultado, recomendacoes, potencial_realista: potencialRealista, potencial_descricao: potencialDescricao }
     } catch (err) {
       console.error('⚠️ Erro nas recomendações (não crítico):', err)
-      // recomendacoes fica null — frontend usa fallback
+      resultado = { ...resultado, recomendacoes: null }
     }
-
-    resultado = { ...resultado, recomendacoes }
 
     // ── 6. Salvar no Supabase ──────────────────────────────────
     await supabase.from('analyses').upsert({
