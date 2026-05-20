@@ -4233,7 +4233,7 @@ function adminAbrirWhatsApp() {
     <!-- CAPACIDADE CALCULADA -->
     <div class="sl">Sua capacidade de endividamento</div>
     <p style="font-size:11px;color:var(--text3);line-height:1.4;margin:-0.5rem 0 0.875rem;">Quanto a empresa pode tomar emprestado mantendo o caixa saudável e os juros sob controle</p>
-    <div class="ab aok pro-only"><div style="flex-shrink:0;margin-top:1px;"><svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="at">Com base na sua DRE, calculamos quanto você pode pegar emprestado sem colocar o caixa em risco. Situação atual: <strong>saudável</strong> — índice de cobertura de juros em 2,1x.</div></div>
+    <div id="end-banner" class="ab aok pro-only"><div style="flex-shrink:0;margin-top:1px;"><svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div id="end-banner-txt" class="at">Com base na sua DRE, calculamos quanto você pode pegar emprestado sem colocar o caixa em risco. Situação atual: <strong>saudável</strong> — índice de cobertura de juros em 2,1x.</div></div>
 
     <div class="mg-section-pro" data-plan-required="pro" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem;">
       <div style="background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;box-shadow:var(--shadow-sm);position:relative;">
@@ -4243,7 +4243,7 @@ function adminAbrirWhatsApp() {
           </div>
         </div>
         <div class="mc-sub">Máximo sem ultrapassar a cobertura de juros de 2x</div>
-        <div style="font-size:22px;font-weight:600;color:var(--green);">R$ 5,82 mi</div>
+        <div id="end-limite-val" style="font-size:22px;font-weight:600;color:var(--green);">R$ 5,82 mi</div>
         <div style="font-size:11px;color:var(--text2);margin-top:3px;">mantendo cobertura de juros 2x</div>
       </div>
       <div style="background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;position:relative;">
@@ -4253,19 +4253,19 @@ function adminAbrirWhatsApp() {
           </div>
         </div>
         <div class="mc-sub">Estimativa com base nas despesas financeiras do período</div>
-        <div style="font-size:22px;font-weight:600;color:var(--green);">R$ 212 mil</div>
+        <div id="end-divida-val" style="font-size:22px;font-weight:600;color:var(--green);">R$ 212 mil</div>
         <div style="font-size:11px;color:var(--text2);margin-top:3px;">em dívidas financeiras estimadas</div>
       </div>
       <div style="background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;">
         <div style="font-size:11px;color:var(--text2);margin-bottom:4px;display:flex;align-items:center;gap:5px;">Espaço disponível <div class="help-icon"><svg width="9" height="9" viewBox="0 0 10 10"><text x="2.5" y="8.5" font-size="9" fill="var(--text2)" font-family="sans-serif" font-weight="600">?</text></svg><div class="tooltip" style="right:0;left:auto;"><div class="tt-titulo">Espaço Disponível para Novo Crédito</div><div class="tt-def">Quanto a empresa ainda pode tomar emprestado sem ultrapassar o limite máximo seguro de endividamento.</div><div class="tt-formula">= Limite máximo seguro − Dívida atual<br>= R$ 5,8 mi − R$ 0,21 mi = R$ 5,6 mi</div><span class="tt-bench">Abaixo de R$ 0 → empresa já ultrapassou o limite seguro</span></div></div></div>
         <div class="mc-sub">Novo crédito disponível sem ultrapassar o limite seguro</div>
-        <div style="font-size:22px;font-weight:600;color:var(--green);">R$ 20 mi</div>
+        <div id="end-espaco-val" style="font-size:22px;font-weight:600;color:var(--green);">R$ 20 mi</div>
         <div style="font-size:11px;color:var(--text2);margin-top:3px;">margem para novo crédito</div>
       </div>
       <div style="background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;">
         <div style="font-size:11px;color:var(--text2);margin-bottom:4px;display:flex;align-items:center;gap:5px;">Cobertura de juros atual <div class="help-icon"><svg width="9" height="9" viewBox="0 0 10 10"><text x="2.5" y="8.5" font-size="9" fill="var(--text2)" font-family="sans-serif" font-weight="600">?</text></svg><div class="tooltip" style="right:0;left:auto;"><div class="tt-titulo">Índice de Cobertura de Juros (ICJ)</div><div class="tt-def">Quantas vezes a empresa consegue pagar os juros da dívida com o seu lucro operacional (EBIT). Quanto maior, mais saudável e mais espaço para contrair nova dívida.</div><div class="tt-formula">= EBIT / Despesas financeiras anuais<br>= 2.907.853 / 34.830 = 83,5x</div><span class="tt-bench">Abaixo de 1x → grave · 1–2x → atenção · 2–3x → saudável · Acima de 3x → espaço para mais crédito</span></div></div></div>
         <div class="mc-sub">Quantas vezes o lucro cobre os juros da dívida atual</div>
-        <div style="font-size:22px;font-weight:600;color:var(--green);">2,1x</div>
+        <div id="end-cobertura-val" style="font-size:22px;font-weight:600;color:var(--green);">2,1x</div>
         <div style="font-size:11px;color:var(--text2);margin-top:3px;">ideal: entre 2x e 3x</div>
       </div>
     </div>
@@ -4283,7 +4283,7 @@ function adminAbrirWhatsApp() {
       </div>
       <div style="display:flex;align-items:flex-start;gap:10px;background:#f0fdf4;border:.5px solid #86efac;border-radius:var(--radius);padding:.75rem .875rem;margin-top:.75rem;">
         <svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:1px"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#15803d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <div style="font-size:12px;color:#15803d;line-height:1.6;"><strong>Endividamento saudável:</strong> apenas R$ 212 mil de dívida — 3,6% do limite seguro. Há R$ 5,60 mi de espaço para novo crédito sem risco. Excelente posição para expandir com capital de terceiros se precisar.</div>
+        <div id="end-termometro-msg" style="font-size:12px;color:#15803d;line-height:1.6;"><strong>Endividamento saudável:</strong> apenas R$ 212 mil de dívida — 3,6% do limite seguro. Há R$ 5,60 mi de espaço para novo crédito sem risco. Excelente posição para expandir com capital de terceiros se precisar.</div>
       </div>
     </div>
 
@@ -10554,6 +10554,64 @@ function popularDashboard(dados) {
   var liqImed    = b.passivo_circulante && b.passivo_circulante !== 0 ? ((b.caixa||0) / Math.abs(b.passivo_circulante)) : 0;
   var imobPL     = b.patrimonio_liquido > 0 ? (Math.abs(b.ativo_nao_circulante||0) / b.patrimonio_liquido * 100) : 0;
   var roe        = b.patrimonio_liquido > 0 ? (Math.abs(d.lucro_liquido||0) / b.patrimonio_liquido * 100) : 0;
+
+  // ── Capacidade de Endividamento — atualizar com dados reais ──────
+  (function() {
+    var eLim  = document.getElementById('end-limite-val');
+    var eDiv  = document.getElementById('end-divida-val');
+    var eEsp  = document.getElementById('end-espaco-val');
+    var eCob  = document.getElementById('end-cobertura-val');
+    var eBann = document.getElementById('end-banner-txt');
+    var eTerm = document.getElementById('end-termometro-msg');
+    if (!eLim) return;
+
+    var corBom   = 'var(--green)', corRuim = 'var(--red)', corAtenc = '#f59e0b';
+    var cobStr   = cobJuros > 99 ? '999x' : cobJuros.toFixed(2).replace('.',',') + 'x';
+    var espaco   = espacoDisp;
+
+    // Limite máximo
+    eLim.textContent = fmtV(limiteMax);
+    eLim.style.color = limiteMax > dividaAtual ? corBom : corRuim;
+
+    // Dívida atual
+    eDiv.textContent = fmtV(dividaAtual);
+    eDiv.style.color = dividaAtual === 0 ? corBom : dividaAtual <= limiteMax * 0.5 ? corBom : dividaAtual <= limiteMax ? corAtenc : corRuim;
+
+    // Espaço disponível
+    eEsp.textContent = espaco >= 0 ? fmtV(espaco) : '− ' + fmtV(Math.abs(espaco));
+    eEsp.style.color = espaco >= 0 ? corBom : corRuim;
+
+    // Cobertura de juros
+    eCob.textContent = cobStr;
+    eCob.style.color = cobJuros >= 2 ? corBom : cobJuros >= 1 ? corAtenc : corRuim;
+
+    // Banner situação
+    if (eBann) {
+      var situacao = cobJuros >= 2 ? 'saudável' : cobJuros >= 1 ? 'atenção' : 'crítica';
+      eBann.innerHTML = 'Com base na sua DRE, calculamos quanto você pode pegar emprestado. Situação atual: <strong>' + situacao + '</strong> — índice de cobertura de juros em ' + cobStr + '.';
+    }
+    var bannerEl = document.getElementById('end-banner');
+    if (bannerEl) {
+      bannerEl.className = 'ab ' + (cobJuros >= 2 ? 'aok' : cobJuros >= 1 ? 'awarning' : 'aerror') + ' pro-only';
+    }
+
+    // Termômetro mensagem
+    if (eTerm) {
+      if (cobJuros < 1) {
+        eTerm.style.color = '#991b1b';
+        eTerm.innerHTML = '<strong>Endividamento crítico:</strong> dívida de ' + fmtV(dividaAtual) + ' com cobertura de juros de apenas ' + cobStr + ' — o EBIT não cobre as despesas financeiras. Refinanciar a dívida é prioridade máxima.';
+        var parentDiv = eTerm.parentElement;
+        if (parentDiv) { parentDiv.style.background = '#fef2f2'; parentDiv.style.borderColor = '#fca5a5'; }
+      } else if (cobJuros < 2) {
+        eTerm.style.color = '#92400e';
+        eTerm.innerHTML = '<strong>Endividamento em atenção:</strong> dívida de ' + fmtV(dividaAtual) + ' com cobertura de ' + cobStr + '. Abaixo de 2x — avaliar refinanciamento para ampliar a margem de segurança.';
+        var parentDiv = eTerm.parentElement;
+        if (parentDiv) { parentDiv.style.background = '#fffbeb'; parentDiv.style.borderColor = '#fde68a'; }
+      } else {
+        eTerm.innerHTML = '<strong>Endividamento saudável:</strong> dívida de ' + fmtV(dividaAtual) + ' com cobertura de juros de ' + cobStr + '. ' + (espaco > 0 ? 'Há ' + fmtV(espaco) + ' de espaço para novo crédito sem risco.' : 'Dívida próxima do limite seguro — avaliar antes de contrair novo crédito.');
+      }
+    }
+  })();
 
   var verde = 'var(--green)', amber = 'var(--amber)';
   var periodo = dados.periodo || 'Anual';
