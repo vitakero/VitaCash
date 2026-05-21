@@ -10772,9 +10772,9 @@ function popularDashboard(dados) {
     var av  = document.getElementById('empresa-avatar');
     var nm  = document.getElementById('empresa-nome-sidebar');
     var sub = document.getElementById('empresa-sub-sidebar');
-    if (av)  av.textContent  = iniciais;
-    if (nm)  nm.textContent  = empresa2;
-    if (sub) sub.textContent = (dados.setor || '') + (dados.ano ? ' · ' + dados.ano : '');
+    if (av)  { av.textContent = iniciais; av.style.background = 'var(--green)'; av.style.color = '#fff'; av.style.fontSize = '11px'; }
+    if (nm)  { nm.textContent = empresa2; nm.style.color = 'var(--text)'; }
+    if (sub) { sub.textContent = (dados.setor || '') + (dados.ano ? ' · ' + dados.ano : ''); }
   })();
 
   // ── 0b. BALANÇO — títulos e pills educativas ─────────────────
