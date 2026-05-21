@@ -10514,8 +10514,27 @@ var _NICHOS_POR_SEGMENTO = {
   tecnologia:  ['Software / SaaS','E-commerce / Marketplace','Startup / Fintech'],
   industria:   ['Indústria Têxtil','Indústria Metalúrgica','Indústria Plástica / Química','Agronegócio / Agropecuária','Indústria / Manufatura'],
   construcao:  ['Incorporadora / Construtora','Imobiliária','Reforma / Manutenção Predial'],
-  transporte:  ['Transportadora / Frete','Locadora de Veículos','Distribuidora / Logística']
+  transporte:  ['Transportadora / Frete','Locadora de Veículos','Distribuidora / Logística'],
+  _extra: [] // nichos extras ficam no "Outro"
 };
+
+// Nichos extras disponíveis no campo "Outro"
+var _NICHOS_EXTRAS = [
+  'Hotelaria / Turismo / Pousada',
+  'Eventos / Entretenimento',
+  'Veterinária / Pet Shop',
+  'Joalheria / Ótica',
+  'Posto de Combustível',
+  'Lavanderia / Limpeza',
+  'Segurança Privada',
+  'Advocacia / Jurídico',
+  'Seguros / Corretora',
+  'Financeiro / Banco / Crédito',
+  'Gráfica / Editorial / Mídia',
+  'Mineração',
+  'Petróleo / Gás',
+  'ONG / Terceiro Setor'
+];
 
 function addEmpresaFiltrarNicho(segmento) {
   var nichoWrap = document.getElementById('add-empresa-nicho-wrap');
@@ -10524,8 +10543,14 @@ function addEmpresaFiltrarNicho(segmento) {
   if (!nichoWrap || !outroWrap || !nichoSel) return;
 
   if (segmento === 'outro') {
-    nichoWrap.style.display = 'none';
+    // Mostra select com nichos extras + campo livre
+    nichoSel.innerHTML = '<option value="">Selecione ou use o campo abaixo</option>' +
+      _NICHOS_EXTRAS.map(function(n){ return '<option value="'+n+'">'+n+'</option>'; }).join('');
+    nichoWrap.style.display = 'block';
     outroWrap.style.display = 'block';
+    // Label do campo livre
+    var outroLabel = outroWrap.querySelector('label');
+    if (outroLabel) outroLabel.textContent = 'Ou digite o nicho específico';
     return;
   }
   outroWrap.style.display = 'none';
@@ -10545,8 +10570,9 @@ function confirmarAddEmpresa() {
   var nicho = '';
   if (segmento === 'outro') {
     var outroTxt = (document.getElementById('add-empresa-outro') || {}).value || '';
-    if (!outroTxt.trim()) { toast('Especifique o nicho no campo de texto.', 'info'); return; }
-    nicho = outroTxt.trim();
+    var nichoSelecionado = (document.getElementById('add-empresa-nicho') || {}).value || '';
+    nicho = outroTxt.trim() || nichoSelecionado;
+    if (!nicho) { toast('Selecione ou digite o nicho de atuação.', 'info'); return; }
   } else {
     nicho = (document.getElementById('add-empresa-nicho') || {}).value || '';
     if (!nicho) { toast('Selecione o nicho do segmento escolhido.', 'info'); return; }
@@ -12747,6 +12773,21 @@ function _getBenchmark(setor, ind) {
   // ── Transporte & Logística ────────────────────────────────────────
   else if (s.includes('transportadora') || s.includes('frete') || s.includes('logistic') || s.includes('transport')) { mb=25; mo=7; ml=4; despOp=17; cmv=75; label='Transportadora/Frete'; }
   else if (s.includes('locadora') || s.includes('aluguel de veiculo') || s.includes('locacao')) { mb=45; mo=15; ml=9; despOp=28; cmv=55; label='Locadora de Veículos'; }
+  // ── Nichos adicionais ─────────────────────────────────────────────
+  else if (s.includes('hotel') || s.includes('pousada') || s.includes('turismo') || s.includes('hospedagem')) { mb=55; mo=14; ml=8; despOp=39; cmv=45; label='Hotelaria/Turismo'; }
+  else if (s.includes('event') || s.includes('entretenimento') || s.includes('show'))  { mb=50; mo=12; ml=7; despOp=36; cmv=50; label='Eventos/Entretenimento'; }
+  else if (s.includes('veterinar') || s.includes('pet shop') || s.includes('petshop') || s.includes('pet ')) { mb=55; mo=16; ml=10; despOp=37; cmv=45; label='Veterinária/Pet Shop'; }
+  else if (s.includes('joalher') || s.includes('otica') || s.includes('otico') || s.includes('joias')) { mb=55; mo=14; ml=9; despOp=39; cmv=45; label='Joalheria/Ótica'; }
+  else if (s.includes('posto') || s.includes('combustivel') || s.includes('combustiv')) { mb=12; mo=3; ml=2; despOp=9; cmv=88; label='Posto de Combustível'; }
+  else if (s.includes('lavanderia') || s.includes('limpeza') || s.includes('conservacao predial')) { mb=58; mo=16; ml=10; despOp=40; cmv=42; label='Lavanderia/Limpeza'; }
+  else if (s.includes('seguranca privada') || s.includes('seguranca')) { mb=40; mo=10; ml=6; despOp=28; cmv=60; label='Segurança Privada'; }
+  else if (s.includes('advocac') || s.includes('juridic') || s.includes('advogad')) { mb=75; mo=28; ml=20; despOp=45; cmv=25; label='Advocacia/Jurídico'; }
+  else if (s.includes('seguro') || s.includes('corretora de seguro') || s.includes('seguradora')) { mb=35; mo=12; ml=8; despOp=22; cmv=65; label='Seguros/Corretora'; }
+  else if (s.includes('banco') || s.includes('financeira') || s.includes('credito') || s.includes('financeir')) { mb=60; mo=25; ml=18; despOp=33; cmv=40; label='Financeiro/Banco'; }
+  else if (s.includes('grafica') || s.includes('editorial') || s.includes('midia') || s.includes('grafico')) { mb=45; mo=12; ml=7; despOp=31; cmv=55; label='Gráfica/Editorial/Mídia'; }
+  else if (s.includes('mineracao') || s.includes('mineradora') || s.includes('mineral')) { mb=45; mo=20; ml=14; despOp=22; cmv=55; label='Mineração'; }
+  else if (s.includes('petroleo') || s.includes('gas natural') || s.includes('petroleo') || s.includes('oleo e gas')) { mb=40; mo=18; ml=12; despOp=20; cmv=60; label='Petróleo/Gás'; }
+  else if (s.includes('ong') || s.includes('terceiro setor') || s.includes('associacao') || s.includes('fundacao')) { mb=70; mo=10; ml=5; despOp=58; cmv=30; label='ONG/Terceiro Setor'; }
   // ── Genéricos (retrocompatibilidade) ─────────────────────────────
   else if (s.includes('atacad') || s.includes('distribui'))       { mb=20; mo=5;  ml=3;  despOp=14; cmv=80; label='Atacado/Distribuição'; }
   else if (s.includes('varejo') || s.includes('comercio'))        { mb=35; mo=6;  ml=3;  despOp=27; cmv=65; label='Varejo Geral'; }
