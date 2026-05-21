@@ -10489,7 +10489,22 @@ function abrirAddEmpresa() {
     var seg = document.getElementById('add-empresa-segmento');
     if (seg) seg.value = '';
     var nichoSel = document.getElementById('add-empresa-nicho');
-    if (nichoSel) { nichoSel.innerHTML = '<option value="">Selecione o nicho</option>'; }
+    if (nichoSel) {
+      // Popula com todos os nichos desde o início
+      var todosNichos = [].concat(
+        _NICHOS_POR_SEGMENTO.alimentacao,
+        _NICHOS_POR_SEGMENTO.saude,
+        _NICHOS_POR_SEGMENTO.varejo,
+        _NICHOS_POR_SEGMENTO.servicos,
+        _NICHOS_POR_SEGMENTO.tecnologia,
+        _NICHOS_POR_SEGMENTO.industria,
+        _NICHOS_POR_SEGMENTO.construcao,
+        _NICHOS_POR_SEGMENTO.transporte,
+        _NICHOS_EXTRAS
+      );
+      nichoSel.innerHTML = '<option value="">Selecione o nicho</option>' +
+        todosNichos.map(function(n){ return '<option value="'+n+'">'+n+'</option>'; }).join('');
+    }
     var nichoWrap = document.getElementById('add-empresa-nicho-wrap');
     if (nichoWrap) nichoWrap.style.display = 'block';
     var outroWrap = document.getElementById('add-empresa-outro-wrap');
