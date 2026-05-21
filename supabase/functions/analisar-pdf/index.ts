@@ -76,14 +76,58 @@ REGRAS IMPORTANTES:
 // ── Benchmarks por setor ──────────────────────────────────────────
 function benchmarksPorSetor(setor: string, dre: Record<string,number>, balanco: Record<string,number>) {
   const s = (setor||'').toLowerCase()
-  let margemBrutaSetor = 30, margemOpSetor = 8, margemLiqSetor = 5
+    .normalize('NFD').replace(/[̀-ͯ]/g,'')
+  let margemBrutaSetor = 35, margemOpSetor = 8, margemLiqSetor = 5
 
-  if (s.includes('atacad')) { margemBrutaSetor = 20; margemOpSetor = 5; margemLiqSetor = 3 }
-  else if (s.includes('varejo') || s.includes('comércio')) { margemBrutaSetor = 35; margemOpSetor = 6; margemLiqSetor = 3 }
-  else if (s.includes('serviço') || s.includes('servico')) { margemBrutaSetor = 60; margemOpSetor = 15; margemLiqSetor = 10 }
-  else if (s.includes('indústria') || s.includes('industria')) { margemBrutaSetor = 35; margemOpSetor = 10; margemLiqSetor = 6 }
-  else if (s.includes('construção') || s.includes('construcao')) { margemBrutaSetor = 25; margemOpSetor = 8; margemLiqSetor = 5 }
-  else if (s.includes('tecnologia') || s.includes('tech') || s.includes('software')) { margemBrutaSetor = 70; margemOpSetor = 20; margemLiqSetor = 15 }
+  // ── Alimentação & Bebidas ──────────────────────────────────────────
+  if      (s.includes('restaurante') || s.includes('lanchonete'))               { margemBrutaSetor=65; margemOpSetor=10; margemLiqSetor=6 }
+  else if (s.includes('padaria')     || s.includes('confeitaria'))               { margemBrutaSetor=60; margemOpSetor=8;  margemLiqSetor=4 }
+  else if (s.includes('food service')|| s.includes('delivery'))                  { margemBrutaSetor=62; margemOpSetor=9;  margemLiqSetor=5 }
+  else if (s.includes('industria de alimento') || s.includes('industria alimentic')) { margemBrutaSetor=32; margemOpSetor=8; margemLiqSetor=5 }
+  else if (s.includes('distribuidora de alimento'))                              { margemBrutaSetor=18; margemOpSetor=4;  margemLiqSetor=2 }
+  // ── Saúde & Bem-estar ─────────────────────────────────────────────
+  else if (s.includes('clinica medic') || s.includes('clinica odontolog') || s.includes('odontolog')) { margemBrutaSetor=55; margemOpSetor=18; margemLiqSetor=12 }
+  else if (s.includes('farmacia')    || s.includes('drogaria'))                  { margemBrutaSetor=30; margemOpSetor=6;  margemLiqSetor=4 }
+  else if (s.includes('academia')    || s.includes('fitness'))                   { margemBrutaSetor=70; margemOpSetor=15; margemLiqSetor=9 }
+  else if (s.includes('estetica'))                                                { margemBrutaSetor=65; margemOpSetor=20; margemLiqSetor=13 }
+  else if (s.includes('hospital')    || s.includes('laborator'))                 { margemBrutaSetor=40; margemOpSetor=10; margemLiqSetor=6 }
+  // ── Varejo & Moda ─────────────────────────────────────────────────
+  else if (s.includes('moda')  || s.includes('vestuario'))                       { margemBrutaSetor=55; margemOpSetor=10; margemLiqSetor=6 }
+  else if (s.includes('calcado') || s.includes('acessorio'))                     { margemBrutaSetor=52; margemOpSetor=9;  margemLiqSetor=5 }
+  else if (s.includes('eletroeletronico') || s.includes('eletronico'))           { margemBrutaSetor=22; margemOpSetor=5;  margemLiqSetor=3 }
+  else if (s.includes('movel') || s.includes('decoracao'))                       { margemBrutaSetor=45; margemOpSetor=8;  margemLiqSetor=5 }
+  else if (s.includes('supermercado') || s.includes('mercearia'))                { margemBrutaSetor=22; margemOpSetor=4;  margemLiqSetor=2 }
+  // ── Serviços ──────────────────────────────────────────────────────
+  else if (s.includes('contabilidade') || s.includes('contabil') || s.includes('consultoria')) { margemBrutaSetor=70; margemOpSetor=22; margemLiqSetor=15 }
+  else if (s.includes('agencia') || s.includes('marketing') || s.includes('publicidade'))      { margemBrutaSetor=65; margemOpSetor=15; margemLiqSetor=10 }
+  else if (s.includes('educacao') || s.includes('escola') || s.includes('curso'))              { margemBrutaSetor=60; margemOpSetor=18; margemLiqSetor=12 }
+  else if (s.includes('salao') || s.includes('barbearia'))                       { margemBrutaSetor=65; margemOpSetor=18; margemLiqSetor=11 }
+  else if (s.includes('oficina') || s.includes('mecanica'))                      { margemBrutaSetor=55; margemOpSetor=14; margemLiqSetor=8 }
+  // ── Tecnologia ────────────────────────────────────────────────────
+  else if (s.includes('saas') || (s.includes('software') && !s.includes('industria'))) { margemBrutaSetor=78; margemOpSetor=25; margemLiqSetor=18 }
+  else if (s.includes('ecommerce') || s.includes('marketplace') || s.includes('e-commerce'))  { margemBrutaSetor=35; margemOpSetor=6;  margemLiqSetor=3 }
+  else if (s.includes('startup') || s.includes('fintech'))                       { margemBrutaSetor=72; margemOpSetor=15; margemLiqSetor=8 }
+  // ── Indústria ─────────────────────────────────────────────────────
+  else if (s.includes('textil'))                                                  { margemBrutaSetor=38; margemOpSetor=9;  margemLiqSetor=5 }
+  else if (s.includes('metalurgi'))                                               { margemBrutaSetor=30; margemOpSetor=8;  margemLiqSetor=5 }
+  else if (s.includes('plastica') || s.includes('quimic'))                       { margemBrutaSetor=35; margemOpSetor=10; margemLiqSetor=6 }
+  else if (s.includes('agronegoc') || s.includes('agropecuar') || s.includes('agro') || s.includes('agricul')) { margemBrutaSetor=30; margemOpSetor=8; margemLiqSetor=5 }
+  // ── Construção & Imóveis ──────────────────────────────────────────
+  else if (s.includes('incorpor') || s.includes('construtora'))                  { margemBrutaSetor=28; margemOpSetor=10; margemLiqSetor=7 }
+  else if (s.includes('imobiliar') || s.includes('imobili'))                     { margemBrutaSetor=50; margemOpSetor=20; margemLiqSetor=14 }
+  else if (s.includes('reforma') || s.includes('manutencao'))                    { margemBrutaSetor=40; margemOpSetor=12; margemLiqSetor=7 }
+  // ── Transporte & Logística ────────────────────────────────────────
+  else if (s.includes('transportadora') || s.includes('frete') || s.includes('logistic') || s.includes('transport')) { margemBrutaSetor=25; margemOpSetor=7; margemLiqSetor=4 }
+  else if (s.includes('locadora') || s.includes('locacao'))                      { margemBrutaSetor=45; margemOpSetor=15; margemLiqSetor=9 }
+  // ── Genéricos (retrocompatibilidade) ─────────────────────────────
+  else if (s.includes('atacad') || s.includes('distribui'))                      { margemBrutaSetor=20; margemOpSetor=5;  margemLiqSetor=3 }
+  else if (s.includes('varejo') || s.includes('comercio') || s.includes('comercio')) { margemBrutaSetor=35; margemOpSetor=6; margemLiqSetor=3 }
+  else if (s.includes('servico') || s.includes('servic'))                        { margemBrutaSetor=60; margemOpSetor=15; margemLiqSetor=10 }
+  else if (s.includes('industria') || s.includes('manufactur'))                  { margemBrutaSetor=35; margemOpSetor=10; margemLiqSetor=6 }
+  else if (s.includes('construc'))                                                { margemBrutaSetor=25; margemOpSetor=8;  margemLiqSetor=5 }
+  else if (s.includes('tecnologia') || s.includes('tech') || s.includes('software')) { margemBrutaSetor=70; margemOpSetor=20; margemLiqSetor=15 }
+  else if (s.includes('alimento') || s.includes('alimentac'))                    { margemBrutaSetor=65; margemOpSetor=10; margemLiqSetor=6 }
+  else if (s.includes('clinic') || s.includes('saude') || s.includes('medic'))  { margemBrutaSetor=55; margemOpSetor=14; margemLiqSetor=9 }
 
   const rec = dre.receita_bruta || 1
   const recL = dre.receita_liquida || rec

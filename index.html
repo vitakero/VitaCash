@@ -2453,6 +2453,7 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
   background-repeat:no-repeat;
   flex-shrink:0;
 }
+.lg-cs-group-label{padding:6px 14px 3px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#94a3b8;pointer-events:none;user-select:none;}
 @media(max-width:700px){
   .lg-outer{grid-template-columns:1fr;min-height:auto;margin:0;}
   .lg-left{display:none;}
@@ -2668,37 +2669,153 @@ div[style*="background:linear-gradient(to right,var(--surface2),var(--green-ligh
             <svg class="lg-cs-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
           </div>
           <div class="lg-cs-menu" id="cs-nicho-menu">
-            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Restaurante / Alimentação',this)">
+            <div class="lg-cs-group-label">Alimentação &amp; Bebidas</div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Restaurante / Lanchonete',this)">
               <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><line x1="7" y1="2" x2="7" y2="22"/><path d="M21 15V2a5 5 0 00-5 5v6c0 1.1.9 2 2 2h3z"/><line x1="21" y1="15" x2="21" y2="22"/></svg>
-              <span class="lg-cs-item-label">Restaurante / Alimentação</span>
+              <span class="lg-cs-item-label">Restaurante / Lanchonete</span>
             </div>
-            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Varejo / Comércio',this)">
-              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9v11a1 1 0 001 1h16a1 1 0 001-1V9"/><path d="M3 9h18"/><path d="M9 13v4"/><path d="M15 13v4"/></svg>
-              <span class="lg-cs-item-label">Varejo / Comércio</span>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Padaria / Confeitaria',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><line x1="7" y1="2" x2="7" y2="22"/><path d="M21 15V2a5 5 0 00-5 5v6c0 1.1.9 2 2 2h3z"/><line x1="21" y1="15" x2="21" y2="22"/></svg>
+              <span class="lg-cs-item-label">Padaria / Confeitaria</span>
             </div>
-            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Clínica / Saúde',this)">
-              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16v13a1 1 0 01-1 1H5a1 1 0 01-1-1V8z"/><path d="M2 8h20"/><path d="M9 4h6v4H9z"/><path d="M12 12v6"/><path d="M9 15h6"/></svg>
-              <span class="lg-cs-item-label">Clínica / Saúde</span>
-            </div>
-            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Distribuidora / Logística',this)">
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Food Service / Delivery',this)">
               <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a1 1 0 00-1-1H3a1 1 0 00-1 1v12a1 1 0 001 1h1"/><path d="M14 9h4l4 4v5a1 1 0 01-1 1h-1"/><circle cx="7" cy="19" r="2"/><circle cx="17" cy="19" r="2"/></svg>
-              <span class="lg-cs-item-label">Distribuidora / Logística</span>
+              <span class="lg-cs-item-label">Food Service / Delivery</span>
             </div>
-            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Indústria / Manufatura',this)">
-              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M2 20V10l6 4V10l6 4V6l8 4v10"/><path d="M6 16h.01"/><path d="M11 16h.01"/><path d="M16 16h.01"/></svg>
-              <span class="lg-cs-item-label">Indústria / Manufatura</span>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Indústria de Alimentos',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M2 20V10l6 4V10l6 4V6l8 4v10"/></svg>
+              <span class="lg-cs-item-label">Indústria de Alimentos</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Distribuidora de Alimentos',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a1 1 0 00-1-1H3a1 1 0 00-1 1v12a1 1 0 001 1h1"/><path d="M14 9h4l4 4v5a1 1 0 01-1 1h-1"/><circle cx="7" cy="19" r="2"/><circle cx="17" cy="19" r="2"/></svg>
+              <span class="lg-cs-item-label">Distribuidora de Alimentos</span>
+            </div>
+            <div class="lg-cs-group-label">Saúde &amp; Bem-estar</div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Clínica Médica / Odontológica',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16v13a1 1 0 01-1 1H5a1 1 0 01-1-1V8z"/><path d="M2 8h20"/><path d="M9 4h6v4H9z"/><path d="M12 12v6"/><path d="M9 15h6"/></svg>
+              <span class="lg-cs-item-label">Clínica Médica / Odontológica</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Farmácia / Drogaria',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16v13a1 1 0 01-1 1H5a1 1 0 01-1-1V8z"/><path d="M2 8h20"/><path d="M9 4h6v4H9z"/><path d="M12 12v6"/><path d="M9 15h6"/></svg>
+              <span class="lg-cs-item-label">Farmácia / Drogaria</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Academia / Fitness',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+              <span class="lg-cs-item-label">Academia / Fitness</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Clínica de Estética',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+              <span class="lg-cs-item-label">Clínica de Estética</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Hospital / Laboratório',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16v13a1 1 0 01-1 1H5a1 1 0 01-1-1V8z"/><path d="M2 8h20"/><path d="M9 4h6v4H9z"/><path d="M12 12v6"/><path d="M9 15h6"/></svg>
+              <span class="lg-cs-item-label">Hospital / Laboratório</span>
+            </div>
+            <div class="lg-cs-group-label">Varejo &amp; Moda</div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Varejo de Moda / Vestuário',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9v11a1 1 0 001 1h16a1 1 0 001-1V9"/><path d="M3 9h18"/><path d="M9 13v4"/><path d="M15 13v4"/></svg>
+              <span class="lg-cs-item-label">Varejo de Moda / Vestuário</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Calçados / Acessórios',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9v11a1 1 0 001 1h16a1 1 0 001-1V9"/><path d="M3 9h18"/></svg>
+              <span class="lg-cs-item-label">Calçados / Acessórios</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Varejo de Eletroeletrônicos',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+              <span class="lg-cs-item-label">Varejo de Eletroeletrônicos</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Varejo de Móveis / Decoração',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9v11a1 1 0 001 1h16a1 1 0 001-1V9"/><path d="M3 9h18"/></svg>
+              <span class="lg-cs-item-label">Varejo de Móveis / Decoração</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Supermercado / Mercearia',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9v11a1 1 0 001 1h16a1 1 0 001-1V9"/><path d="M3 9h18"/></svg>
+              <span class="lg-cs-item-label">Supermercado / Mercearia</span>
+            </div>
+            <div class="lg-cs-group-label">Serviços</div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Contabilidade / Consultoria',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/><path d="M2 13h20"/></svg>
+              <span class="lg-cs-item-label">Contabilidade / Consultoria</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Agência de Marketing / Publicidade',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/><path d="M2 13h20"/></svg>
+              <span class="lg-cs-item-label">Agência de Marketing / Publicidade</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Educação / Escola / Curso',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/><path d="M2 13h20"/></svg>
+              <span class="lg-cs-item-label">Educação / Escola / Curso</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Salão de Beleza / Barbearia',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/><path d="M2 13h20"/></svg>
+              <span class="lg-cs-item-label">Salão de Beleza / Barbearia</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Oficina / Mecânica Automotiva',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/><path d="M2 13h20"/></svg>
+              <span class="lg-cs-item-label">Oficina / Mecânica Automotiva</span>
             </div>
             <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Prestação de Serviços',this)">
               <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/><path d="M2 13h20"/></svg>
               <span class="lg-cs-item-label">Prestação de Serviços</span>
             </div>
-            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Construção / Engenharia',this)">
-              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-7h6v7"/><path d="M8 6h.01"/><path d="M12 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/></svg>
-              <span class="lg-cs-item-label">Construção / Engenharia</span>
-            </div>
-            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','E-commerce / Digital',this)">
+            <div class="lg-cs-group-label">Tecnologia</div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Software / SaaS',this)">
               <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-              <span class="lg-cs-item-label">E-commerce / Digital</span>
+              <span class="lg-cs-item-label">Software / SaaS</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','E-commerce / Marketplace',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+              <span class="lg-cs-item-label">E-commerce / Marketplace</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Startup / Fintech',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+              <span class="lg-cs-item-label">Startup / Fintech</span>
+            </div>
+            <div class="lg-cs-group-label">Indústria</div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Indústria Têxtil',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M2 20V10l6 4V10l6 4V6l8 4v10"/></svg>
+              <span class="lg-cs-item-label">Indústria Têxtil</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Indústria Metalúrgica',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M2 20V10l6 4V10l6 4V6l8 4v10"/></svg>
+              <span class="lg-cs-item-label">Indústria Metalúrgica</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Indústria Plástica / Química',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M2 20V10l6 4V10l6 4V6l8 4v10"/></svg>
+              <span class="lg-cs-item-label">Indústria Plástica / Química</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Agronegócio / Agropecuária',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M2 20V10l6 4V10l6 4V6l8 4v10"/></svg>
+              <span class="lg-cs-item-label">Agronegócio / Agropecuária</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Indústria / Manufatura',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M2 20V10l6 4V10l6 4V6l8 4v10"/></svg>
+              <span class="lg-cs-item-label">Indústria / Manufatura</span>
+            </div>
+            <div class="lg-cs-group-label">Construção &amp; Imóveis</div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Incorporadora / Construtora',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-7h6v7"/><path d="M8 6h.01"/><path d="M12 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/></svg>
+              <span class="lg-cs-item-label">Incorporadora / Construtora</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Imobiliária',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-7h6v7"/><path d="M8 6h.01"/><path d="M12 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/></svg>
+              <span class="lg-cs-item-label">Imobiliária</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Reforma / Manutenção Predial',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-7h6v7"/><path d="M8 6h.01"/><path d="M12 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/></svg>
+              <span class="lg-cs-item-label">Reforma / Manutenção Predial</span>
+            </div>
+            <div class="lg-cs-group-label">Transporte &amp; Logística</div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Transportadora / Frete',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a1 1 0 00-1-1H3a1 1 0 00-1 1v12a1 1 0 001 1h1"/><path d="M14 9h4l4 4v5a1 1 0 01-1 1h-1"/><circle cx="7" cy="19" r="2"/><circle cx="17" cy="19" r="2"/></svg>
+              <span class="lg-cs-item-label">Transportadora / Frete</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Locadora de Veículos',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a1 1 0 00-1-1H3a1 1 0 00-1 1v12a1 1 0 001 1h1"/><path d="M14 9h4l4 4v5a1 1 0 01-1 1h-1"/><circle cx="7" cy="19" r="2"/><circle cx="17" cy="19" r="2"/></svg>
+              <span class="lg-cs-item-label">Locadora de Veículos</span>
+            </div>
+            <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Distribuidora / Logística',this)">
+              <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a1 1 0 00-1-1H3a1 1 0 00-1 1v12a1 1 0 001 1h1"/><path d="M14 9h4l4 4v5a1 1 0 01-1 1h-1"/><circle cx="7" cy="19" r="2"/><circle cx="17" cy="19" r="2"/></svg>
+              <span class="lg-cs-item-label">Distribuidora / Logística</span>
             </div>
             <div class="lg-cs-item" onclick="lgCsSelect('cs-nicho','Outro',this)">
               <svg class="lg-cs-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="6" cy="12" r="1.4" fill="currentColor"/><circle cx="18" cy="12" r="1.4" fill="currentColor"/></svg>
@@ -12539,26 +12656,72 @@ var _BENCHMARKS = {
 function _getBenchmark(setor, ind) {
   var s = (setor||'').toLowerCase()
     .normalize('NFD').replace(/[̀-ͯ]/g,''); // remove acentos para comparação
-  // Busca pelo primeiro match nas chaves
-  var keys = Object.keys(_BENCHMARKS);
-  var matched = null;
-  for (var i=0; i<keys.length; i++) {
-    if (keys[i] !== '_default' && s.includes(keys[i])) { matched = keys[i]; break; }
-  }
-  var result = matched ? _BENCHMARKS[matched] : _BENCHMARKS['_default'];
+
+  var mb, mo, ml, despOp, cmv, label;
+
+  // ── Alimentação & Bebidas ──────────────────────────────────────────
+  if      (s.includes('restaurante') || s.includes('lanchonete')) { mb=65; mo=10; ml=6;  despOp=52; cmv=35; label='Restaurantes/Lanchonetes'; }
+  else if (s.includes('padaria')     || s.includes('confeitaria')){ mb=60; mo=8;  ml=4;  despOp=50; cmv=40; label='Padarias/Confeitarias'; }
+  else if (s.includes('food service')|| s.includes('delivery'))   { mb=62; mo=9;  ml=5;  despOp=51; cmv=38; label='Food Service/Delivery'; }
+  else if (s.includes('industria de alimento') || s.includes('industria alimentic')) { mb=32; mo=8; ml=5; despOp=20; cmv=68; label='Indústria de Alimentos'; }
+  else if (s.includes('distribuidora de alimento'))                { mb=18; mo=4;  ml=2;  despOp=12; cmv=82; label='Distribuidora de Alimentos'; }
+  // ── Saúde & Bem-estar ─────────────────────────────────────────────
+  else if (s.includes('clinica medic') || s.includes('clinica odontolog') || s.includes('odontolog')) { mb=55; mo=18; ml=12; despOp=35; cmv=45; label='Clínica Médica/Odontológica'; }
+  else if (s.includes('farmacia')    || s.includes('drogaria'))   { mb=30; mo=6;  ml=4;  despOp=22; cmv=70; label='Farmácias/Drogarias'; }
+  else if (s.includes('academia')    || s.includes('fitness'))    { mb=70; mo=15; ml=9;  despOp=53; cmv=30; label='Academias/Fitness'; }
+  else if (s.includes('estetica')    || s.includes('estetica'))   { mb=65; mo=20; ml=13; despOp=43; cmv=35; label='Clínicas de Estética'; }
+  else if (s.includes('hospital')    || s.includes('laborator'))  { mb=40; mo=10; ml=6;  despOp=28; cmv=60; label='Hospital/Laboratório'; }
+  // ── Varejo & Moda ─────────────────────────────────────────────────
+  else if (s.includes('moda')  || s.includes('vestuario') || (s.includes('varejo') && s.includes('moda'))) { mb=55; mo=10; ml=6; despOp=45; cmv=45; label='Varejo de Moda/Vestuário'; }
+  else if (s.includes('calcado') || s.includes('acessorio'))      { mb=52; mo=9;  ml=5;  despOp=43; cmv=48; label='Calçados/Acessórios'; }
+  else if (s.includes('eletroeletronico') || s.includes('eletronico')) { mb=22; mo=5; ml=3; despOp=17; cmv=78; label='Varejo de Eletroeletrônicos'; }
+  else if (s.includes('movel') || s.includes('decoracao'))        { mb=45; mo=8;  ml=5;  despOp=37; cmv=55; label='Varejo de Móveis/Decoração'; }
+  else if (s.includes('supermercado') || s.includes('mercearia')) { mb=22; mo=4;  ml=2;  despOp=16; cmv=78; label='Supermercado/Mercearia'; }
+  // ── Serviços ──────────────────────────────────────────────────────
+  else if (s.includes('contabilidade') || s.includes('contabil') || s.includes('consultoria')) { mb=70; mo=22; ml=15; despOp=46; cmv=30; label='Contabilidade/Consultoria'; }
+  else if (s.includes('agencia') || s.includes('marketing') || s.includes('publicidade')) { mb=65; mo=15; ml=10; despOp=48; cmv=35; label='Agência de Marketing/Publicidade'; }
+  else if (s.includes('educacao') || s.includes('escola') || s.includes('curso')) { mb=60; mo=18; ml=12; despOp=40; cmv=40; label='Educação/Escola/Curso'; }
+  else if (s.includes('salao') || s.includes('barbearia'))        { mb=65; mo=18; ml=11; despOp=46; cmv=35; label='Salão de Beleza/Barbearia'; }
+  else if (s.includes('oficina') || s.includes('mecanica') || s.includes('automoativ')) { mb=55; mo=14; ml=8; despOp=39; cmv=45; label='Oficina/Mecânica Automotiva'; }
+  // ── Tecnologia ────────────────────────────────────────────────────
+  else if (s.includes('saas') || (s.includes('software') && !s.includes('industria'))) { mb=78; mo=25; ml=18; despOp=51; cmv=22; label='Software/SaaS'; }
+  else if (s.includes('ecommerce') || s.includes('marketplace') || s.includes('e-commerce')) { mb=35; mo=6; ml=3; despOp=29; cmv=65; label='E-commerce/Marketplace'; }
+  else if (s.includes('startup') || s.includes('fintech'))        { mb=72; mo=15; ml=8;  despOp=55; cmv=28; label='Startup/Fintech'; }
+  // ── Indústria ─────────────────────────────────────────────────────
+  else if (s.includes('textil'))                                   { mb=38; mo=9;  ml=5;  despOp=25; cmv=62; label='Indústria Têxtil'; }
+  else if (s.includes('metalurgi') || s.includes('metalurg'))     { mb=30; mo=8;  ml=5;  despOp=20; cmv=70; label='Indústria Metalúrgica'; }
+  else if (s.includes('plastica') || s.includes('quimic'))        { mb=35; mo=10; ml=6;  despOp=23; cmv=65; label='Indústria Plástica/Química'; }
+  else if (s.includes('agronegoc') || s.includes('agropecuar') || s.includes('agro') || s.includes('agricul')) { mb=30; mo=8; ml=5; despOp=18; cmv=70; label='Agronegócio/Agropecuária'; }
+  // ── Construção & Imóveis ──────────────────────────────────────────
+  else if (s.includes('incorpor') || s.includes('construtora'))   { mb=28; mo=10; ml=7;  despOp=16; cmv=72; label='Incorporadora/Construtora'; }
+  else if (s.includes('imobiliar') || s.includes('imobili'))      { mb=50; mo=20; ml=14; despOp=28; cmv=50; label='Imobiliária'; }
+  else if (s.includes('reforma') || s.includes('manutencao predial') || s.includes('manutencao')) { mb=40; mo=12; ml=7; despOp=26; cmv=60; label='Reforma/Manutenção Predial'; }
+  // ── Transporte & Logística ────────────────────────────────────────
+  else if (s.includes('transportadora') || s.includes('frete') || s.includes('logistic') || s.includes('transport')) { mb=25; mo=7; ml=4; despOp=17; cmv=75; label='Transportadora/Frete'; }
+  else if (s.includes('locadora') || s.includes('aluguel de veiculo') || s.includes('locacao')) { mb=45; mo=15; ml=9; despOp=28; cmv=55; label='Locadora de Veículos'; }
+  // ── Genéricos (retrocompatibilidade) ─────────────────────────────
+  else if (s.includes('atacad') || s.includes('distribui'))       { mb=20; mo=5;  ml=3;  despOp=14; cmv=80; label='Atacado/Distribuição'; }
+  else if (s.includes('varejo') || s.includes('comercio'))        { mb=35; mo=6;  ml=3;  despOp=27; cmv=65; label='Varejo Geral'; }
+  else if (s.includes('servico') || s.includes('servic'))         { mb=60; mo=15; ml=10; despOp=43; cmv=40; label='Serviços Gerais'; }
+  else if (s.includes('industria') || s.includes('manufactur'))   { mb=35; mo=10; ml=6;  despOp=22; cmv=65; label='Indústria Geral'; }
+  else if (s.includes('construc'))                                 { mb=25; mo=8;  ml=5;  despOp=15; cmv=75; label='Construção Civil'; }
+  else if (s.includes('tecnologia') || s.includes('tech'))        { mb=70; mo=20; ml=15; despOp=48; cmv=30; label='Tecnologia'; }
+  else if (s.includes('alimento') || s.includes('alimentac'))     { mb=65; mo=10; ml=6;  despOp=52; cmv=35; label='Alimentação/Food Service'; }
+  else if (s.includes('clinic') || s.includes('saude') || s.includes('medic')) { mb=55; mo=14; ml=9; despOp=38; cmv=45; label='Saúde/Clínica'; }
+  else { mb=35; mo=8; ml=5; despOp=25; cmv=65; label='Mercado Geral'; }
 
   // Desambiguação por perfil financeiro:
-  // Se o setor veio como varejo/comércio genérico mas a margem bruta é > 45%,
-  // provavelmente é moda/premium — usa benchmark de moda (mais realista)
-  var mb = ind && (ind.margemBruta || ind.mb) || 0;
-  if ((matched === 'varejo' || matched === 'comercio' || !matched) && mb > 45) {
-    return _BENCHMARKS['moda']; // Varejo de Moda: despOp 45%, mb 55%
+  // Se setor veio genérico mas margem bruta real é > 65% → provavelmente serviços
+  var mbReal = ind && (ind.margemBruta || ind.mb) || 0;
+  if (label === 'Varejo Geral' && mbReal > 45) {
+    mb=55; mo=10; ml=6; despOp=45; cmv=45; label='Varejo de Moda/Vestuário';
   }
-  // Se margem bruta > 65% e setor genérico → provavelmente serviços
-  if (!matched && mb > 65) {
-    return _BENCHMARKS['servico'];
+  if (label === 'Mercado Geral' && mbReal > 65) {
+    mb=60; mo=15; ml=10; despOp=43; cmv=40; label='Serviços Gerais';
   }
-  return result;
+
+  return { margemBruta:mb, margemOp:mo, margemLiq:ml, label:label, despOp:despOp, cmv:cmv,
+           mb:mb, mo:mo, ml:ml };
 }
 
 // ── CÁLCULO DE INDICADORES (browser) ────────────────────────────────
@@ -13785,14 +13948,57 @@ function okComecarAgora(){
     <label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">Segmento / Nicho</label>
     <select id="add-empresa-nicho" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;background:#fff;color:var(--text);margin-bottom:.75rem;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'" onchange="var o=document.getElementById('add-empresa-outro-wrap');if(o)o.style.display=this.value==='Outro'?'block':'none';">
       <option value="">Selecione o tipo de negócio</option>
-      <option value="Restaurante / Alimentação">Restaurante / Alimentação</option>
-      <option value="Varejo / Comércio">Varejo / Comércio</option>
-      <option value="Clínica / Saúde">Clínica / Saúde</option>
-      <option value="Distribuidora / Logística">Distribuidora / Logística</option>
-      <option value="Indústria / Manufatura">Indústria / Manufatura</option>
-      <option value="Prestação de Serviços">Prestação de Serviços</option>
-      <option value="Construção / Engenharia">Construção / Engenharia</option>
-      <option value="E-commerce / Digital">E-commerce / Digital</option>
+      <optgroup label="Alimentação &amp; Bebidas">
+        <option value="Restaurante / Lanchonete">Restaurante / Lanchonete</option>
+        <option value="Padaria / Confeitaria">Padaria / Confeitaria</option>
+        <option value="Food Service / Delivery">Food Service / Delivery</option>
+        <option value="Indústria de Alimentos">Indústria de Alimentos</option>
+        <option value="Distribuidora de Alimentos">Distribuidora de Alimentos</option>
+      </optgroup>
+      <optgroup label="Saúde &amp; Bem-estar">
+        <option value="Clínica Médica / Odontológica">Clínica Médica / Odontológica</option>
+        <option value="Farmácia / Drogaria">Farmácia / Drogaria</option>
+        <option value="Academia / Fitness">Academia / Fitness</option>
+        <option value="Clínica de Estética">Clínica de Estética</option>
+        <option value="Hospital / Laboratório">Hospital / Laboratório</option>
+      </optgroup>
+      <optgroup label="Varejo &amp; Moda">
+        <option value="Varejo de Moda / Vestuário">Varejo de Moda / Vestuário</option>
+        <option value="Calçados / Acessórios">Calçados / Acessórios</option>
+        <option value="Varejo de Eletroeletrônicos">Varejo de Eletroeletrônicos</option>
+        <option value="Varejo de Móveis / Decoração">Varejo de Móveis / Decoração</option>
+        <option value="Supermercado / Mercearia">Supermercado / Mercearia</option>
+      </optgroup>
+      <optgroup label="Serviços">
+        <option value="Contabilidade / Consultoria">Contabilidade / Consultoria</option>
+        <option value="Agência de Marketing / Publicidade">Agência de Marketing / Publicidade</option>
+        <option value="Educação / Escola / Curso">Educação / Escola / Curso</option>
+        <option value="Salão de Beleza / Barbearia">Salão de Beleza / Barbearia</option>
+        <option value="Oficina / Mecânica Automotiva">Oficina / Mecânica Automotiva</option>
+        <option value="Prestação de Serviços">Prestação de Serviços</option>
+      </optgroup>
+      <optgroup label="Tecnologia">
+        <option value="Software / SaaS">Software / SaaS</option>
+        <option value="E-commerce / Marketplace">E-commerce / Marketplace</option>
+        <option value="Startup / Fintech">Startup / Fintech</option>
+      </optgroup>
+      <optgroup label="Indústria">
+        <option value="Indústria Têxtil">Indústria Têxtil</option>
+        <option value="Indústria Metalúrgica">Indústria Metalúrgica</option>
+        <option value="Indústria Plástica / Química">Indústria Plástica / Química</option>
+        <option value="Agronegócio / Agropecuária">Agronegócio / Agropecuária</option>
+        <option value="Indústria / Manufatura">Indústria / Manufatura</option>
+      </optgroup>
+      <optgroup label="Construção &amp; Imóveis">
+        <option value="Incorporadora / Construtora">Incorporadora / Construtora</option>
+        <option value="Imobiliária">Imobiliária</option>
+        <option value="Reforma / Manutenção Predial">Reforma / Manutenção Predial</option>
+      </optgroup>
+      <optgroup label="Transporte &amp; Logística">
+        <option value="Transportadora / Frete">Transportadora / Frete</option>
+        <option value="Locadora de Veículos">Locadora de Veículos</option>
+        <option value="Distribuidora / Logística">Distribuidora / Logística</option>
+      </optgroup>
       <option value="Outro">Outro</option>
     </select>
     <div id="add-empresa-outro-wrap" style="display:none;margin-bottom:.75rem;">
