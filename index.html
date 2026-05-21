@@ -13588,8 +13588,10 @@ async function carregarEmpresasSwitcher() {
   });
 
   // Insere itens de empresa antes do botão "Adicionar"
+  // Pula a empresa ativa — ela já aparece no card .empresa-atual acima
   var idAtivo = (window._empresaSelecionada && window._empresaSelecionada.id) || null;
   empresas.forEach(function(emp) {
+    if (emp.id === idAtivo) return; // já visível no card ativo, não duplicar
     var initials = (emp.name || '?').trim().split(/\s+/).map(function(w){ return w[0]; }).slice(0,2).join('').toUpperCase();
     var isAtiva = emp.id === idAtivo;
     var div = document.createElement('div');
