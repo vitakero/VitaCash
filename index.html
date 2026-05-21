@@ -12889,6 +12889,35 @@ function ndreAnalisar() {
   // Chama Claude API diretamente do browser
   (async function() {
     try {
+
+      // ── 0. Verificação antecipada: empresa + ano + período ──────────────
+      // Roda ANTES de ler o conteúdo do PDF — evita processar arquivo
+      // desnecessariamente quando o relatório já foi analisado antes.
+      var _selEarly = window._empresaSelecionada;
+      var _anoEarly = (document.getElementById('ndre-ano') || {}).value || '';
+      var _perEarly = (document.getElementById('ndre-periodo') || {}).value || 'Anual';
+      if (_selEarly && _selEarly.id && _anoEarly && _selEarly.modo === 'existente') {
+        try {
+          var _earlyRes = await sb.from('analyses')
+            .select('dados_extraidos, hash_combo')
+            .eq('company_id', _selEarly.id)
+            .eq('year', _anoEarly)
+            .eq('period', _perEarly)
+            .not('dados_extraidos', 'is', null)
+            .maybeSingle();
+          if (_earlyRes.data && _earlyRes.data.dados_extraidos) {
+            console.log('✅ Cache hit antecipado (empresa+ano+período) — IA não chamada');
+            var _earlyDados = Object.assign({}, _earlyRes.data.dados_extraidos, {
+              _hashCombo: _earlyRes.data.hash_combo,
+              cache: true
+            });
+            window._dadosIA = _earlyDados;
+            return; // Sai sem chamar IA — _aguardarIAeIr vai pegar window._dadosIA
+          }
+        } catch(_) {}
+      }
+      // ────────────────────────────────────────────────────────────────────
+
       var dreB64 = ndreFiles.dre ? await fileToBase64(ndreFiles.dre) : null;
       var arquivoSeparado = !ndreUnico && ndreFiles.bp && ndreFiles.bp !== ndreFiles.dre;
       var balancoB64 = arquivoSeparado ? await fileToBase64(ndreFiles.bp) : null;
@@ -12901,7 +12930,7 @@ function ndreAnalisar() {
       }
       var hashCombo = await sha256b64((dreB64||'none') + (balancoB64||'none'));
 
-      // 1. Verificar cache no Supabase
+      // 1. Verificar cache no Supabase pelo hash do conteúdo
       var cached = null;
       try {
         var cacheRes = await sb.from('analyses').select('dados_extraidos').eq('hash_combo', hashCombo).not('dados_extraidos','is',null).maybeSingle();
