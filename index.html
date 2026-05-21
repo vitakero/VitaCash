@@ -14360,15 +14360,11 @@ function okComecarAgora(){
     <div id="empresa-mismatch-titulo" style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;">PDF não corresponde</div>
     <div id="empresa-mismatch-desc" style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:1.25rem;">PDF não corresponde à empresa selecionada. Verifique o arquivo.</div>
     <div id="empresa-mismatch-detalhe" style="font-size:11px;color:var(--text3);background:var(--surface,#f8faf9);border-radius:8px;padding:10px;margin-bottom:1.25rem;text-align:left;line-height:1.6;"></div>
-    <!-- Modo hard: bloqueio total (após IA detectar) -->
+    <!-- Único botão: sempre bloqueia e cancela -->
     <div id="empresa-mismatch-btns-hard">
-      <button onclick="document.getElementById('modal-empresa-mismatch').style.display='none'" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--green);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Entendido</button>
-    </div>
-    <!-- Modo soft: aviso preventivo (Camada 0, antes da IA) -->
-    <div id="empresa-mismatch-btns-soft" style="display:none;gap:8px;flex-direction:column;">
-      <button onclick="_mismatchContinuar()" style="width:100%;padding:12px;border-radius:10px;border:none;background:#D85A30;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Continuar mesmo assim</button>
       <button onclick="_mismatchCancelar()" style="width:100%;padding:12px;border-radius:10px;border:1.5px solid var(--border);background:#fff;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Cancelar — trocar arquivo</button>
     </div>
+    <div id="empresa-mismatch-btns-soft" style="display:none;"></div>
   </div>
 </div>
 
@@ -14650,9 +14646,9 @@ function _mostrarAvisoPDF(nomeEmpresa, callback) {
   var btnsSoft = document.getElementById('empresa-mismatch-btns-soft');
   if (titulo) titulo.textContent = 'Nome da empresa não encontrado no PDF';
   if (desc) desc.textContent = 'Não encontramos o nome da empresa selecionada neste arquivo. Verifique se enviou o PDF correto.';
-  if (detalhe) detalhe.innerHTML = 'Empresa selecionada: <strong>' + nomeEmpresa + '</strong><br>Continuar vai chamar a IA (consome crédito).';
-  if (btnsHard) btnsHard.style.display = 'none';
-  if (btnsSoft) btnsSoft.style.display = 'flex';
+  if (detalhe) detalhe.innerHTML = 'Empresa selecionada: <strong>' + nomeEmpresa + '</strong>';
+  if (btnsHard) btnsHard.style.display = 'block';
+  if (btnsSoft) btnsSoft.style.display = 'none';
   _mismatchCallback = callback;
   if (mm) mm.style.display = 'flex';
 }
@@ -14685,7 +14681,7 @@ document.addEventListener('click', function(e) {
   if (e.target.id === 'modal-premium-upgrade') document.getElementById('modal-premium-upgrade').style.display='none';
   if (e.target.id === 'modal-empresa-seletor') fecharSeletorEmpresa();
   if (e.target.id === 'modal-add-empresa') fecharAddEmpresa();
-  if (e.target.id === 'modal-empresa-mismatch') document.getElementById('modal-empresa-mismatch').style.display='none';
+  if (e.target.id === 'modal-empresa-mismatch') _mismatchCancelar();
 });
 
 </script>
