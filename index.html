@@ -10485,7 +10485,17 @@ function abrirAddEmpresa() {
   fecharSeletorEmpresa();
   var modal = document.getElementById('modal-add-empresa');
   if (modal) {
-    document.getElementById('add-empresa-nicho').value = '';
+    // Reset campos
+    var seg = document.getElementById('add-empresa-segmento');
+    if (seg) seg.value = '';
+    var nichoSel = document.getElementById('add-empresa-nicho');
+    if (nichoSel) { nichoSel.innerHTML = '<option value="">Selecione o nicho</option>'; }
+    var nichoWrap = document.getElementById('add-empresa-nicho-wrap');
+    if (nichoWrap) nichoWrap.style.display = 'none';
+    var outroWrap = document.getElementById('add-empresa-outro-wrap');
+    if (outroWrap) outroWrap.style.display = 'none';
+    var outroInp = document.getElementById('add-empresa-outro');
+    if (outroInp) outroInp.value = '';
     modal.style.display = 'flex';
   }
 }
@@ -10495,15 +10505,53 @@ function fecharAddEmpresa() {
   if (modal) modal.style.display = 'none';
 }
 
-function confirmarAddEmpresa() {
-  var nicho = document.getElementById('add-empresa-nicho').value;
-  if (!nicho) { toast('Selecione o segmento de atuação.', 'info'); return; }
-  // Se "Outro", usa o texto digitado
-  if (nicho === 'Outro') {
-    var outroTxt = (document.getElementById('add-empresa-outro') || {}).value || '';
-    if (!outroTxt.trim()) { toast('Especifique o nicho no campo abaixo de "Outro".', 'info'); return; }
-    nicho = outroTxt.trim();
+// Nichos por segmento
+var _NICHOS_POR_SEGMENTO = {
+  alimentacao: ['Restaurante / Lanchonete','Padaria / Confeitaria','Food Service / Delivery','Indústria de Alimentos','Distribuidora de Alimentos'],
+  saude:       ['Clínica Médica / Odontológica','Farmácia / Drogaria','Academia / Fitness','Clínica de Estética','Hospital / Laboratório'],
+  varejo:      ['Varejo de Moda / Vestuário','Calçados / Acessórios','Varejo de Eletroeletrônicos','Varejo de Móveis / Decoração','Supermercado / Mercearia'],
+  servicos:    ['Contabilidade / Consultoria','Agência de Marketing / Publicidade','Educação / Escola / Curso','Salão de Beleza / Barbearia','Oficina / Mecânica Automotiva','Prestação de Serviços'],
+  tecnologia:  ['Software / SaaS','E-commerce / Marketplace','Startup / Fintech'],
+  industria:   ['Indústria Têxtil','Indústria Metalúrgica','Indústria Plástica / Química','Agronegócio / Agropecuária','Indústria / Manufatura'],
+  construcao:  ['Incorporadora / Construtora','Imobiliária','Reforma / Manutenção Predial'],
+  transporte:  ['Transportadora / Frete','Locadora de Veículos','Distribuidora / Logística']
+};
+
+function addEmpresaFiltrarNicho(segmento) {
+  var nichoWrap = document.getElementById('add-empresa-nicho-wrap');
+  var outroWrap = document.getElementById('add-empresa-outro-wrap');
+  var nichoSel  = document.getElementById('add-empresa-nicho');
+  if (!nichoWrap || !outroWrap || !nichoSel) return;
+
+  if (segmento === 'outro') {
+    nichoWrap.style.display = 'none';
+    outroWrap.style.display = 'block';
+    return;
   }
+  outroWrap.style.display = 'none';
+
+  var opcoes = _NICHOS_POR_SEGMENTO[segmento] || [];
+  if (!opcoes.length) { nichoWrap.style.display = 'none'; return; }
+
+  nichoSel.innerHTML = '<option value="">Selecione o nicho</option>' +
+    opcoes.map(function(n){ return '<option value="'+n+'">'+n+'</option>'; }).join('');
+  nichoWrap.style.display = 'block';
+}
+
+function confirmarAddEmpresa() {
+  var segmento = (document.getElementById('add-empresa-segmento') || {}).value || '';
+  if (!segmento) { toast('Selecione o segmento de atuação.', 'info'); return; }
+
+  var nicho = '';
+  if (segmento === 'outro') {
+    var outroTxt = (document.getElementById('add-empresa-outro') || {}).value || '';
+    if (!outroTxt.trim()) { toast('Especifique o nicho no campo de texto.', 'info'); return; }
+    nicho = outroTxt.trim();
+  } else {
+    nicho = (document.getElementById('add-empresa-nicho') || {}).value || '';
+    if (!nicho) { toast('Selecione o nicho do segmento escolhido.', 'info'); return; }
+  }
+
   // Marca modo "cadastro" — nome virá do PDF
   window._empresaSelecionada = { id: null, name: null, nicho: nicho, modo: 'cadastro' };
   fecharAddEmpresa();
@@ -13944,68 +13992,38 @@ function okComecarAgora(){
   <div style="background:#fff;border-radius:16px;max-width:420px;width:90%;padding:1.5rem;position:relative;">
     <button onclick="fecharAddEmpresa()" style="position:absolute;top:12px;right:12px;background:none;border:none;font-size:18px;cursor:pointer;color:var(--text3);">✕</button>
     <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px;">Adicionar nova empresa</div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:1.25rem;line-height:1.5;">O nome da empresa será extraído automaticamente do PDF após a análise. Selecione apenas o segmento de atuação:</div>
-    <label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">Segmento / Nicho</label>
-    <select id="add-empresa-nicho" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;background:#fff;color:var(--text);margin-bottom:.75rem;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'" onchange="var o=document.getElementById('add-empresa-outro-wrap');if(o)o.style.display=this.value==='Outro'?'block':'none';">
-      <option value="">Selecione o tipo de negócio</option>
-      <optgroup label="Alimentação &amp; Bebidas">
-        <option value="Restaurante / Lanchonete">Restaurante / Lanchonete</option>
-        <option value="Padaria / Confeitaria">Padaria / Confeitaria</option>
-        <option value="Food Service / Delivery">Food Service / Delivery</option>
-        <option value="Indústria de Alimentos">Indústria de Alimentos</option>
-        <option value="Distribuidora de Alimentos">Distribuidora de Alimentos</option>
-      </optgroup>
-      <optgroup label="Saúde &amp; Bem-estar">
-        <option value="Clínica Médica / Odontológica">Clínica Médica / Odontológica</option>
-        <option value="Farmácia / Drogaria">Farmácia / Drogaria</option>
-        <option value="Academia / Fitness">Academia / Fitness</option>
-        <option value="Clínica de Estética">Clínica de Estética</option>
-        <option value="Hospital / Laboratório">Hospital / Laboratório</option>
-      </optgroup>
-      <optgroup label="Varejo &amp; Moda">
-        <option value="Varejo de Moda / Vestuário">Varejo de Moda / Vestuário</option>
-        <option value="Calçados / Acessórios">Calçados / Acessórios</option>
-        <option value="Varejo de Eletroeletrônicos">Varejo de Eletroeletrônicos</option>
-        <option value="Varejo de Móveis / Decoração">Varejo de Móveis / Decoração</option>
-        <option value="Supermercado / Mercearia">Supermercado / Mercearia</option>
-      </optgroup>
-      <optgroup label="Serviços">
-        <option value="Contabilidade / Consultoria">Contabilidade / Consultoria</option>
-        <option value="Agência de Marketing / Publicidade">Agência de Marketing / Publicidade</option>
-        <option value="Educação / Escola / Curso">Educação / Escola / Curso</option>
-        <option value="Salão de Beleza / Barbearia">Salão de Beleza / Barbearia</option>
-        <option value="Oficina / Mecânica Automotiva">Oficina / Mecânica Automotiva</option>
-        <option value="Prestação de Serviços">Prestação de Serviços</option>
-      </optgroup>
-      <optgroup label="Tecnologia">
-        <option value="Software / SaaS">Software / SaaS</option>
-        <option value="E-commerce / Marketplace">E-commerce / Marketplace</option>
-        <option value="Startup / Fintech">Startup / Fintech</option>
-      </optgroup>
-      <optgroup label="Indústria">
-        <option value="Indústria Têxtil">Indústria Têxtil</option>
-        <option value="Indústria Metalúrgica">Indústria Metalúrgica</option>
-        <option value="Indústria Plástica / Química">Indústria Plástica / Química</option>
-        <option value="Agronegócio / Agropecuária">Agronegócio / Agropecuária</option>
-        <option value="Indústria / Manufatura">Indústria / Manufatura</option>
-      </optgroup>
-      <optgroup label="Construção &amp; Imóveis">
-        <option value="Incorporadora / Construtora">Incorporadora / Construtora</option>
-        <option value="Imobiliária">Imobiliária</option>
-        <option value="Reforma / Manutenção Predial">Reforma / Manutenção Predial</option>
-      </optgroup>
-      <optgroup label="Transporte &amp; Logística">
-        <option value="Transportadora / Frete">Transportadora / Frete</option>
-        <option value="Locadora de Veículos">Locadora de Veículos</option>
-        <option value="Distribuidora / Logística">Distribuidora / Logística</option>
-      </optgroup>
-      <option value="Outro">Outro</option>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:1.25rem;line-height:1.5;">O nome será extraído automaticamente do PDF. Selecione o segmento e o nicho:</div>
+
+    <!-- CAMPO 1: Segmento -->
+    <label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">Segmento</label>
+    <select id="add-empresa-segmento" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;background:#fff;color:var(--text);margin-bottom:1rem;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'" onchange="addEmpresaFiltrarNicho(this.value)">
+      <option value="">Selecione o segmento</option>
+      <option value="alimentacao">Alimentação &amp; Bebidas</option>
+      <option value="saude">Saúde &amp; Bem-estar</option>
+      <option value="varejo">Varejo &amp; Moda</option>
+      <option value="servicos">Serviços</option>
+      <option value="tecnologia">Tecnologia</option>
+      <option value="industria">Indústria</option>
+      <option value="construcao">Construção &amp; Imóveis</option>
+      <option value="transporte">Transporte &amp; Logística</option>
+      <option value="outro">Outro</option>
     </select>
-    <div id="add-empresa-outro-wrap" style="display:none;margin-bottom:.75rem;">
-      <input id="add-empresa-outro" type="text" placeholder="Especifique o nicho (ex: Agropecuária, Educação…)" maxlength="60" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'">
+
+    <!-- CAMPO 2: Nicho (aparece após escolher segmento) -->
+    <div id="add-empresa-nicho-wrap" style="display:none;">
+      <label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">Nicho</label>
+      <select id="add-empresa-nicho" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;background:#fff;color:var(--text);margin-bottom:.75rem;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'">
+        <option value="">Selecione o nicho</option>
+      </select>
     </div>
-    <div style="margin-bottom:1.25rem;"></div>
-    <button onclick="confirmarAddEmpresa()" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--green);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Continuar para upload →</button>
+
+    <!-- CAMPO Outro: digitar nicho -->
+    <div id="add-empresa-outro-wrap" style="display:none;margin-bottom:.75rem;">
+      <label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">Especifique o nicho</label>
+      <input id="add-empresa-outro" type="text" placeholder="Ex: Agropecuária, Mineração, Petróleo…" maxlength="60" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'">
+    </div>
+
+    <button onclick="confirmarAddEmpresa()" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--green);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:.5rem;">Continuar para upload →</button>
     <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:.5rem;">Você confirmará o nome após a análise do PDF</div>
   </div>
 </div>
