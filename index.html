@@ -13167,13 +13167,41 @@ async function salvarAnalise() {
   toast('Salvando análise...', 'info');
 
   var iaData = window._dadosIA || {};
+
+  // Garante que a empresa existe no banco antes de salvar a análise
+  var _companyId = window._empresaSelecionada?.id || null;
+  if (!_companyId && iaData.empresa) {
+    try {
+      var _sel = window._empresaSelecionada || {};
+      var _res = await sb.from('companies')
+        .insert({ user_id: currentUser.id, name: iaData.empresa, nicho: _sel.nicho || iaData.setor || '' })
+        .select().single();
+      if (_res.data && _res.data.id) {
+        _companyId = _res.data.id;
+        window._empresaSelecionada = { id: _companyId, name: _res.data.name, nicho: _res.data.nicho, modo: 'existente' };
+        console.log('✅ Empresa criada automaticamente ao salvar análise:', _res.data.name);
+        // Atualiza card da sidebar
+        var _ini = (_res.data.name||'').trim().split(/\s+/).map(function(w){return w[0];}).slice(0,2).join('').toUpperCase();
+        var _avEl = document.getElementById('empresa-avatar');
+        var _nmEl = document.getElementById('empresa-nome-sidebar');
+        var _sbEl = document.getElementById('empresa-sub-sidebar');
+        var _bdEl = document.getElementById('empresa-badge-ativa');
+        if (_avEl) { _avEl.textContent = _ini; _avEl.style.background = 'var(--green)'; _avEl.style.color = '#fff'; _avEl.style.fontSize = '11px'; }
+        if (_nmEl) { _nmEl.textContent = _res.data.name; _nmEl.style.color = 'var(--text)'; }
+        if (_sbEl) _sbEl.textContent = _res.data.nicho || '';
+        if (_bdEl) _bdEl.style.display = 'inline';
+        if (typeof carregarEmpresasSwitcher === 'function') carregarEmpresasSwitcher();
+      }
+    } catch(_e) { console.warn('Não foi possível criar empresa automática:', _e); }
+  }
+
   var upsertPayload = {
     user_id:          currentUser.id,
     year:             meta.year,
     period:           meta.period || 'Anual',
     filename_dre:     meta.dre     || null,
     filename_balanco: meta.balanco || null,
-    company_id:       window._empresaSelecionada?.id || null
+    company_id:       _companyId
   };
   // Só inclui dados da IA se existirem — evita sobrescrever com NULL o que a edge function salvou
   if (iaData._hashCombo)             upsertPayload.hash_combo      = iaData._hashCombo;
