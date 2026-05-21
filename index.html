@@ -9311,14 +9311,14 @@ function go(id){
   if(id==='s-perfil' && currentUser) setTimeout(carregarPerfil, 50);
   // Restaura estado do botão de envio ao entrar na tela de Nova análise
   if(id==='s-nova-dre'){
+    // Sempre limpa arquivos e campos ao entrar na tela de nova análise
+    if(typeof ndreLimpar === 'function') ndreLimpar();
     var btnNdre = document.getElementById('ndre-btn');
     if(btnNdre){
       btnNdre.textContent = 'Descobrir quanto estou perdendo →';
       btnNdre.style.background = '';
       btnNdre.style.boxShadow = '';
       btnNdre.disabled = true;
-      // Re-aplica a validação pra liberar o botão se a tela já tem arquivos
-      if(typeof ndreChk === 'function') ndreChk();
     }
   }
   // Limpa flag de novo cadastro ao sair da pagina de planos
