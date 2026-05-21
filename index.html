@@ -10447,6 +10447,11 @@ async function abrirSeletorEmpresa() {
     document.getElementById('empresa-seletor-loading').style.display = 'none';
     if (error) throw error;
 
+    // Fallback: se a query voltou vazia mas há empresa ativa em memória, inclui ela
+    if ((!empresas || empresas.length === 0) && window._empresaSelecionada && window._empresaSelecionada.id) {
+      empresas = [{ id: window._empresaSelecionada.id, name: window._empresaSelecionada.name, nicho: window._empresaSelecionada.nicho }];
+    }
+
     if (!empresas || empresas.length === 0) {
       document.getElementById('empresa-seletor-vazio').style.display = 'block';
     } else {
@@ -14292,7 +14297,7 @@ function okComecarAgora(){
     <div id="empresa-seletor-loading" style="text-align:center;padding:2rem;color:var(--text3);font-size:13px;">Carregando empresas...</div>
     <div id="empresa-seletor-lista" style="display:none;overflow-y:auto;flex:1;margin-bottom:1rem;"></div>
     <div id="empresa-seletor-vazio" style="display:none;text-align:center;padding:1.5rem 0;color:var(--text3);font-size:13px;">Nenhuma empresa cadastrada ainda.</div>
-    <button onclick="abrirAddEmpresa()" style="width:100%;padding:11px;border-radius:10px;border:1.5px dashed var(--green);background:var(--green-light,#e8f8f1);color:var(--green);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;">
+    <button onclick="fecharSeletorEmpresa();tentarAdicionarEmpresa();" style="width:100%;padding:11px;border-radius:10px;border:1.5px dashed var(--green);background:var(--green-light,#e8f8f1);color:var(--green);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       Adicionar nova empresa
     </button>
