@@ -13125,8 +13125,15 @@ async function popularFiltroDash() {
     // Mostra empty state e esconde conteúdo do dashboard
     var emptyState = document.getElementById('dash-empty-state');
     var mainContent = document.getElementById('dash-main-content');
-    if (emptyState) { emptyState.style.display = 'flex'; emptyState.style.position = 'relative'; }
+    if (emptyState) emptyState.style.display = 'flex';
     if (mainContent) mainContent.style.display = 'none';
+    // Limpa o "Carregando..." da sidebar de empresa
+    var subSidebar = document.getElementById('empresa-sub-sidebar');
+    if (subSidebar) subSidebar.textContent = 'Nenhuma análise';
+    var nmSidebar = document.getElementById('empresa-nome-sidebar');
+    if (nmSidebar) nmSidebar.textContent = 'Adicionar empresa';
+    var avSidebar = document.getElementById('empresa-avatar');
+    if (avSidebar) avSidebar.textContent = '+';
     return;
   }
   // Tem análises — esconde empty state e mostra conteúdo
