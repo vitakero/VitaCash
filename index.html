@@ -10543,8 +10543,10 @@ function addEmpresaFiltrarNicho(segmento) {
   if (!nichoWrap || !outroWrap || !nichoSel) return;
 
   if (segmento === 'outro') {
-    nichoWrap.style.display = 'none';
-    outroWrap.style.display = 'block';
+    nichoSel.innerHTML = '<option value="">Selecione o nicho</option>' +
+      _NICHOS_EXTRAS.map(function(n){ return '<option value="'+n+'">'+n+'</option>'; }).join('');
+    nichoWrap.style.display = 'block';
+    outroWrap.style.display = 'none';
     return;
   }
   outroWrap.style.display = 'none';
@@ -10563,10 +10565,8 @@ function confirmarAddEmpresa() {
 
   var nicho = '';
   if (segmento === 'outro') {
-    var outroTxt = (document.getElementById('add-empresa-outro') || {}).value || '';
-    var nichoSelecionado = (document.getElementById('add-empresa-nicho') || {}).value || '';
-    nicho = outroTxt.trim() || nichoSelecionado;
-    if (!nicho) { toast('Selecione ou digite o nicho de atuação.', 'info'); return; }
+    nicho = (document.getElementById('add-empresa-nicho') || {}).value || '';
+    if (!nicho) { toast('Selecione o nicho de atuação.', 'info'); return; }
   } else {
     nicho = (document.getElementById('add-empresa-nicho') || {}).value || '';
     if (!nicho) { toast('Selecione o nicho do segmento escolhido.', 'info'); return; }
