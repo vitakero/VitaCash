@@ -10381,6 +10381,12 @@ function fecharAddEmpresa() {
 function confirmarAddEmpresa() {
   var nicho = document.getElementById('add-empresa-nicho').value;
   if (!nicho) { toast('Selecione o segmento de atuação.', 'info'); return; }
+  // Se "Outro", usa o texto digitado
+  if (nicho === 'Outro') {
+    var outroTxt = (document.getElementById('add-empresa-outro') || {}).value || '';
+    if (!outroTxt.trim()) { toast('Especifique o nicho no campo abaixo de "Outro".', 'info'); return; }
+    nicho = outroTxt.trim();
+  }
   // Marca modo "cadastro" — nome virá do PDF
   window._empresaSelecionada = { id: null, name: null, nicho: nicho, modo: 'cadastro' };
   fecharAddEmpresa();
@@ -13777,7 +13783,7 @@ function okComecarAgora(){
     <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px;">Adicionar nova empresa</div>
     <div style="font-size:12px;color:var(--text3);margin-bottom:1.25rem;line-height:1.5;">O nome da empresa será extraído automaticamente do PDF após a análise. Selecione apenas o segmento de atuação:</div>
     <label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">Segmento / Nicho</label>
-    <select id="add-empresa-nicho" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;background:#fff;color:var(--text);margin-bottom:1.25rem;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'">
+    <select id="add-empresa-nicho" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;background:#fff;color:var(--text);margin-bottom:.75rem;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'" onchange="var o=document.getElementById('add-empresa-outro-wrap');if(o)o.style.display=this.value==='Outro'?'block':'none';">
       <option value="">Selecione o tipo de negócio</option>
       <option value="Restaurante / Alimentação">Restaurante / Alimentação</option>
       <option value="Varejo / Comércio">Varejo / Comércio</option>
@@ -13789,6 +13795,10 @@ function okComecarAgora(){
       <option value="E-commerce / Digital">E-commerce / Digital</option>
       <option value="Outro">Outro</option>
     </select>
+    <div id="add-empresa-outro-wrap" style="display:none;margin-bottom:.75rem;">
+      <input id="add-empresa-outro" type="text" placeholder="Especifique o nicho (ex: Agropecuária, Educação…)" maxlength="60" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'">
+    </div>
+    <div style="margin-bottom:1.25rem;"></div>
     <button onclick="confirmarAddEmpresa()" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--green);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Continuar para upload →</button>
     <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:.5rem;">Você confirmará o nome após a análise do PDF</div>
   </div>
