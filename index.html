@@ -14539,11 +14539,10 @@ function togEmpresas() {
 var EMPRESA_LIMIT = { starter: 1, free: 1, growth: 1, pro: 3, premium: 999 };
 
 function tentarAdicionarEmpresa() {
-  // Conta quantas empresas o usuário já tem (itens reais no switcher, sem contar o botão de adicionar)
-  var items = document.querySelectorAll('#empresa-list .empresa-item');
-  // O último item é sempre o "Adicionar", os anteriores são empresas reais
-  // Por enquanto temos 1 empresa fixa (a atual)
-  var totalEmpresas = 1; // TODO: buscar do Supabase quando tabela companies existir
+  // Conta empresas reais na lista + 1 se há empresa ativa no card
+  var naLista = document.querySelectorAll('#empresa-list .empresa-item[data-empresa-id]').length;
+  var temAtiva = (window._empresaSelecionada && window._empresaSelecionada.id) ? 1 : 0;
+  var totalEmpresas = naLista + temAtiva;
 
   var planoAtual = 'starter';
   try { planoAtual = document.querySelector('[data-current-plan]')?.dataset.currentPlan || 'starter'; } catch(e) {}
