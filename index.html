@@ -3588,10 +3588,10 @@ function adminAbrirWhatsApp() {
     <!-- Card da empresa ativa — clique para expandir/recolher a lista -->
     <div class="empresa-atual" onclick="togEmpresas()">
       <div style="display:flex;align-items:center;gap:10px;">
-        <div id="empresa-avatar" style="width:32px;height:32px;border-radius:8px;background:var(--green);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;">—</div>
+        <div id="empresa-avatar" style="width:32px;height:32px;border-radius:8px;background:var(--border);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:15px;font-weight:400;">+</div>
         <div>
-          <div id="empresa-nome-sidebar" style="font-size:13px;font-weight:600;color:var(--text);">—</div>
-          <div id="empresa-sub-sidebar" style="font-size:10px;color:var(--text3);">Carregando...</div>
+          <div id="empresa-nome-sidebar" style="font-size:13px;font-weight:600;color:var(--text3);">Nenhuma empresa</div>
+          <div id="empresa-sub-sidebar" style="font-size:10px;color:var(--text3);">Clique para adicionar</div>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
@@ -13478,6 +13478,13 @@ async function popularFiltroDash() {
     ['ut','ut2','dt'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=''; });
     // Limpa badge de empresas na sidebar
     document.querySelectorAll('#empresa-list .empresa-item[data-empresa-id]').forEach(function(el){ el.remove(); });
+    // Reseta card da empresa ativa para estado neutro
+    var _av = document.getElementById('empresa-avatar');
+    var _nm = document.getElementById('empresa-nome-sidebar');
+    var _sb = document.getElementById('empresa-sub-sidebar');
+    if (_av) { _av.textContent = '+'; _av.style.background = 'var(--border)'; _av.style.color = 'var(--text3)'; _av.style.fontSize = '15px'; }
+    if (_nm) { _nm.textContent = 'Nenhuma empresa'; _nm.style.color = 'var(--text3)'; }
+    if (_sb) { _sb.textContent = 'Clique para adicionar'; }
     return;
   }
   // Tem análises — esconde empty state e mostra conteúdo
@@ -13605,9 +13612,9 @@ function selecionarEmpresaSwitcher(id, name, nicho) {
   var nomeEl   = document.getElementById('empresa-nome-sidebar');
   var subEl    = document.getElementById('empresa-sub-sidebar');
   var initials = (name || '?').trim().split(/\s+/).map(function(w){ return w[0]; }).slice(0,2).join('').toUpperCase();
-  if (avatarEl) avatarEl.textContent = initials;
-  if (nomeEl)   nomeEl.textContent   = name;
-  if (subEl)    subEl.textContent    = nicho || '';
+  if (avatarEl) { avatarEl.textContent = initials; avatarEl.style.background = 'var(--green)'; avatarEl.style.color = '#fff'; avatarEl.style.fontSize = '11px'; }
+  if (nomeEl)   { nomeEl.textContent = name; nomeEl.style.color = 'var(--text)'; }
+  if (subEl)    { subEl.textContent  = nicho || ''; }
 
   // Fecha a lista após selecionar
   var list = document.getElementById('empresa-list');
@@ -13714,9 +13721,9 @@ async function dashFilterChange(id) {
             var nm = document.getElementById('empresa-nome-sidebar');
             var sb2 = document.getElementById('empresa-sub-sidebar');
             var ini = res.data.name.trim().split(/\s+/).map(function(w){return w[0];}).slice(0,2).join('').toUpperCase();
-            if (av) av.textContent = ini;
-            if (nm) nm.textContent = res.data.name;
-            if (sb2) sb2.textContent = res.data.nicho || '';
+            if (av)  { av.textContent = ini; av.style.background = 'var(--green)'; av.style.color = '#fff'; av.style.fontSize = '11px'; }
+            if (nm)  { nm.textContent = res.data.name; nm.style.color = 'var(--text)'; }
+            if (sb2) { sb2.textContent = res.data.nicho || ''; }
           }
           // Reconstrói lista sem a empresa ativa (evita duplicata)
           if (typeof carregarEmpresasSwitcher === 'function') carregarEmpresasSwitcher();
