@@ -10492,6 +10492,13 @@ async function abrirSeletorEmpresa() {
       var _atingiu = _total2 >= _limite2 && nivelAtual < 3;
       btnAdd.style.display     = _atingiu ? 'none' : 'flex';
       btnUpgrade.style.display = _atingiu ? 'flex' : 'none';
+      // Ajusta texto do botão de upgrade conforme plano atual
+      if (_atingiu) {
+        var _subEl = document.getElementById('empresa-seletor-upgrade-sub');
+        if (_subEl) _subEl.textContent = nivelAtual < 2
+          ? 'Faça upgrade para o PRO — gerencie até 3 empresas'
+          : 'Faça upgrade para o Premium — empresas ilimitadas';
+      }
     }
   } catch(e) {
     document.getElementById('empresa-seletor-loading').style.display = 'none';
@@ -14318,9 +14325,9 @@ function okComecarAgora(){
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       Adicionar nova empresa
     </button>
-    <button id="empresa-seletor-btn-upgrade" onclick="fecharSeletorEmpresa();tentarAdicionarEmpresa();" style="display:none;width:100%;padding:11px;border-radius:10px;border:none;background:var(--green);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;flex-direction:column;align-items:center;gap:2px;">
-      <span>Adicionar nova empresa</span>
-      <span style="font-size:11px;font-weight:400;opacity:.85;">Faça upgrade para o PRO — gerencie até 3 empresas</span>
+    <button id="empresa-seletor-btn-upgrade" onclick="fecharSeletorEmpresa();_upgradeSeletorEmpresa(this);" style="display:none;width:100%;padding:11px;border-radius:10px;border:none;background:var(--green);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;flex-direction:column;align-items:center;gap:2px;">
+      <span id="empresa-seletor-upgrade-titulo">Adicionar nova empresa</span>
+      <span id="empresa-seletor-upgrade-sub" style="font-size:11px;font-weight:400;opacity:.85;">Faça upgrade para o PRO — gerencie até 3 empresas</span>
     </button>
   </div>
 </div>
@@ -14563,6 +14570,14 @@ function togEmpresas() {
 
 // Limite de empresas por plano
 var EMPRESA_LIMIT = { starter: 1, free: 1, growth: 1, pro: 3, premium: 999 };
+
+function _upgradeSeletorEmpresa(btn) {
+  if (nivelAtual < 2) {
+    iniciarCheckout('pro', 'price_1TUWxWHkpdynZUBW2DLLEnlE', btn);
+  } else {
+    falarComConsultor(); // Premium — contato via consultor
+  }
+}
 
 function tentarAdicionarEmpresa() {
   // Conta empresas reais na lista + 1 se há empresa ativa no card
