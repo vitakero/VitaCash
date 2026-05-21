@@ -10447,9 +10447,13 @@ async function abrirSeletorEmpresa() {
     document.getElementById('empresa-seletor-loading').style.display = 'none';
     if (error) throw error;
 
-    // Fallback: se a query voltou vazia mas há empresa ativa em memória, inclui ela
+    // Fallback 1: empresa ativa em memória com id
     if ((!empresas || empresas.length === 0) && window._empresaSelecionada && window._empresaSelecionada.id) {
       empresas = [{ id: window._empresaSelecionada.id, name: window._empresaSelecionada.name, nicho: window._empresaSelecionada.nicho }];
+    }
+    // Fallback 2: análise ativa sem empresa no DB — usa nome do resultado da IA
+    if ((!empresas || empresas.length === 0) && window._dadosIA && window._dadosIA.empresa) {
+      empresas = [{ id: null, name: window._dadosIA.empresa, nicho: window._dadosIA.setor || '' }];
     }
 
     if (!empresas || empresas.length === 0) {
@@ -10467,7 +10471,7 @@ async function abrirSeletorEmpresa() {
           '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
         item.onclick = (function(e) {
           return function() {
-            window._empresaSelecionada = { id: e.id, name: e.name, nicho: e.nicho, modo: 'existente' };
+            window._empresaSelecionada = { id: e.id, name: e.name, nicho: e.nicho, modo: e.id ? 'existente' : 'nova' };
             fecharSeletorEmpresa();
             if (typeof go === 'function') go('s-nova-dre');
           };
@@ -10475,6 +10479,20 @@ async function abrirSeletorEmpresa() {
         lista.appendChild(item);
       });
       lista.style.display = 'block';
+    }
+
+    // Botão "Adicionar nova empresa": se já atingiu o limite, troca por aviso de upgrade
+    var btnAdd = document.getElementById('empresa-seletor-btn-add');
+    var btnUpgrade = document.getElementById('empresa-seletor-btn-upgrade');
+    if (btnAdd && btnUpgrade) {
+      var _naLista2 = document.querySelectorAll('#empresa-list .empresa-item[data-empresa-id]').length;
+      var _temAtiva2 = (window._empresaSelecionada && window._empresaSelecionada.id) ? 1 : 0;
+      var _total2 = _naLista2 + _temAtiva2 || (empresas && empresas[0] && empresas[0].id ? 1 : 0);
+      var _planoNome2 = nivelAtual >= 3 ? 'premium' : nivelAtual >= 2 ? 'pro' : nivelAtual >= 1 ? 'growth' : 'starter';
+      var _limite2 = EMPRESA_LIMIT[_planoNome2] || 1;
+      var _atingiu = _total2 >= _limite2 && nivelAtual < 3;
+      btnAdd.style.display     = _atingiu ? 'none' : 'flex';
+      btnUpgrade.style.display = _atingiu ? 'flex' : 'none';
     }
   } catch(e) {
     document.getElementById('empresa-seletor-loading').style.display = 'none';
@@ -14297,9 +14315,13 @@ function okComecarAgora(){
     <div id="empresa-seletor-loading" style="text-align:center;padding:2rem;color:var(--text3);font-size:13px;">Carregando empresas...</div>
     <div id="empresa-seletor-lista" style="display:none;overflow-y:auto;flex:1;margin-bottom:1rem;"></div>
     <div id="empresa-seletor-vazio" style="display:none;text-align:center;padding:1.5rem 0;color:var(--text3);font-size:13px;">Nenhuma empresa cadastrada ainda.</div>
-    <button onclick="fecharSeletorEmpresa();tentarAdicionarEmpresa();" style="width:100%;padding:11px;border-radius:10px;border:1.5px dashed var(--green);background:var(--green-light,#e8f8f1);color:var(--green);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;">
+    <button id="empresa-seletor-btn-add" onclick="fecharSeletorEmpresa();tentarAdicionarEmpresa();" style="width:100%;padding:11px;border-radius:10px;border:1.5px dashed var(--green);background:var(--green-light,#e8f8f1);color:var(--green);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       Adicionar nova empresa
+    </button>
+    <button id="empresa-seletor-btn-upgrade" onclick="fecharSeletorEmpresa();tentarAdicionarEmpresa();" style="display:none;width:100%;padding:11px;border-radius:10px;border:none;background:var(--green);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;flex-direction:column;align-items:center;gap:2px;">
+      <span>🔒 Adicionar nova empresa</span>
+      <span style="font-size:11px;font-weight:400;opacity:.85;">Faça upgrade para o PRO — gerencie até 3 empresas</span>
     </button>
   </div>
 </div>
