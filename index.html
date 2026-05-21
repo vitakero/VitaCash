@@ -3599,7 +3599,7 @@ function adminAbrirWhatsApp() {
       </div>
     </div>
     <div id="empresa-list" style="display:none;">
-      <div class="empresa-item" style="cursor:pointer;" onclick="tentarAdicionarEmpresa()">
+      <div class="empresa-item" data-add="1" style="cursor:pointer;" onclick="tentarAdicionarEmpresa()">
         <div style="width:28px;height:28px;border-radius:6px;background:var(--surface2);display:flex;align-items:center;justify-content:center;border:1.5px dashed var(--border2);">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         </div>
@@ -9145,6 +9145,8 @@ async function carregarPerfilDash() {
     }
     // Aplica restricoes de acesso baseadas no plano
     aplicarRestricoesDePlano(data.current_plan || 'starter');
+    // Carrega empresas no switcher da sidebar
+    carregarEmpresasSwitcher();
   } catch(e) { console.warn('carregarPerfilDash:', e); }
 }
 let abertos=new Set();
@@ -13061,7 +13063,8 @@ async function salvarAnalise() {
     year:             meta.year,
     period:           meta.period || 'Anual',
     filename_dre:     meta.dre     || null,
-    filename_balanco: meta.balanco || null
+    filename_balanco: meta.balanco || null,
+    company_id:       window._empresaSelecionada?.id || null
   };
   // Só inclui dados da IA se existirem — evita sobrescrever com NULL o que a edge function salvou
   if (iaData._hashCombo)             upsertPayload.hash_combo      = iaData._hashCombo;
@@ -13380,6 +13383,10 @@ async function popularFiltroDash() {
     toast('Não autenticado — faça login para ver suas análises.', 'erro');
     return;
   }
+  // Se há uma empresa selecionada, filtra análises por ela
+  if (window._empresaSelecionada && window._empresaSelecionada.id) {
+    return popularFiltroDashPorEmpresa(window._empresaSelecionada.id);
+  }
   console.log('📂 Buscando análises para user:', currentUser.id);
   var analises = await carregarAnalises();
   console.log('📂 Análises encontradas:', analises.length, analises);
@@ -13456,6 +13463,130 @@ async function popularFiltroDash() {
 
   // Carrega os dados da análise selecionada
   if (idParaCarregar) dashFilterChange(idParaCarregar);
+}
+
+// ── FILTRO DE ANÁLISES POR EMPRESA ─────────────────────────────────────
+async function popularFiltroDashPorEmpresa(companyId) {
+  if (!currentUser) return;
+  console.log('📂 Buscando análises para empresa:', companyId);
+  var { data: analises, error } = await sb
+    .from('analyses')
+    .select('id, year, period, filename_dre, created_at')
+    .eq('user_id', currentUser.id)
+    .eq('company_id', companyId)
+    .order('year',   { ascending: false })
+    .order('period', { ascending: true });
+  if (error) { console.warn('popularFiltroDashPorEmpresa:', error.message); analises = []; }
+  analises = analises || [];
+
+  var sel    = document.getElementById('dash-filter');
+  var menu   = document.getElementById('dash-cs-menu');
+  var labelEl = document.getElementById('dash-cs-label');
+  if (!sel) return;
+
+  if (!analises.length) {
+    sel.innerHTML = '<option value="">Nenhuma análise para esta empresa</option>';
+    if (menu) menu.innerHTML = '<div class="dash-cs-opt sel" data-val="" onclick="pickDashCs(this)">Nenhuma análise para esta empresa</div>';
+    var emptyState   = document.getElementById('dash-empty-state');
+    var mainContent  = document.getElementById('dash-main-content');
+    if (emptyState)  emptyState.style.display  = 'flex';
+    if (mainContent) mainContent.style.display = 'none';
+    return;
+  }
+
+  var emptyState  = document.getElementById('dash-empty-state');
+  var mainContent = document.getElementById('dash-main-content');
+  if (emptyState)  emptyState.style.display  = 'none';
+  if (mainContent) mainContent.style.display = 'grid';
+
+  sel.innerHTML = analises.map(function(a) {
+    var lbl = a.year + (a.period && a.period !== 'Anual' ? ' · ' + a.period : '');
+    return '<option value="' + a.id + '" data-year="' + a.year + '" data-period="' + (a.period||'') + '">' + lbl + '</option>';
+  }).join('');
+
+  if (menu) {
+    menu.innerHTML = analises.map(function(a) {
+      var lbl = a.year + (a.period && a.period !== 'Anual' ? ' · ' + a.period : '');
+      return '<div class="dash-cs-opt" data-val="' + a.id + '" onclick="pickDashCs(this)">' + lbl + '</div>';
+    }).join('');
+  }
+
+  // Auto-seleciona a análise mais recente
+  var primeiraOpt = sel.options[0];
+  sel.value = primeiraOpt.value;
+  if (labelEl) labelEl.textContent = primeiraOpt.textContent;
+  var csOpt = menu && menu.querySelector('[data-val="' + primeiraOpt.value + '"]');
+  if (csOpt) {
+    document.querySelectorAll('.dash-cs-opt').forEach(function(o){ o.classList.remove('sel'); });
+    csOpt.classList.add('sel');
+  }
+  dashFilterChange(primeiraOpt.value);
+}
+
+// ── SELECIONAR EMPRESA NO SWITCHER ──────────────────────────────────────
+function selecionarEmpresaSwitcher(id, name, nicho) {
+  window._empresaSelecionada = { id: id, name: name, nicho: nicho, modo: 'existente' };
+
+  // Atualiza o card de empresa na sidebar
+  var avatarEl = document.getElementById('empresa-avatar');
+  var nomeEl   = document.getElementById('empresa-nome-sidebar');
+  var subEl    = document.getElementById('empresa-sub-sidebar');
+  var initials = (name || '?').trim().split(/\s+/).map(function(w){ return w[0]; }).slice(0,2).join('').toUpperCase();
+  if (avatarEl) avatarEl.textContent = initials;
+  if (nomeEl)   nomeEl.textContent   = name;
+  if (subEl)    subEl.textContent    = nicho || '';
+
+  // Fecha o switcher
+  var list = document.getElementById('empresa-list');
+  if (list) list.style.display = 'none';
+
+  // Filtra análises pela empresa selecionada
+  popularFiltroDashPorEmpresa(id);
+}
+
+// ── CARREGAR EMPRESAS NO SWITCHER ───────────────────────────────────────
+async function carregarEmpresasSwitcher() {
+  if (!currentUser) return;
+  var { data: empresas, error } = await sb
+    .from('companies')
+    .select('id, name, nicho')
+    .eq('user_id', currentUser.id)
+    .order('created_at', { ascending: true });
+  if (error) { console.warn('carregarEmpresasSwitcher:', error.message); return; }
+  empresas = empresas || [];
+
+  var list = document.getElementById('empresa-list');
+  if (!list) return;
+
+  // Remove itens de empresa anteriores (mantém só o botão "Adicionar" que é o último filho fixo)
+  var addBtn = list.querySelector('.empresa-item[data-add]');
+  // Limpa todos os filhos dinâmicos
+  Array.from(list.children).forEach(function(child) {
+    if (!child.dataset.add) child.remove();
+  });
+
+  // Insere itens de empresa antes do botão "Adicionar"
+  empresas.forEach(function(emp) {
+    var initials = (emp.name || '?').trim().split(/\s+/).map(function(w){ return w[0]; }).slice(0,2).join('').toUpperCase();
+    var div = document.createElement('div');
+    div.className = 'empresa-item';
+    div.setAttribute('data-empresa-id', emp.id);
+    div.style.cssText = 'cursor:pointer;padding:.5rem .75rem;border-radius:8px;display:flex;align-items:center;gap:8px;transition:background .15s;';
+    div.setAttribute('onclick', "selecionarEmpresaSwitcher('" + emp.id + "','" + (emp.name||'').replace(/'/g,"\\'") + "','" + (emp.nicho||'').replace(/'/g,"\\'") + "')");
+    div.setAttribute('onmouseover', "this.style.background='var(--surface2)'");
+    div.setAttribute('onmouseout',  "this.style.background=''");
+    div.innerHTML =
+      '<div style="width:28px;height:28px;border-radius:6px;background:var(--green);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;flex-shrink:0;">' + initials + '</div>' +
+      '<div>' +
+        '<div style="font-size:12px;font-weight:600;color:var(--text);">' + (emp.name || '') + '</div>' +
+        '<div style="font-size:10px;color:var(--text3);">' + (emp.nicho || '') + '</div>' +
+      '</div>';
+    if (addBtn) {
+      list.insertBefore(div, addBtn);
+    } else {
+      list.appendChild(div);
+    }
+  });
 }
 
 async function dashFilterChange(id) {
