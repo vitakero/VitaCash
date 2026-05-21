@@ -12890,10 +12890,30 @@ function ndreAnalisar() {
   (async function() {
     try {
 
-      // ── 0. Verificação antecipada: empresa + ano + período ──────────────
+      // ── Camada 0: Verificar nome da empresa no PDF (sem IA) ─────────────
+      // Lê texto das primeiras páginas e confere se o nome da empresa
+      // selecionada está presente. Se não estiver, avisa o usuário ANTES
+      // de chamar a IA — zero crédito consumido.
+      var _selEarly = window._empresaSelecionada;
+      if (_selEarly && _selEarly.modo === 'existente' && _selEarly.name && ndreFiles.dre) {
+        var _textoPDF = await extrairTextoPDF(ndreFiles.dre);
+        if (_textoPDF && _textoPDF.length > 50) {
+          var _nomeNorm = normalizarNomeEmpresa(_selEarly.name);
+          var _textoNorm = normalizarNomeEmpresa(_textoPDF.substring(0, 8000));
+          // Verifica se pelo menos a primeira palavra significativa do nome aparece
+          var _primeiraPalavra = _nomeNorm.split(' ').filter(function(w){ return w.length > 3; })[0] || _nomeNorm;
+          if (_primeiraPalavra && !_textoNorm.includes(_primeiraPalavra)) {
+            // Nome não encontrado — pede confirmação do usuário
+            var _continuar = await new Promise(function(resolve) {
+              _mostrarAvisoPDF(_selEarly.name, resolve);
+            });
+            if (!_continuar) return; // usuário cancelou
+          }
+        }
+      }
+      // ── 0b. Verificação antecipada: empresa + ano + período ─────────────
       // Roda ANTES de ler o conteúdo do PDF — evita processar arquivo
       // desnecessariamente quando o relatório já foi analisado antes.
-      var _selEarly = window._empresaSelecionada;
       var _anoEarly = (document.getElementById('ndre-ano') || {}).value || '';
       var _perEarly = (document.getElementById('ndre-periodo') || {}).value || 'Anual';
       if (_selEarly && _selEarly.id && _anoEarly && _selEarly.modo === 'existente') {
@@ -12944,6 +12964,7 @@ function ndreAnalisar() {
         var selC = window._empresaSelecionada;
         if (selC && selC.modo === 'existente') {
           if (!empresaCorresponde(cachedDados.empresa, selC.name)) {
+            _restaurarModalMismatchHard();
             var detC = document.getElementById('empresa-mismatch-detalhe');
             if (detC) detC.innerHTML = 'Empresa selecionada: <strong>' + selC.name + '</strong><br>Empresa no PDF: <strong>' + (cachedDados.empresa || '—') + '</strong>';
             var mmC = document.getElementById('modal-empresa-mismatch');
@@ -13033,6 +13054,7 @@ function ndreAnalisar() {
       if (sel && sel.modo === 'existente') {
         // Verificar se o PDF corresponde à empresa selecionada
         if (!empresaCorresponde(dados.empresa, sel.name)) {
+          _restaurarModalMismatchHard();
           var det = document.getElementById('empresa-mismatch-detalhe');
           if (det) det.innerHTML = 'Empresa selecionada: <strong>' + sel.name + '</strong><br>Empresa no PDF: <strong>' + (dados.empresa || '—') + '</strong>';
           var mm = document.getElementById('modal-empresa-mismatch');
@@ -14328,10 +14350,18 @@ function okComecarAgora(){
     <div style="width:48px;height:48px;border-radius:50%;background:#fef2f2;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D85A30" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
     </div>
-    <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;">PDF não corresponde</div>
-    <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:1.25rem;">PDF não corresponde à empresa selecionada. Verifique o arquivo.</div>
+    <div id="empresa-mismatch-titulo" style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;">PDF não corresponde</div>
+    <div id="empresa-mismatch-desc" style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:1.25rem;">PDF não corresponde à empresa selecionada. Verifique o arquivo.</div>
     <div id="empresa-mismatch-detalhe" style="font-size:11px;color:var(--text3);background:var(--surface,#f8faf9);border-radius:8px;padding:10px;margin-bottom:1.25rem;text-align:left;line-height:1.6;"></div>
-    <button onclick="document.getElementById('modal-empresa-mismatch').style.display='none'" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--green);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Entendido</button>
+    <!-- Modo hard: bloqueio total (após IA detectar) -->
+    <div id="empresa-mismatch-btns-hard">
+      <button onclick="document.getElementById('modal-empresa-mismatch').style.display='none'" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--green);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Entendido</button>
+    </div>
+    <!-- Modo soft: aviso preventivo (Camada 0, antes da IA) -->
+    <div id="empresa-mismatch-btns-soft" style="display:none;gap:8px;flex-direction:column;">
+      <button onclick="_mismatchContinuar()" style="width:100%;padding:12px;border-radius:10px;border:none;background:#D85A30;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Continuar mesmo assim</button>
+      <button onclick="_mismatchCancelar()" style="width:100%;padding:12px;border-radius:10px;border:1.5px solid var(--border);background:#fff;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Cancelar — trocar arquivo</button>
+    </div>
   </div>
 </div>
 
@@ -14549,6 +14579,87 @@ function enviarConvite() {
     btn.style.background = '';
     fecharContador();
   }, 2000);
+}
+
+// ── CAMADA 0: Leitura de texto do PDF no browser (sem IA) ──────────────────
+
+// Carrega PDF.js sob demanda (só quando necessário)
+async function _loadPDFJS() {
+  if (window.pdfjsLib) return window.pdfjsLib;
+  return new Promise(function(resolve, reject) {
+    var script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    script.onload = function() {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      resolve(window.pdfjsLib);
+    };
+    script.onerror = function() { resolve(null); }; // falha silenciosa
+    document.head.appendChild(script);
+  });
+}
+
+// Extrai texto das primeiras páginas do PDF
+async function extrairTextoPDF(file) {
+  try {
+    var pdfjs = await _loadPDFJS();
+    if (!pdfjs) return '';
+    var buf = await file.arrayBuffer();
+    var pdf = await pdfjs.getDocument({ data: buf }).promise;
+    var texto = '';
+    var maxPags = Math.min(3, pdf.numPages);
+    for (var i = 1; i <= maxPags; i++) {
+      var pag = await pdf.getPage(i);
+      var content = await pag.getTextContent();
+      texto += content.items.map(function(it){ return it.str; }).join(' ') + ' ';
+    }
+    return texto;
+  } catch(e) {
+    console.warn('extrairTextoPDF:', e.message);
+    return '';
+  }
+}
+
+// Callback para quando usuário escolhe no modal de aviso (modo soft)
+var _mismatchCallback = null;
+function _mismatchContinuar() {
+  document.getElementById('modal-empresa-mismatch').style.display = 'none';
+  if (typeof _mismatchCallback === 'function') _mismatchCallback(true);
+  _mismatchCallback = null;
+}
+function _mismatchCancelar() {
+  document.getElementById('modal-empresa-mismatch').style.display = 'none';
+  if (typeof _mismatchCallback === 'function') _mismatchCallback(false);
+  _mismatchCallback = null;
+}
+
+// Mostra modal de aviso preventivo (modo soft — Camada 0)
+function _mostrarAvisoPDF(nomeEmpresa, callback) {
+  var mm = document.getElementById('modal-empresa-mismatch');
+  var titulo = document.getElementById('empresa-mismatch-titulo');
+  var desc = document.getElementById('empresa-mismatch-desc');
+  var detalhe = document.getElementById('empresa-mismatch-detalhe');
+  var btnsHard = document.getElementById('empresa-mismatch-btns-hard');
+  var btnsSoft = document.getElementById('empresa-mismatch-btns-soft');
+  if (titulo) titulo.textContent = 'Nome da empresa não encontrado no PDF';
+  if (desc) desc.textContent = 'Não encontramos o nome da empresa selecionada neste arquivo. Verifique se enviou o PDF correto.';
+  if (detalhe) detalhe.innerHTML = 'Empresa selecionada: <strong>' + nomeEmpresa + '</strong><br>Continuar vai chamar a IA (consome crédito).';
+  if (btnsHard) btnsHard.style.display = 'none';
+  if (btnsSoft) btnsSoft.style.display = 'flex';
+  _mismatchCallback = callback;
+  if (mm) mm.style.display = 'flex';
+}
+
+// Restaura modal para modo hard (padrão)
+function _restaurarModalMismatchHard() {
+  var titulo = document.getElementById('empresa-mismatch-titulo');
+  var desc = document.getElementById('empresa-mismatch-desc');
+  var btnsHard = document.getElementById('empresa-mismatch-btns-hard');
+  var btnsSoft = document.getElementById('empresa-mismatch-btns-soft');
+  if (titulo) titulo.textContent = 'PDF não corresponde';
+  if (desc) desc.textContent = 'PDF não corresponde à empresa selecionada. Verifique o arquivo.';
+  if (btnsHard) btnsHard.style.display = 'block';
+  if (btnsSoft) btnsSoft.style.display = 'none';
 }
 
 // Modal suporte
