@@ -3464,7 +3464,7 @@ function adminAbrirWhatsApp() {
 }
 </script>
 
-  <div id="dash-tag-file" class="tag-file">📄 DRE_GJoaoDosSantos_2022.pdf + Balanço_Patrimonial_GJoao.pdf · analisados automaticamente</div>
+  <div id="dash-tag-file" class="tag-file" style="display:none;"></div>
 
   <!-- SELETOR DE EMPRESA -->
   <div class="empresa-switcher">
@@ -12408,8 +12408,10 @@ function popularDashboard(dados) {
       if (nomeBP && nomeBP !== nomeDRE) txt += ' + ' + nomeBP;
       txt += ' · analisados automaticamente';
       tagEl.textContent = txt;
+      tagEl.style.display = '';
     } else if (dados.empresa) {
       tagEl.textContent = '📄 ' + dados.empresa + ' · ' + (dados.ano || '') + ' · analisados automaticamente';
+      tagEl.style.display = '';
     }
   })();
 
