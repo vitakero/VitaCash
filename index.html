@@ -3584,23 +3584,16 @@ function adminAbrirWhatsApp() {
   <div id="dash-tag-file" class="tag-file" style="display:none;"></div>
 
   <!-- SELETOR DE EMPRESA -->
+  <!-- elementos ocultos mantidos para atualizações programáticas -->
+  <div id="empresa-avatar" style="display:none;">—</div>
+  <div id="empresa-nome-sidebar" style="display:none;">—</div>
+  <div id="empresa-sub-sidebar" style="display:none;">Carregando...</div>
+
   <div class="empresa-switcher">
-    <div class="empresa-atual" onclick="togEmpresas()">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div id="empresa-avatar" style="width:32px;height:32px;border-radius:8px;background:var(--green);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;">—</div>
-        <div>
-          <div id="empresa-nome-sidebar" style="font-size:13px;font-weight:600;color:var(--text);">—</div>
-          <div id="empresa-sub-sidebar" style="font-size:10px;color:var(--text3);">Carregando...</div>
-        </div>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <span style="font-size:9px;background:var(--green-light);color:var(--green);padding:2px 8px;border-radius:99px;font-weight:600;">Ativa</span>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      </div>
-    </div>
-    <div id="empresa-list" style="display:none;">
+    <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:.5rem;padding:0 .25rem;">Empresas</div>
+    <div id="empresa-list" style="display:block;">
       <div class="empresa-item" data-add="1" style="cursor:pointer;" onclick="tentarAdicionarEmpresa()">
-        <div style="width:28px;height:28px;border-radius:6px;background:var(--surface2);display:flex;align-items:center;justify-content:center;border:1.5px dashed var(--border2);">
+        <div style="width:28px;height:28px;border-radius:6px;background:var(--surface2);display:flex;align-items:center;justify-content:center;border:1.5px dashed var(--border2);flex-shrink:0;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         </div>
         <div>
@@ -9693,8 +9686,8 @@ function imprimirRelatorio() {
   if (oldCover) oldCover.remove();
 
   // Tenta pegar nome da empresa dinamicamente
-  var empresaNome = (document.querySelector('.empresa-atual .font-semibold, .empresa-atual [style*="font-weight:600"], .empresa-atual [style*="font-weight: 600"]') || {}).textContent
-    || (window._dadosIA && window._dadosIA.empresa) || ''
+  var empresaNome = (window._empresaSelecionada && window._empresaSelecionada.name)
+    || (window._dadosIA && window._dadosIA.empresa)
     || 'Empresa';
   var dataEmissao = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
   var anoExercicio = new Date().getFullYear();
@@ -10678,6 +10671,8 @@ async function salvarNovaEmpresa(nome) {
     window._empresaSelecionada = { id: data.id, name: data.name, nicho: data.nicho, modo: 'existente' };
     toast('Empresa "' + nome + '" cadastrada com sucesso!', 'ok');
     console.log('✅ Nova empresa salva:', data);
+    // Atualiza a lista de empresas na sidebar imediatamente
+    if (typeof carregarEmpresasSwitcher === 'function') carregarEmpresasSwitcher();
   } catch(e) {
     console.error('Erro ao salvar empresa:', e);
     toast('Erro ao cadastrar empresa: ' + e.message, 'erro');
@@ -13529,7 +13524,7 @@ async function popularFiltroDashPorEmpresa(companyId) {
 function selecionarEmpresaSwitcher(id, name, nicho) {
   window._empresaSelecionada = { id: id, name: name, nicho: nicho, modo: 'existente' };
 
-  // Atualiza o card de empresa na sidebar
+  // Atualiza elementos ocultos de estado (usados por outras funções)
   var avatarEl = document.getElementById('empresa-avatar');
   var nomeEl   = document.getElementById('empresa-nome-sidebar');
   var subEl    = document.getElementById('empresa-sub-sidebar');
@@ -13538,9 +13533,14 @@ function selecionarEmpresaSwitcher(id, name, nicho) {
   if (nomeEl)   nomeEl.textContent   = name;
   if (subEl)    subEl.textContent    = nicho || '';
 
-  // Fecha o switcher
-  var list = document.getElementById('empresa-list');
-  if (list) list.style.display = 'none';
+  // Destaca a empresa ativa na lista (sem fechar a lista)
+  document.querySelectorAll('#empresa-list .empresa-item[data-empresa-id]').forEach(function(item) {
+    var isAtiva = item.getAttribute('data-empresa-id') === id;
+    item.style.background  = isAtiva ? 'var(--green-light)' : '';
+    item.style.borderColor = isAtiva ? 'var(--green)' : '';
+    var badge = item.querySelector('.badge-ativa');
+    if (badge) badge.style.display = isAtiva ? 'inline' : 'none';
+  });
 
   // Filtra análises pela empresa selecionada
   popularFiltroDashPorEmpresa(id);
@@ -13568,26 +13568,41 @@ async function carregarEmpresasSwitcher() {
   });
 
   // Insere itens de empresa antes do botão "Adicionar"
+  var idAtivo = (window._empresaSelecionada && window._empresaSelecionada.id) || null;
   empresas.forEach(function(emp) {
     var initials = (emp.name || '?').trim().split(/\s+/).map(function(w){ return w[0]; }).slice(0,2).join('').toUpperCase();
+    var isAtiva = emp.id === idAtivo;
     var div = document.createElement('div');
     div.className = 'empresa-item';
     div.setAttribute('data-empresa-id', emp.id);
-    div.style.cssText = 'cursor:pointer;padding:.5rem .75rem;border-radius:8px;display:flex;align-items:center;gap:8px;transition:background .15s;';
+    div.style.cssText = 'cursor:pointer;padding:.625rem .875rem;border-radius:10px;display:flex;align-items:center;gap:10px;transition:background .15s,border-color .15s;' +
+      (isAtiva ? 'background:var(--green-light);border-color:var(--green);' : '');
     div.setAttribute('onclick', "selecionarEmpresaSwitcher('" + emp.id + "','" + (emp.name||'').replace(/'/g,"\\'") + "','" + (emp.nicho||'').replace(/'/g,"\\'") + "')");
-    div.setAttribute('onmouseover', "this.style.background='var(--surface2)'");
-    div.setAttribute('onmouseout',  "this.style.background=''");
+    div.setAttribute('onmouseover', "if(!this.getAttribute('data-empresa-id')||'" + emp.id + "'!==((window._empresaSelecionada||{}).id||''))this.style.background='var(--surface2)'");
+    div.setAttribute('onmouseout',  "if('" + emp.id + "'!==((window._empresaSelecionada||{}).id||''))this.style.background=''");
     div.innerHTML =
-      '<div style="width:28px;height:28px;border-radius:6px;background:var(--green);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;flex-shrink:0;">' + initials + '</div>' +
-      '<div>' +
-        '<div style="font-size:12px;font-weight:600;color:var(--text);">' + (emp.name || '') + '</div>' +
-        '<div style="font-size:10px;color:var(--text3);">' + (emp.nicho || '') + '</div>' +
-      '</div>';
+      '<div style="width:30px;height:30px;border-radius:8px;background:var(--green);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;flex-shrink:0;">' + initials + '</div>' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div style="font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (emp.name || '') + '</div>' +
+        '<div style="font-size:10px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (emp.nicho || '') + '</div>' +
+      '</div>' +
+      '<span class="badge-ativa" style="display:' + (isAtiva ? 'inline' : 'none') + ';font-size:9px;background:var(--green-light);color:var(--green);padding:2px 7px;border-radius:99px;font-weight:700;flex-shrink:0;border:1px solid var(--green);">Ativa</span>';
     if (addBtn) {
       list.insertBefore(div, addBtn);
     } else {
       list.appendChild(div);
     }
+  });
+}
+
+// Atualiza destaque "Ativa" na lista de empresas do switcher
+function _atualizarBadgeAtiva(companyId) {
+  document.querySelectorAll('#empresa-list .empresa-item[data-empresa-id]').forEach(function(item) {
+    var isAtiva = item.getAttribute('data-empresa-id') === companyId;
+    item.style.background  = isAtiva ? 'var(--green-light)' : '';
+    item.style.borderColor = isAtiva ? 'var(--green)' : '';
+    var badge = item.querySelector('.badge-ativa');
+    if (badge) badge.style.display = isAtiva ? 'inline' : 'none';
   });
 }
 
@@ -13612,6 +13627,22 @@ async function dashFilterChange(id) {
   if (mc) mc.textContent = 'Diagnóstico financeiro';
 
   console.log('📊 Análise carregada:', labelPeriodo, data);
+
+  // Resolve empresa ativa pela análise carregada
+  if (data.company_id) {
+    if (!window._empresaSelecionada || !window._empresaSelecionada.id) {
+      // Busca info da empresa para popular _empresaSelecionada
+      sb.from('companies').select('id,name,nicho').eq('id', data.company_id).single()
+        .then(function(res) {
+          if (res.data) {
+            window._empresaSelecionada = { id: res.data.id, name: res.data.name, nicho: res.data.nicho, modo: 'existente' };
+          }
+          _atualizarBadgeAtiva(data.company_id);
+        });
+    } else {
+      _atualizarBadgeAtiva(data.company_id);
+    }
+  }
 
   // Popula dashboard com dados salvos da IA
   // Se veio de uma análise fresca, não sobrescreve — os dados já foram populados
@@ -14372,9 +14403,10 @@ body:has(#s-dash.active) #btn-export-pdf { display:block!important; }
 .empresa-atual:hover { border-color:var(--green); background:var(--green-light); }
 .empresa-item {
   display:flex; align-items:center; gap:10px;
-  padding:12px 16px; border:1.5px dashed var(--border);
-  border-radius:10px; margin-top:8px; transition:all .2s;
+  padding:10px 14px; border:1.5px solid var(--border);
+  border-radius:10px; margin-top:6px; transition:all .2s;
 }
+.empresa-item[data-add="1"] { border-style:dashed; }
 .empresa-item:hover { border-color:var(--green); }
 
 
@@ -14492,15 +14524,10 @@ function exportarPDF() {
   }
 
   // ── DOM ──────────────────────────────────────────────────────────
-  var empresaEl = document.querySelector('.empresa-atual');
-  var empresaNome = 'Empresa';
-  var cnpj = '';
-  if (empresaEl) {
-    var nomeEl = empresaEl.querySelector('[style*="font-weight:600"],[style*="font-weight: 600"]');
-    if (nomeEl) empresaNome = nomeEl.textContent.trim();
-    var cnpjEl = empresaEl.querySelector('[style*="font-size:10px"]');
-    if (cnpjEl) cnpj = cnpjEl.textContent.trim();
-  }
+  var empresaNome = (window._empresaSelecionada && window._empresaSelecionada.name)
+    || (window._dadosIA && window._dadosIA.empresa)
+    || 'Empresa';
+  var cnpj = (window._dadosIA && window._dadosIA.cnpj) || '';
   var nota = (document.querySelector('.nota-num') || {}).textContent || '8,4';
   var dataEmissao = new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
   var anoRef = '2022';
