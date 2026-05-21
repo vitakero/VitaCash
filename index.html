@@ -14267,11 +14267,11 @@ function okComecarAgora(){
     <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#0a2818,#1D9E75);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1l3.09 6.26L22 8.27l-5 4.87 1.18 6.88L12 16.77l-6.18 3.25L7 13.14 2 8.27l6.91-1.01L12 1z"/></svg>
     </div>
-    <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:6px;">Recurso Premium</div>
+    <div id="premium-upgrade-titulo" style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:6px;">Recurso Premium</div>
     <div id="premium-upgrade-desc" style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:1.25rem;">Esta funcionalidade está disponível apenas no plano Premium.</div>
     <div style="background:var(--surface2);border-radius:10px;padding:1rem;margin-bottom:1.25rem;text-align:left;">
-      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Incluso no Premium</div>
-      <div style="display:flex;flex-direction:column;gap:6px;">
+      <div id="premium-upgrade-features-label" style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Incluso no Premium</div>
+      <div id="premium-upgrade-features" style="display:flex;flex-direction:column;gap:6px;">
         <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Empresas ilimitadas</div>
         <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Relatórios PDF exportáveis</div>
         <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Acesso para contador</div>
@@ -14279,7 +14279,7 @@ function okComecarAgora(){
       </div>
     </div>
     <button onclick="document.getElementById('modal-premium-upgrade').style.display='none';falarComConsultor()" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--green);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Falar com consultor →</button>
-    <div style="font-size:11px;color:var(--text3);margin-top:.5rem;">R$ 347/mês · 14 dias grátis</div>
+    <div id="premium-upgrade-preco" style="font-size:11px;color:var(--text3);margin-top:.5rem;">R$ 347/mês · 14 dias grátis</div>
   </div>
 </div>
 
@@ -14551,19 +14551,37 @@ function tentarAdicionarEmpresa() {
   var limite = EMPRESA_LIMIT[planoNome] || 1;
 
   if (totalEmpresas >= limite) {
-    // Atingiu o limite — mostra upgrade
+    var titulo     = document.getElementById('premium-upgrade-titulo');
+    var desc       = document.getElementById('premium-upgrade-desc');
+    var featLabel  = document.getElementById('premium-upgrade-features-label');
+    var featList   = document.getElementById('premium-upgrade-features');
+    var preco      = document.getElementById('premium-upgrade-preco');
+    var checkIcon  = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+
+    if (titulo) titulo.textContent = 'Limite de empresas atingido';
+
     if (nivelAtual < 2) {
-      // Free/Growth → precisa do PRO (3 empresas)
-      document.getElementById('premium-upgrade-desc').textContent = 'Seu plano permite apenas ' + limite + ' empresa. Faça upgrade para o PRO e gerencie até 3 empresas.';
-      document.getElementById('modal-premium-upgrade').style.display = 'flex';
+      // Starter/Growth → upgrade para PRO
+      if (desc)      desc.textContent = 'Seu plano permite apenas ' + limite + ' empresa. Faça upgrade para o PRO e gerencie até 3 empresas.';
+      if (featLabel) featLabel.textContent = 'Incluso no PRO';
+      if (featList)  featList.innerHTML =
+        '<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);">' + checkIcon + ' Até 3 empresas</div>' +
+        '<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);">' + checkIcon + ' Análises ilimitadas</div>' +
+        '<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);">' + checkIcon + ' Relatórios PDF exportáveis</div>' +
+        '<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);">' + checkIcon + ' Suporte prioritário</div>';
+      if (preco) preco.textContent = 'R$ 197/mês · 14 dias grátis';
     } else if (nivelAtual < 3) {
-      // PRO → precisa do Premium (ilimitadas)
-      document.getElementById('premium-upgrade-desc').textContent = 'Seu plano PRO permite até 3 empresas. Faça upgrade para o Premium e tenha empresas ilimitadas.';
-      document.getElementById('modal-premium-upgrade').style.display = 'flex';
-    } else {
-      // Premium — nunca deveria cair aqui, mas por segurança
-      alert('Em breve: adicionar nova empresa');
+      // PRO → upgrade para Premium
+      if (desc)      desc.textContent = 'Seu plano PRO permite até 3 empresas. Faça upgrade para o Premium e tenha empresas ilimitadas.';
+      if (featLabel) featLabel.textContent = 'Incluso no Premium';
+      if (featList)  featList.innerHTML =
+        '<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);">' + checkIcon + ' Empresas ilimitadas</div>' +
+        '<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);">' + checkIcon + ' Análises ilimitadas</div>' +
+        '<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);">' + checkIcon + ' Acesso para contador</div>' +
+        '<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);">' + checkIcon + ' Suporte prioritário</div>';
+      if (preco) preco.textContent = 'R$ 347/mês · 14 dias grátis';
     }
+    document.getElementById('modal-premium-upgrade').style.display = 'flex';
   } else {
     // Tem espaço — pode adicionar
     abrirSeletorEmpresa();
