@@ -10721,12 +10721,23 @@ async function salvarNovaEmpresa(nome) {
     if (_sb) { _sb.textContent = data.nicho || ''; }
     if (_bdg) _bdg.style.display = 'inline';
 
-    // Vincula análises salvas sem empresa (company_id NULL) à nova empresa
-    // Isso corrige o caso onde salvarAnalise() rodou antes da empresa ser criada
-    await sb.from('analyses')
-      .update({ company_id: data.id })
-      .eq('user_id', currentUser.id)
-      .is('company_id', null);
+    // Vincula SOMENTE a análise da sessão atual (se ainda sem empresa)
+    // Não linka TODAS para não contaminar análises de outras empresas
+    var _analiseId = window._analiseAtual && window._analiseAtual.id;
+    if (_analiseId) {
+      await sb.from('analyses')
+        .update({ company_id: data.id })
+        .eq('id', _analiseId)
+        .is('company_id', null);
+    } else {
+      // Fallback: linka só a análise mais recente sem empresa
+      await sb.from('analyses')
+        .update({ company_id: data.id })
+        .eq('user_id', currentUser.id)
+        .is('company_id', null)
+        .order('created_at', { ascending: false })
+        .limit(1);
+    }
 
     // Atualiza a lista de empresas na sidebar imediatamente
     if (typeof carregarEmpresasSwitcher === 'function') await carregarEmpresasSwitcher();
