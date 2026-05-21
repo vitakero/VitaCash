@@ -3595,7 +3595,7 @@ function adminAbrirWhatsApp() {
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
-        <span style="font-size:9px;background:var(--green-light);color:var(--green);padding:2px 8px;border-radius:99px;font-weight:600;">Ativa</span>
+        <span id="empresa-badge-ativa" style="font-size:9px;background:var(--green-light);color:var(--green);padding:2px 8px;border-radius:99px;font-weight:600;display:none;">Ativa</span>
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
     </div>
@@ -10775,6 +10775,8 @@ function popularDashboard(dados) {
     if (av)  { av.textContent = iniciais; av.style.background = 'var(--green)'; av.style.color = '#fff'; av.style.fontSize = '11px'; }
     if (nm)  { nm.textContent = empresa2; nm.style.color = 'var(--text)'; }
     if (sub) { sub.textContent = (dados.setor || '') + (dados.ano ? ' · ' + dados.ano : ''); }
+    var _badge = document.getElementById('empresa-badge-ativa');
+    if (_badge) _badge.style.display = 'inline';
   })();
 
   // ── 0b. BALANÇO — títulos e pills educativas ─────────────────
@@ -13485,6 +13487,8 @@ async function popularFiltroDash() {
     if (_av) { _av.textContent = '+'; _av.style.background = 'var(--border)'; _av.style.color = 'var(--text3)'; _av.style.fontSize = '15px'; }
     if (_nm) { _nm.textContent = 'Nenhuma empresa'; _nm.style.color = 'var(--text3)'; }
     if (_sb) { _sb.textContent = 'Clique para adicionar'; }
+    var _bdgV = document.getElementById('empresa-badge-ativa');
+    if (_bdgV) _bdgV.style.display = 'none';
     return;
   }
   // Tem análises — esconde empty state e mostra conteúdo
@@ -13615,6 +13619,8 @@ function selecionarEmpresaSwitcher(id, name, nicho) {
   if (avatarEl) { avatarEl.textContent = initials; avatarEl.style.background = 'var(--green)'; avatarEl.style.color = '#fff'; avatarEl.style.fontSize = '11px'; }
   if (nomeEl)   { nomeEl.textContent = name; nomeEl.style.color = 'var(--text)'; }
   if (subEl)    { subEl.textContent  = nicho || ''; }
+  var badgeAtiva = document.getElementById('empresa-badge-ativa');
+  if (badgeAtiva) badgeAtiva.style.display = 'inline';
 
   // Fecha a lista após selecionar
   var list = document.getElementById('empresa-list');
@@ -13724,6 +13730,8 @@ async function dashFilterChange(id) {
             if (av)  { av.textContent = ini; av.style.background = 'var(--green)'; av.style.color = '#fff'; av.style.fontSize = '11px'; }
             if (nm)  { nm.textContent = res.data.name; nm.style.color = 'var(--text)'; }
             if (sb2) { sb2.textContent = res.data.nicho || ''; }
+            var _bdg = document.getElementById('empresa-badge-ativa');
+            if (_bdg) _bdg.style.display = 'inline';
           }
           // Reconstrói lista sem a empresa ativa (evita duplicata)
           if (typeof carregarEmpresasSwitcher === 'function') carregarEmpresasSwitcher();
