@@ -13658,11 +13658,21 @@ async function dashFilterChange(id) {
         .then(function(res) {
           if (res.data) {
             window._empresaSelecionada = { id: res.data.id, name: res.data.name, nicho: res.data.nicho, modo: 'existente' };
+            // Atualiza card empresa-atual na sidebar
+            var av = document.getElementById('empresa-avatar');
+            var nm = document.getElementById('empresa-nome-sidebar');
+            var sb2 = document.getElementById('empresa-sub-sidebar');
+            var ini = res.data.name.trim().split(/\s+/).map(function(w){return w[0];}).slice(0,2).join('').toUpperCase();
+            if (av) av.textContent = ini;
+            if (nm) nm.textContent = res.data.name;
+            if (sb2) sb2.textContent = res.data.nicho || '';
           }
-          _atualizarBadgeAtiva(data.company_id);
+          // Reconstrói lista sem a empresa ativa (evita duplicata)
+          if (typeof carregarEmpresasSwitcher === 'function') carregarEmpresasSwitcher();
         });
     } else {
-      _atualizarBadgeAtiva(data.company_id);
+      // Reconstrói lista sem a empresa ativa (evita duplicata)
+      if (typeof carregarEmpresasSwitcher === 'function') carregarEmpresasSwitcher();
     }
   }
 
