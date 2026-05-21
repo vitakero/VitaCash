@@ -13405,18 +13405,19 @@ async function popularFiltroDash() {
   if (!analises.length) {
     sel.innerHTML = '<option value="">Nenhuma análise salva</option>';
     if (menu) menu.innerHTML = '<div class="dash-cs-opt sel" data-val="" onclick="pickDashCs(this)">Nenhuma análise salva</div>';
+    // Limpa dados em memória para não vazar entre sessões
+    window._dadosIA = null;
+    window._empresaSelecionada = null;
+    window._analiseAtual = null;
     // Mostra empty state e esconde conteúdo do dashboard
     var emptyState = document.getElementById('dash-empty-state');
     var mainContent = document.getElementById('dash-main-content');
     if (emptyState) emptyState.style.display = 'flex';
     if (mainContent) mainContent.style.display = 'none';
-    // Limpa o "Carregando..." da sidebar de empresa
-    var subSidebar = document.getElementById('empresa-sub-sidebar');
-    if (subSidebar) subSidebar.textContent = 'Nenhuma análise';
-    var nmSidebar = document.getElementById('empresa-nome-sidebar');
-    if (nmSidebar) nmSidebar.textContent = 'Adicionar empresa';
-    var avSidebar = document.getElementById('empresa-avatar');
-    if (avSidebar) avSidebar.textContent = '+';
+    // Limpa header de arquivos analisados
+    ['ut','ut2','dt'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=''; });
+    // Limpa badge de empresas na sidebar
+    document.querySelectorAll('#empresa-list .empresa-item[data-empresa-id]').forEach(function(el){ el.remove(); });
     return;
   }
   // Tem análises — esconde empty state e mostra conteúdo
@@ -13494,6 +13495,11 @@ async function popularFiltroDashPorEmpresa(companyId) {
   if (!analises.length) {
     sel.innerHTML = '<option value="">Nenhuma análise para esta empresa</option>';
     if (menu) menu.innerHTML = '<div class="dash-cs-opt sel" data-val="" onclick="pickDashCs(this)">Nenhuma análise para esta empresa</div>';
+    // Limpa dados em memória
+    window._dadosIA = null;
+    window._analiseAtual = null;
+    // Limpa header de arquivos
+    ['ut','ut2','dt'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=''; });
     var emptyState   = document.getElementById('dash-empty-state');
     var mainContent  = document.getElementById('dash-main-content');
     if (emptyState)  emptyState.style.display  = 'flex';
