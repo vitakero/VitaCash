@@ -3584,14 +3584,23 @@ function adminAbrirWhatsApp() {
   <div id="dash-tag-file" class="tag-file" style="display:none;"></div>
 
   <!-- SELETOR DE EMPRESA -->
-  <!-- elementos ocultos mantidos para atualizações programáticas -->
-  <div id="empresa-avatar" style="display:none;">—</div>
-  <div id="empresa-nome-sidebar" style="display:none;">—</div>
-  <div id="empresa-sub-sidebar" style="display:none;">Carregando...</div>
-
   <div class="empresa-switcher">
-    <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:.5rem;padding:0 .25rem;">Empresas</div>
-    <div id="empresa-list" style="display:block;">
+    <!-- Card da empresa ativa — clique para expandir/recolher a lista -->
+    <div class="empresa-atual" onclick="togEmpresas()">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div id="empresa-avatar" style="width:32px;height:32px;border-radius:8px;background:var(--green);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;">—</div>
+        <div>
+          <div id="empresa-nome-sidebar" style="font-size:13px;font-weight:600;color:var(--text);">—</div>
+          <div id="empresa-sub-sidebar" style="font-size:10px;color:var(--text3);">Carregando...</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:9px;background:var(--green-light);color:var(--green);padding:2px 8px;border-radius:99px;font-weight:600;">Ativa</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>
+    <!-- Lista expansível: outras empresas + botão adicionar -->
+    <div id="empresa-list" style="display:none;">
       <div class="empresa-item" data-add="1" style="cursor:pointer;" onclick="tentarAdicionarEmpresa()">
         <div style="width:28px;height:28px;border-radius:6px;background:var(--surface2);display:flex;align-items:center;justify-content:center;border:1.5px dashed var(--border2);flex-shrink:0;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -13549,14 +13558,9 @@ function selecionarEmpresaSwitcher(id, name, nicho) {
   if (nomeEl)   nomeEl.textContent   = name;
   if (subEl)    subEl.textContent    = nicho || '';
 
-  // Destaca a empresa ativa na lista (sem fechar a lista)
-  document.querySelectorAll('#empresa-list .empresa-item[data-empresa-id]').forEach(function(item) {
-    var isAtiva = item.getAttribute('data-empresa-id') === id;
-    item.style.background  = isAtiva ? 'var(--green-light)' : '';
-    item.style.borderColor = isAtiva ? 'var(--green)' : '';
-    var badge = item.querySelector('.badge-ativa');
-    if (badge) badge.style.display = isAtiva ? 'inline' : 'none';
-  });
+  // Fecha a lista após selecionar
+  var list = document.getElementById('empresa-list');
+  if (list) list.style.display = 'none';
 
   // Filtra análises pela empresa selecionada
   popularFiltroDashPorEmpresa(id);
