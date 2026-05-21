@@ -10491,7 +10491,7 @@ function abrirAddEmpresa() {
     var nichoSel = document.getElementById('add-empresa-nicho');
     if (nichoSel) { nichoSel.innerHTML = '<option value="">Selecione o nicho</option>'; }
     var nichoWrap = document.getElementById('add-empresa-nicho-wrap');
-    if (nichoWrap) nichoWrap.style.display = 'none';
+    if (nichoWrap) nichoWrap.style.display = 'block';
     var outroWrap = document.getElementById('add-empresa-outro-wrap');
     if (outroWrap) outroWrap.style.display = 'none';
     var outroInp = document.getElementById('add-empresa-outro');
@@ -14044,8 +14044,8 @@ function okComecarAgora(){
       <option value="outro">Outro</option>
     </select>
 
-    <!-- CAMPO 2: Nicho (aparece após escolher segmento) -->
-    <div id="add-empresa-nicho-wrap" style="display:none;">
+    <!-- CAMPO 2: Nicho -->
+    <div id="add-empresa-nicho-wrap" style="display:block;">
       <label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">Nicho</label>
       <select id="add-empresa-nicho" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;background:#fff;color:var(--text);margin-bottom:.75rem;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'">
         <option value="">Selecione o nicho</option>
