@@ -10543,14 +10543,8 @@ function addEmpresaFiltrarNicho(segmento) {
   if (!nichoWrap || !outroWrap || !nichoSel) return;
 
   if (segmento === 'outro') {
-    // Mostra select com nichos extras + campo livre
-    nichoSel.innerHTML = '<option value="">Selecione ou use o campo abaixo</option>' +
-      _NICHOS_EXTRAS.map(function(n){ return '<option value="'+n+'">'+n+'</option>'; }).join('');
-    nichoWrap.style.display = 'block';
+    nichoWrap.style.display = 'none';
     outroWrap.style.display = 'block';
-    // Label do campo livre
-    var outroLabel = outroWrap.querySelector('label');
-    if (outroLabel) outroLabel.textContent = 'Ou digite o nicho específico';
     return;
   }
   outroWrap.style.display = 'none';
