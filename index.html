@@ -10287,7 +10287,178 @@ function ndreLimpar() {
 // Atalho usado por botões "Nova análise" do dashboard: limpa + navega
 function novaAnalise() {
   if (typeof ndreLimpar === 'function') ndreLimpar();
+  window._empresaSelecionada = null;
+  abrirSeletorEmpresa();
+}
+
+// Abre o modal seletor de empresa e carrega empresas do Supabase
+async function abrirSeletorEmpresa() {
+  var modal = document.getElementById('modal-empresa-seletor');
+  if (!modal) { if (typeof go === 'function') go('s-nova-dre'); return; }
+  modal.style.display = 'flex';
+  document.getElementById('empresa-seletor-loading').style.display = 'block';
+  document.getElementById('empresa-seletor-lista').style.display = 'none';
+  document.getElementById('empresa-seletor-vazio').style.display = 'none';
+
+  try {
+    var { data: empresas, error } = await sb.from('companies')
+      .select('id, name, nicho')
+      .eq('user_id', currentUser.id)
+      .order('name');
+
+    document.getElementById('empresa-seletor-loading').style.display = 'none';
+    if (error) throw error;
+
+    if (!empresas || empresas.length === 0) {
+      document.getElementById('empresa-seletor-vazio').style.display = 'block';
+    } else {
+      var lista = document.getElementById('empresa-seletor-lista');
+      lista.innerHTML = '';
+      empresas.forEach(function(emp) {
+        var item = document.createElement('div');
+        item.style.cssText = 'padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:border-color .15s;';
+        item.onmouseenter = function() { this.style.borderColor = 'var(--green)'; };
+        item.onmouseleave = function() { this.style.borderColor = 'var(--border)'; };
+        item.innerHTML = '<div><div style="font-size:14px;font-weight:600;color:var(--text);">' + emp.name + '</div>' +
+          (emp.nicho ? '<div style="font-size:11px;color:var(--text3);margin-top:2px;">' + emp.nicho + '</div>' : '') + '</div>' +
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+        item.onclick = (function(e) {
+          return function() {
+            window._empresaSelecionada = { id: e.id, name: e.name, nicho: e.nicho, modo: 'existente' };
+            fecharSeletorEmpresa();
+            if (typeof go === 'function') go('s-nova-dre');
+          };
+        })(emp);
+        lista.appendChild(item);
+      });
+      lista.style.display = 'block';
+    }
+  } catch(e) {
+    document.getElementById('empresa-seletor-loading').style.display = 'none';
+    document.getElementById('empresa-seletor-vazio').style.display = 'block';
+    document.getElementById('empresa-seletor-vazio').textContent = 'Erro ao carregar empresas.';
+    console.error('abrirSeletorEmpresa:', e);
+  }
+}
+
+function fecharSeletorEmpresa() {
+  var modal = document.getElementById('modal-empresa-seletor');
+  if (modal) modal.style.display = 'none';
+}
+
+function abrirAddEmpresa() {
+  // Verifica limite de empresas antes de abrir
+  var planoNome = nivelAtual >= 3 ? 'premium' : nivelAtual >= 2 ? 'pro' : nivelAtual >= 1 ? 'growth' : 'starter';
+  // Verificação real via Supabase acontece em confirmarAddEmpresa; aqui só abrimos o modal
+  fecharSeletorEmpresa();
+  var modal = document.getElementById('modal-add-empresa');
+  if (modal) {
+    document.getElementById('add-empresa-nicho').value = '';
+    modal.style.display = 'flex';
+  }
+}
+
+function fecharAddEmpresa() {
+  var modal = document.getElementById('modal-add-empresa');
+  if (modal) modal.style.display = 'none';
+}
+
+function confirmarAddEmpresa() {
+  var nicho = document.getElementById('add-empresa-nicho').value;
+  if (!nicho) { toast('Selecione o segmento de atuação.', 'info'); return; }
+  // Marca modo "cadastro" — nome virá do PDF
+  window._empresaSelecionada = { id: null, name: null, nicho: nicho, modo: 'cadastro' };
+  fecharAddEmpresa();
   if (typeof go === 'function') go('s-nova-dre');
+}
+
+// Normaliza nome de empresa para comparação fuzzy
+function normalizarNomeEmpresa(nome) {
+  if (!nome) return '';
+  return nome
+    .toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '') // remove acentos
+    .replace(/\b(s\.?a\.?|ltda\.?|me\.?|epp\.?|eireli\.?|sa|ltda)\b/g, '') // remove sufixos
+    .replace(/[^a-z0-9\s]/g, '') // remove caracteres especiais
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// Verifica se dois nomes de empresa são equivalentes (fuzzy)
+function empresaCorresponde(nomePdf, nomeSelecionado) {
+  var a = normalizarNomeEmpresa(nomePdf);
+  var b = normalizarNomeEmpresa(nomeSelecionado);
+  if (!a || !b) return false;
+  if (a === b) return true;
+  // Contém um ao outro
+  if (a.includes(b) || b.includes(a)) return true;
+  // Distância de Levenshtein simples para nomes curtos
+  if (Math.abs(a.length - b.length) <= 3) {
+    var longer = a.length > b.length ? a : b;
+    var shorter = a.length > b.length ? b : a;
+    var matches = 0;
+    for (var i = 0; i < shorter.length; i++) {
+      if (longer.indexOf(shorter[i]) !== -1) matches++;
+    }
+    if (matches / longer.length > 0.8) return true;
+  }
+  return false;
+}
+
+// Fluxo de confirmação do nome da empresa extraído pelo Claude
+function confirmarNomeEmpresa(correto) {
+  if (correto) {
+    var nome = window._empresaExtraida || '';
+    salvarNovaEmpresa(nome);
+  } else {
+    var inputWrap = document.getElementById('confirmar-empresa-input-wrap');
+    if (inputWrap) inputWrap.style.display = 'block';
+    var inp = document.getElementById('confirmar-empresa-input');
+    if (inp) { inp.value = window._empresaExtraida || ''; inp.focus(); }
+  }
+}
+
+function salvarNomeCorrigido() {
+  var inp = document.getElementById('confirmar-empresa-input');
+  var nome = inp ? inp.value.trim() : '';
+  if (!nome) { toast('Digite o nome da empresa.', 'info'); return; }
+  salvarNovaEmpresa(nome);
+}
+
+async function salvarNovaEmpresa(nome) {
+  var sel = window._empresaSelecionada;
+  if (!sel) return;
+  var nicho = sel.nicho || '';
+  var mc = document.getElementById('modal-confirmar-empresa');
+  if (mc) mc.style.display = 'none';
+
+  // Verificar limite de empresas
+  var planoNome = nivelAtual >= 3 ? 'premium' : nivelAtual >= 2 ? 'pro' : nivelAtual >= 1 ? 'growth' : 'starter';
+  var limite = EMPRESA_LIMIT[planoNome] || 1;
+  try {
+    var { count } = await sb.from('companies').select('id', { count: 'exact', head: true }).eq('user_id', currentUser.id);
+    if ((count || 0) >= limite) {
+      if (typeof document !== 'undefined') {
+        var desc = 'Seu plano permite apenas ' + limite + ' empresa' + (limite === 1 ? '' : 's') + '. Faça upgrade para gerenciar mais empresas.';
+        document.getElementById('premium-upgrade-desc').textContent = desc;
+        document.getElementById('modal-premium-upgrade').style.display = 'flex';
+      }
+      return;
+    }
+  } catch(e) { console.warn('Não foi possível verificar limite de empresas:', e); }
+
+  try {
+    var { data, error } = await sb.from('companies').insert({ user_id: currentUser.id, name: nome, nicho: nicho }).select().single();
+    if (error) throw error;
+    window._empresaSelecionada = { id: data.id, name: data.name, nicho: data.nicho, modo: 'existente' };
+    toast('Empresa "' + nome + '" cadastrada com sucesso!', 'ok');
+    console.log('✅ Nova empresa salva:', data);
+  } catch(e) {
+    console.error('Erro ao salvar empresa:', e);
+    toast('Erro ao cadastrar empresa: ' + e.message, 'erro');
+    // Mesmo com erro, não bloqueia — define sem id
+    window._empresaSelecionada = { id: null, name: nome, nicho: nicho, modo: 'existente' };
+  }
 }
 
 function ndreChkBtn(periodosOk) {
@@ -12437,7 +12608,29 @@ function ndreAnalisar() {
 
       if (cached?.dados_extraidos) {
         console.log('✅ Cache hit:', hashCombo.slice(0,8));
-        window._dadosIA = Object.assign({}, cached.dados_extraidos, { _hashCombo: hashCombo, cache: true });
+        var cachedDados = Object.assign({}, cached.dados_extraidos, { _hashCombo: hashCombo, cache: true });
+        // Validação de empresa mesmo no cache
+        var selC = window._empresaSelecionada;
+        if (selC && selC.modo === 'existente') {
+          if (!empresaCorresponde(cachedDados.empresa, selC.name)) {
+            var detC = document.getElementById('empresa-mismatch-detalhe');
+            if (detC) detC.innerHTML = 'Empresa selecionada: <strong>' + selC.name + '</strong><br>Empresa no PDF: <strong>' + (cachedDados.empresa || '—') + '</strong>';
+            var mmC = document.getElementById('modal-empresa-mismatch');
+            if (mmC) mmC.style.display = 'flex';
+            return;
+          }
+        } else if (selC && selC.modo === 'cadastro') {
+          window._empresaExtraida = cachedDados.empresa;
+          window._dadosIA = cachedDados;
+          var nomElC = document.getElementById('confirmar-empresa-nome');
+          if (nomElC) nomElC.textContent = cachedDados.empresa || 'Empresa';
+          var iwC = document.getElementById('confirmar-empresa-input-wrap');
+          if (iwC) iwC.style.display = 'none';
+          var mcC = document.getElementById('modal-confirmar-empresa');
+          if (mcC) mcC.style.display = 'flex';
+          return;
+        }
+        window._dadosIA = cachedDados;
         return;
       }
 
@@ -12503,6 +12696,32 @@ function ndreAnalisar() {
         cache: false
       };
       if (dados.error) throw new Error(dados.error);
+
+      // ── Validação / cadastro de empresa ──────────────────────────────
+      var sel = window._empresaSelecionada;
+      if (sel && sel.modo === 'existente') {
+        // Verificar se o PDF corresponde à empresa selecionada
+        if (!empresaCorresponde(dados.empresa, sel.name)) {
+          var det = document.getElementById('empresa-mismatch-detalhe');
+          if (det) det.innerHTML = 'Empresa selecionada: <strong>' + sel.name + '</strong><br>Empresa no PDF: <strong>' + (dados.empresa || '—') + '</strong>';
+          var mm = document.getElementById('modal-empresa-mismatch');
+          if (mm) mm.style.display = 'flex';
+          console.warn('⚠ Empresa do PDF não corresponde:', dados.empresa, 'vs', sel.name);
+          return; // Bloqueia — não salva _dadosIA
+        }
+      } else if (sel && sel.modo === 'cadastro') {
+        // Modo cadastro: mostrar confirmação do nome extraído
+        window._empresaExtraida = dados.empresa;
+        window._dadosIA = dados; // Salva temporariamente para usar depois
+        var nomEl = document.getElementById('confirmar-empresa-nome');
+        if (nomEl) nomEl.textContent = dados.empresa || 'Empresa';
+        var inputWrap = document.getElementById('confirmar-empresa-input-wrap');
+        if (inputWrap) inputWrap.style.display = 'none';
+        var mc = document.getElementById('modal-confirmar-empresa');
+        if (mc) mc.style.display = 'flex';
+        return; // Aguarda confirmação antes de prosseguir
+      }
+      // ─────────────────────────────────────────────────────────────────
 
       // Guarda para usar quando o dashboard abrir
       window._dadosIA = dados;
@@ -13502,6 +13721,77 @@ function okComecarAgora(){
 </div>
 
 
+<!-- MODAL SELETOR DE EMPRESA -->
+<div id="modal-empresa-seletor" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.45);align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:16px;max-width:420px;width:90%;padding:1.5rem;position:relative;max-height:80vh;display:flex;flex-direction:column;">
+    <button onclick="fecharSeletorEmpresa()" style="position:absolute;top:12px;right:12px;background:none;border:none;font-size:18px;cursor:pointer;color:var(--text3);">✕</button>
+    <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:1.25rem;">Qual empresa você vai analisar?</div>
+    <div id="empresa-seletor-loading" style="text-align:center;padding:2rem;color:var(--text3);font-size:13px;">Carregando empresas...</div>
+    <div id="empresa-seletor-lista" style="display:none;overflow-y:auto;flex:1;margin-bottom:1rem;"></div>
+    <div id="empresa-seletor-vazio" style="display:none;text-align:center;padding:1.5rem 0;color:var(--text3);font-size:13px;">Nenhuma empresa cadastrada ainda.</div>
+    <button onclick="abrirAddEmpresa()" style="width:100%;padding:11px;border-radius:10px;border:1.5px dashed var(--green);background:var(--green-light,#e8f8f1);color:var(--green);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Adicionar nova empresa
+    </button>
+  </div>
+</div>
+
+<!-- MODAL ADICIONAR EMPRESA -->
+<div id="modal-add-empresa" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.45);align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:16px;max-width:420px;width:90%;padding:1.5rem;position:relative;">
+    <button onclick="fecharAddEmpresa()" style="position:absolute;top:12px;right:12px;background:none;border:none;font-size:18px;cursor:pointer;color:var(--text3);">✕</button>
+    <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px;">Adicionar nova empresa</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:1.25rem;line-height:1.5;">O nome da empresa será extraído automaticamente do PDF após a análise. Selecione apenas o segmento de atuação:</div>
+    <label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;">Segmento / Nicho</label>
+    <select id="add-empresa-nicho" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;background:#fff;color:var(--text);margin-bottom:1.25rem;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'">
+      <option value="">Selecione o tipo de negócio</option>
+      <option value="Restaurante / Alimentação">Restaurante / Alimentação</option>
+      <option value="Varejo / Comércio">Varejo / Comércio</option>
+      <option value="Clínica / Saúde">Clínica / Saúde</option>
+      <option value="Distribuidora / Logística">Distribuidora / Logística</option>
+      <option value="Indústria / Manufatura">Indústria / Manufatura</option>
+      <option value="Prestação de Serviços">Prestação de Serviços</option>
+      <option value="Construção / Engenharia">Construção / Engenharia</option>
+      <option value="E-commerce / Digital">E-commerce / Digital</option>
+      <option value="Outro">Outro</option>
+    </select>
+    <button onclick="confirmarAddEmpresa()" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--green);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Continuar para upload →</button>
+    <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:.5rem;">Você confirmará o nome após a análise do PDF</div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR EMPRESA EXTRAÍDA -->
+<div id="modal-confirmar-empresa" style="display:none;position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,.45);align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:16px;max-width:420px;width:90%;padding:1.5rem;position:relative;">
+    <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px;">Confirmar empresa</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:1rem;">Encontramos o seguinte nome no PDF:</div>
+    <div id="confirmar-empresa-nome" style="font-size:15px;font-weight:700;color:var(--green);background:var(--surface,#f8faf9);border-radius:8px;padding:12px 14px;margin-bottom:1.25rem;"></div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:.5rem;">Esse é o nome correto?</div>
+    <div style="display:flex;gap:8px;margin-bottom:1.25rem;">
+      <button onclick="confirmarNomeEmpresa(true)" style="flex:1;padding:10px;border-radius:8px;border:none;background:var(--green);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Sim, correto</button>
+      <button onclick="confirmarNomeEmpresa(false)" style="flex:1;padding:10px;border-radius:8px;border:1.5px solid var(--border);background:#fff;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Corrigir nome</button>
+    </div>
+    <div id="confirmar-empresa-input-wrap" style="display:none;margin-bottom:1rem;">
+      <label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;">Nome correto da empresa</label>
+      <input id="confirmar-empresa-input" type="text" placeholder="Digite o nome da empresa" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'">
+      <button onclick="salvarNomeCorrigido()" style="width:100%;margin-top:8px;padding:10px;border-radius:8px;border:none;background:var(--green);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salvar empresa</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EMPRESA NÃO CORRESPONDE -->
+<div id="modal-empresa-mismatch" style="display:none;position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,.45);align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:16px;max-width:380px;width:90%;padding:1.5rem;position:relative;text-align:center;">
+    <div style="width:48px;height:48px;border-radius:50%;background:#fef2f2;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D85A30" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+    <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;">PDF não corresponde</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:1.25rem;">PDF não corresponde à empresa selecionada. Verifique o arquivo.</div>
+    <div id="empresa-mismatch-detalhe" style="font-size:11px;color:var(--text3);background:var(--surface,#f8faf9);border-radius:8px;padding:10px;margin-bottom:1.25rem;text-align:left;line-height:1.6;"></div>
+    <button onclick="document.getElementById('modal-empresa-mismatch').style.display='none'" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--green);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Entendido</button>
+  </div>
+</div>
+
 <!-- MODAL CONTADOR -->
 <div id="modal-contador" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;display:none;align-items:center;justify-content:center;">
   <div style="background:#fff;border-radius:16px;padding:2rem;max-width:420px;width:90%;position:relative;">
@@ -13692,7 +13982,7 @@ function tentarAdicionarEmpresa() {
     }
   } else {
     // Tem espaço — pode adicionar
-    alert('Em breve: formulário para adicionar nova empresa');
+    abrirSeletorEmpresa();
   }
 }
 
@@ -13731,6 +14021,9 @@ document.addEventListener('click', function(e) {
   if (e.target.id === 'modal-contador') fecharContador();
   if (e.target.id === 'modal-suporte') fecharSuporte();
   if (e.target.id === 'modal-premium-upgrade') document.getElementById('modal-premium-upgrade').style.display='none';
+  if (e.target.id === 'modal-empresa-seletor') fecharSeletorEmpresa();
+  if (e.target.id === 'modal-add-empresa') fecharAddEmpresa();
+  if (e.target.id === 'modal-empresa-mismatch') document.getElementById('modal-empresa-mismatch').style.display='none';
 });
 
 </script>
