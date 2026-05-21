@@ -10421,7 +10421,9 @@ function ndreLimpar() {
 // Atalho usado por botões "Nova análise" do dashboard: limpa + navega
 function novaAnalise() {
   if (typeof ndreLimpar === 'function') ndreLimpar();
-  window._empresaSelecionada = null;
+  // Não zera _empresaSelecionada aqui: ela só é trocada quando o usuário
+  // confirmar a seleção no modal. Assim a empresa atual continua visível
+  // no dashboard se o usuário cancelar o modal sem escolher nada.
   abrirSeletorEmpresa();
 }
 
