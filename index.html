@@ -10485,9 +10485,8 @@ async function abrirSeletorEmpresa() {
     var btnAdd = document.getElementById('empresa-seletor-btn-add');
     var btnUpgrade = document.getElementById('empresa-seletor-btn-upgrade');
     if (btnAdd && btnUpgrade) {
-      var _naLista2 = document.querySelectorAll('#empresa-list .empresa-item[data-empresa-id]').length;
-      var _temAtiva2 = (window._empresaSelecionada && window._empresaSelecionada.id) ? 1 : 0;
-      var _total2 = _naLista2 + _temAtiva2 || (empresas && empresas[0] && empresas[0].id ? 1 : 0);
+      // Total = empresas reais no DB + fallbacks exibidos na lista
+      var _total2 = empresas ? empresas.length : 0;
       var _planoNome2 = nivelAtual >= 3 ? 'premium' : nivelAtual >= 2 ? 'pro' : nivelAtual >= 1 ? 'growth' : 'starter';
       var _limite2 = EMPRESA_LIMIT[_planoNome2] || 1;
       var _atingiu = _total2 >= _limite2 && nivelAtual < 3;
