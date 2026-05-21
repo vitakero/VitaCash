@@ -10710,6 +10710,17 @@ async function salvarNovaEmpresa(nome) {
     toast('Empresa "' + nome + '" cadastrada com sucesso!', 'ok');
     console.log('✅ Nova empresa salva:', data);
 
+    // Atualiza card visual da sidebar com a nova empresa
+    var _ini = (data.name||'?').trim().split(/\s+/).map(function(w){return w[0];}).slice(0,2).join('').toUpperCase();
+    var _av = document.getElementById('empresa-avatar');
+    var _nm = document.getElementById('empresa-nome-sidebar');
+    var _sb = document.getElementById('empresa-sub-sidebar');
+    var _bdg = document.getElementById('empresa-badge-ativa');
+    if (_av) { _av.textContent = _ini; _av.style.background = 'var(--green)'; _av.style.color = '#fff'; _av.style.fontSize = '11px'; }
+    if (_nm) { _nm.textContent = data.name; _nm.style.color = 'var(--text)'; }
+    if (_sb) { _sb.textContent = data.nicho || ''; }
+    if (_bdg) _bdg.style.display = 'inline';
+
     // Vincula análises salvas sem empresa (company_id NULL) à nova empresa
     // Isso corrige o caso onde salvarAnalise() rodou antes da empresa ser criada
     await sb.from('analyses')
