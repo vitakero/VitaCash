@@ -10671,8 +10671,18 @@ async function salvarNovaEmpresa(nome) {
     window._empresaSelecionada = { id: data.id, name: data.name, nicho: data.nicho, modo: 'existente' };
     toast('Empresa "' + nome + '" cadastrada com sucesso!', 'ok');
     console.log('✅ Nova empresa salva:', data);
+
+    // Vincula análises salvas sem empresa (company_id NULL) à nova empresa
+    // Isso corrige o caso onde salvarAnalise() rodou antes da empresa ser criada
+    await sb.from('analyses')
+      .update({ company_id: data.id })
+      .eq('user_id', currentUser.id)
+      .is('company_id', null);
+
     // Atualiza a lista de empresas na sidebar imediatamente
-    if (typeof carregarEmpresasSwitcher === 'function') carregarEmpresasSwitcher();
+    if (typeof carregarEmpresasSwitcher === 'function') await carregarEmpresasSwitcher();
+    // Carrega as análises da nova empresa no dashboard
+    if (typeof popularFiltroDashPorEmpresa === 'function') popularFiltroDashPorEmpresa(data.id);
   } catch(e) {
     console.error('Erro ao salvar empresa:', e);
     toast('Erro ao cadastrar empresa: ' + e.message, 'erro');
