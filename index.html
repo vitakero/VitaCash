@@ -13705,6 +13705,9 @@ function selecionarEmpresaSwitcher(id, name, nicho) {
   var list = document.getElementById('empresa-list');
   if (list) list.style.display = 'none';
 
+  // Reconstrói a lista com a nova empresa ativa (remove ela da lista, adiciona a anterior)
+  if (typeof carregarEmpresasSwitcher === 'function') carregarEmpresasSwitcher();
+
   // Filtra análises pela empresa selecionada
   popularFiltroDashPorEmpresa(id);
 }
