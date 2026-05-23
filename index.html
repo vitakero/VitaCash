@@ -4298,7 +4298,7 @@ function adminAbrirWhatsApp() {
     <div class="card mg-section-pro" data-plan-required="pro">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.75rem;">
         <div>
-          <div class="mc-sub" style="margin-bottom:4px;">Reserva operacional mínima com base no ciclo de caixa</div>
+          <div class="mc-sub" style="margin-bottom:4px;">Custo operacional mínimo por mês (CMV + Despesas)</div>
           <div class="cg-val" id="cgv">R$ 351 mil</div>
           <div style="font-size:11px;color:var(--text2);margin-top:3px;">ciclo de caixa negativo — empresa em posição privilegiada</div>
         </div>
@@ -9870,10 +9870,12 @@ function recalc(){
   const ncg=gastosDiarios*ciclo;
   const caixa=5481375;
   const excesso=caixa-ncg;
-  document.getElementById('resciclo').textContent=ciclo+' dias';
-  document.getElementById('rescg').textContent=ciclo<=0?'R$ 0,00':fmt(ncg);
-  document.getElementById('cgv').textContent=ciclo<=0?'R$ 0,00':fmt(ncg);
-  var necLabel=document.getElementById('cgnec'); if(necLabel) necLabel.textContent='Necessário: '+(ciclo<=0?'R$ 0,00':fmt(ncg));
+  // reserva mínima mensal salva pelo popularDashboard
+  const reservaMin = window._reservaMinMensal || 0;
+  document.getElementById('resciclo').textContent=(p2+p3-p1)+' dias';
+  document.getElementById('rescg').textContent=ciclo<=0?fmt(reservaMin):fmt(ncg);
+  document.getElementById('cgv').textContent=ciclo<=0?fmt(reservaMin):fmt(ncg);
+  var necLabel=document.getElementById('cgnec'); if(necLabel) necLabel.textContent=(ciclo<=0?'Reserva mínima: ':'Necessário: ')+(ciclo<=0?fmt(reservaMin):fmt(ncg));
   var cxLabel=document.getElementById('cgcaixa'); if(cxLabel) cxLabel.textContent='Caixa: '+fmt(caixa);
   const pct=ciclo<=0?0:Math.min(Math.round((ncg/caixa)*100),95);
   document.getElementById('cgfill').style.width=ciclo<=0?'2%':Math.min(pct+18,95)+'%';
@@ -9881,8 +9883,8 @@ function recalc(){
     document.getElementById('cgfill').style.background='#5DCAA5';
     document.getElementById('cgst').textContent='Situação ok';
     document.getElementById('cgst').className='cg-status ok';
-    document.getElementById('cgsub').innerHTML='Caixa disponível: <strong>'+fmt(caixa)+'</strong> · Ciclo negativo — empresa recebe antes de pagar fornecedores.';
-    document.getElementById('resmsg').textContent='Ciclo negativo: empresa recebe ANTES de pagar fornecedores — capital de giro necessário é zero!';
+    document.getElementById('cgsub').innerHTML='Caixa disponível: <strong>'+fmt(caixa)+'</strong> · Reserva mínima mensal: <strong>'+fmt(reservaMin)+'</strong> · Ciclo negativo — posição privilegiada.';
+    document.getElementById('resmsg').textContent='Ciclo negativo: empresa recebe antes de pagar fornecedores. Mantenha ao menos '+fmt(reservaMin)+'/mês em caixa para custos operacionais.';
   }else if(excesso>0){
     document.getElementById('cgfill').style.background='#5DCAA5';
     document.getElementById('cgst').textContent='Situação ok';
@@ -11176,8 +11178,14 @@ function popularDashboard(dados) {
   var ncg     = ciclo > 0 ? ncgBalanco : 0;
   var excesso = caixa - ncg;
 
-  // Atualiza variável global gastosDiarios usada pelo slider recalc()
+  // Reserva mínima mensal — sempre mostrar o custo operacional mensal mínimo
+  // = (CMV + Despesas Operacionais) / 12 — o mínimo que a empresa precisa ter disponível por mês
+  var despesasOpAbs = Math.abs(d.despesas_vendas||0) + Math.abs(d.despesas_admin||0) + Math.abs(d.outras_despesas_op||0);
+  var reservaMinMensal = Math.round((cmvAbs + despesasOpAbs) / 12);
+
+  // Atualiza variáveis globais usadas pelo slider recalc()
   try { gastosDiarios = gdiar; } catch(e){}
+  try { window._reservaMinMensal = reservaMinMensal; } catch(e){}
 
   // Sliders PMR/PME/PMP
   var s1 = document.getElementById('s1'), s2 = document.getElementById('s2'), s3 = document.getElementById('s3');
@@ -11188,11 +11196,11 @@ function popularDashboard(dados) {
   // Cards de ciclo
   setText('resciclo', ciclo + ' dias');
   if (ciclo <= 0) {
-    setText('rescg',  'R$ 0,00');
-    setText('cgv',    'R$ 0,00');
-    setText('resmsg', 'Ciclo negativo! Empresa recebe ANTES de pagar fornecedores — capital de giro necessário é zero.');
-    setHTML('cgsub',  'Caixa disponível: <strong>' + fmtV(caixa) + '</strong> · Ciclo: <strong>' + ciclo + ' dias</strong> — empresa com posição de caixa privilegiada.');
-    setText('cgnec',  'Necessário: R$ 0,00');
+    setText('rescg',  fmtV(reservaMinMensal));
+    setText('cgv',    fmtV(reservaMinMensal));
+    setText('resmsg', 'Ciclo negativo — empresa recebe antes de pagar fornecedores. Mesmo assim, mantenha ao menos ' + fmtV(reservaMinMensal) + '/mês em caixa para cobrir custos operacionais.');
+    setHTML('cgsub',  'Caixa disponível: <strong>' + fmtV(caixa) + '</strong> · Reserva mínima mensal recomendada: <strong>' + fmtV(reservaMinMensal) + '</strong> · Ciclo: <strong>' + ciclo + ' dias</strong> — posição privilegiada.');
+    setText('cgnec',  'Reserva mínima: ' + fmtV(reservaMinMensal));
     setText('cgcaixa','Caixa: ' + fmtV(caixa));
   } else {
     setText('rescg',  fmtV(ncg));
