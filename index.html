@@ -10737,22 +10737,28 @@ async function salvarNovaEmpresa(nome) {
     if (_sb) { _sb.textContent = data.nicho || ''; }
     if (_bdg) _bdg.style.display = 'inline';
 
-    // Vincula SOMENTE a análise da sessão atual (se ainda sem empresa)
-    // Não linka TODAS para não contaminar análises de outras empresas
+    // Vincula a análise à empresa + garante que dados_extraidos foi salvo
+    // Usa _dadosIA se disponível (caso o save automático não tenha incluído os dados)
+    var _updatePayload = { company_id: data.id };
+    if (window._dadosIA && Object.keys(window._dadosIA).length > 0) {
+      _updatePayload.dados_extraidos = window._dadosIA;
+      if (window._dadosIA._hashCombo) _updatePayload.hash_combo = window._dadosIA._hashCombo;
+    }
     var _analiseId = window._analiseAtual && window._analiseAtual.id;
     if (_analiseId) {
-      await sb.from('analyses')
-        .update({ company_id: data.id })
-        .eq('id', _analiseId)
-        .is('company_id', null);
+      await sb.from('analyses').update(_updatePayload).eq('id', _analiseId);
     } else {
-      // Fallback: linka só a análise mais recente sem empresa
-      await sb.from('analyses')
-        .update({ company_id: data.id })
+      // Fallback: atualiza a análise mais recente do usuário (qualquer company_id)
+      var _recRes = await sb.from('analyses')
+        .select('id')
         .eq('user_id', currentUser.id)
-        .is('company_id', null)
         .order('created_at', { ascending: false })
-        .limit(1);
+        .limit(1)
+        .single();
+      if (_recRes.data && _recRes.data.id) {
+        await sb.from('analyses').update(_updatePayload).eq('id', _recRes.data.id);
+        console.log('✅ Análise vinculada à empresa e dados salvos:', data.name);
+      }
     }
 
     // Atualiza a lista de empresas na sidebar imediatamente
