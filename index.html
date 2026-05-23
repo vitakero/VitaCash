@@ -10704,8 +10704,22 @@ async function salvarNovaEmpresa(nome) {
   } catch(e) { console.warn('Não foi possível verificar limite de empresas:', e); }
 
   try {
-    var { data, error } = await sb.from('companies').insert({ user_id: currentUser.id, name: nome, nicho: nicho }).select().single();
-    if (error) throw error;
+    // Verifica se já existe empresa com esse nome antes de criar (evita duplicata por race condition)
+    var _existCheck = await sb.from('companies')
+      .select('id, name, nicho')
+      .eq('user_id', currentUser.id)
+      .ilike('name', nome)
+      .maybeSingle();
+    var data;
+    if (_existCheck.data && _existCheck.data.id) {
+      data = _existCheck.data;
+      console.log('✅ salvarNovaEmpresa: empresa já existe, reutilizando:', data.name);
+    } else {
+      var _ins = await sb.from('companies').insert({ user_id: currentUser.id, name: nome, nicho: nicho }).select().single();
+      if (_ins.error) throw _ins.error;
+      data = _ins.data;
+    }
+    var error = null;
     window._empresaSelecionada = { id: data.id, name: data.name, nicho: data.nicho, modo: 'existente' };
     toast('Empresa "' + nome + '" cadastrada com sucesso!', 'ok');
     console.log('✅ Nova empresa salva:', data);
