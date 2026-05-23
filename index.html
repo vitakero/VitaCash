@@ -13885,15 +13885,12 @@ async function dashFilterChange(id) {
     if (_bdg) _bdg.style.display = 'inline';
     if (typeof carregarEmpresasSwitcher === 'function') carregarEmpresasSwitcher();
   }
-  if (data.company_id) {
-    if (!window._empresaSelecionada || !window._empresaSelecionada.id) {
-      sb.from('companies').select('id,name,nicho').eq('id', data.company_id).single()
-        .then(function(res) { if (res.data) _aplicarEmpresaNoCard(res.data); else if (typeof carregarEmpresasSwitcher === 'function') carregarEmpresasSwitcher(); });
-    } else {
+  // Tenta recuperar/criar empresa pelo nome quando company_id não resolve
+  function _recuperarEmpresaPorNome() {
+    if (!data.dados_extraidos || !data.dados_extraidos.empresa || !currentUser) {
       if (typeof carregarEmpresasSwitcher === 'function') carregarEmpresasSwitcher();
+      return;
     }
-  } else if (data.dados_extraidos && data.dados_extraidos.empresa && currentUser) {
-    // company_id null — tenta recuperar empresa pelo nome (pode ter sido salva sem vínculo)
     sb.from('companies').select('id,name,nicho')
       .eq('user_id', currentUser.id)
       .ilike('name', data.dados_extraidos.empresa)
@@ -13901,24 +13898,45 @@ async function dashFilterChange(id) {
       .then(function(res) {
         if (res.data && res.data.id) {
           _aplicarEmpresaNoCard(res.data);
-          // Vincula análise à empresa retroativamente
           sb.from('analyses').update({ company_id: res.data.id }).eq('id', data.id).then(function(){
             console.log('✅ Análise vinculada à empresa retroativamente:', res.data.name);
           });
         } else {
-          // Empresa não existe — cria agora e vincula
           sb.from('companies').insert({ user_id: currentUser.id, name: data.dados_extraidos.empresa, nicho: data.dados_extraidos.setor || '' })
             .select().single()
             .then(function(cr) {
               if (cr.data && cr.data.id) {
                 _aplicarEmpresaNoCard(cr.data);
                 sb.from('analyses').update({ company_id: cr.data.id }).eq('id', data.id).then(function(){
-                  console.log('✅ Empresa criada e análise vinculada retroativamente:', cr.data.name);
+                  console.log('✅ Empresa criada e análise vinculada:', cr.data.name);
                 });
+              } else {
+                console.warn('⚠ Não foi possível criar empresa:', cr.error && cr.error.message);
+                if (typeof carregarEmpresasSwitcher === 'function') carregarEmpresasSwitcher();
               }
             });
         }
       });
+  }
+
+  if (data.company_id) {
+    if (!window._empresaSelecionada || !window._empresaSelecionada.id) {
+      sb.from('companies').select('id,name,nicho').eq('id', data.company_id).single()
+        .then(function(res) {
+          if (res.data) {
+            _aplicarEmpresaNoCard(res.data);
+          } else {
+            // Empresa deletada — recupera pelo nome dos dados extraídos
+            console.log('⚠ company_id aponta para empresa deletada — tentando recuperar pelo nome');
+            _recuperarEmpresaPorNome();
+          }
+        });
+    } else {
+      if (typeof carregarEmpresasSwitcher === 'function') carregarEmpresasSwitcher();
+    }
+  } else {
+    // company_id null — recupera pelo nome
+    _recuperarEmpresaPorNome();
   }
 
   // Popula dashboard com dados salvos da IA
