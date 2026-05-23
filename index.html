@@ -13688,6 +13688,10 @@ async function popularFiltroDashPorEmpresa(companyId) {
 
 // ── SELECIONAR EMPRESA NO SWITCHER ──────────────────────────────────────
 function selecionarEmpresaSwitcher(id, name, nicho) {
+  // Limpa dados da empresa anterior da memória
+  window._dadosIA    = null;
+  window._iaFresh    = false;
+  window._analiseAtual = null;
   window._empresaSelecionada = { id: id, name: name, nicho: nicho, modo: 'existente' };
 
   // Atualiza elementos ocultos de estado (usados por outras funções)
