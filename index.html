@@ -13266,7 +13266,12 @@ function ndreAnalisar() {
       console.log('✅ IA retornou dados:', dados.empresa, dados.ano, dados.cache ? '(cache)' : '(novo)');
     } catch(e) {
       console.error('❌ Erro na análise IA:', e.message);
-      toast('Erro na análise: ' + e.message, 'erro');
+      var msgErro = e.message || '';
+      if (msgErro.includes('maximum') && msgErro.includes('100') && msgErro.includes('pages')) {
+        toast('PDF com mais de 100 páginas — o VitaCash não consegue analisar arquivos tão grandes. Extraia só as páginas do Balanço, DRE e Fluxo de Caixa (geralmente 10–20 páginas) e envie novamente.', 'erro');
+      } else {
+        toast('Erro na análise: ' + msgErro, 'erro');
+      }
     }
   })();
 }
