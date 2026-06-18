@@ -10813,6 +10813,22 @@ function popularDashboard(dados) {
   var recL = Math.abs(d.receita_liquida || rec);
   var cmvAbs = Math.abs(d.cmv || 0);
 
+  // Aviso se DRE estiver essencialmente vazia (só balanço enviado)
+  var dreVazio = !d.receita_bruta && !d.receita_liquida && !d.lucro_liquido && !d.ebit;
+  var avisoExistente = document.getElementById('aviso-dre-vazia');
+  if (dreVazio) {
+    if (!avisoExistente) {
+      var aviso = document.createElement('div');
+      aviso.id = 'aviso-dre-vazia';
+      aviso.style.cssText = 'background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 16px;margin:12px 0;font-size:13px;color:#92400e;line-height:1.5;';
+      aviso.innerHTML = '<strong>⚠ DRE não encontrada</strong> — os indicadores de rentabilidade (margem, EBIT, ROE) ficaram zerados porque o documento enviado não contém a Demonstração do Resultado. Envie também a DRE para ver a análise completa.';
+      var dashEl = document.getElementById('s-dash') || document.querySelector('.dash-wrap');
+      if (dashEl) dashEl.insertBefore(aviso, dashEl.firstChild);
+    }
+  } else if (avisoExistente) {
+    avisoExistente.remove();
+  }
+
   function fmtV(v) {
     if (v === null || v === undefined) return '—';
     var abs = Math.abs(v);
@@ -11376,7 +11392,7 @@ function popularDashboard(dados) {
   var despFinPct = recL > 0 ? (despFinAbs / recL * 100) : 0;
   var despOpAbs  = Math.abs((d.despesas_vendas||0)+(d.despesas_admin||0)+(d.outras_despesas_op||0));
   var dividaAtual= Math.abs(b.emprestimos_cp||0) + Math.abs(b.emprestimos_lp||0) + Math.abs(b.obrigacoes_financeiras_cp||0) + Math.abs(b.obrigacoes_financeiras_lp||0) + Math.abs(b.arrendamentos_cp||0) + Math.abs(b.arrendamentos_lp||0);
-  var limiteMax  = Math.abs(d.ebit||0) / 0.25 / 2;  // EBIT / (taxa 25% × 2)
+  var limiteMax  = Math.abs(d.ebit||0) / 0.20 / 2;  // EBIT / (taxa 20% a.a. PME × cobertura 2x)
   var espacoDisp = limiteMax - dividaAtual;
   var endivGeral = b.ativo_total > 0 ? (Math.abs(b.passivo_total||0) / b.ativo_total * 100) : 0;
   var endivPL    = b.patrimonio_liquido > 0 ? (Math.abs(b.passivo_total||0) / b.patrimonio_liquido) : 0;
@@ -11662,19 +11678,26 @@ function popularDashboard(dados) {
   // Alerta rentabilidade
   var alertaRent = document.getElementById('alerta-rentabilidade');
   if (alertaRent) {
-    var roeStr  = roe.toFixed(1).replace('.',',') + '%';
     var roiStr  = roi.toFixed(1).replace('.',',') + '%';
-    var acimaSelic = roe >= 15;
-    var roiBom    = roi >= roiBenchLow;
-    if (acimaSelic) {
-      alertaRent.innerHTML = 'O <strong>ROE de ' + roeStr + '</strong> está acima da Selic (15% a.a.), o que significa que a empresa está <strong>criando valor</strong> — o dinheiro investido pelos sócios rende mais do que a renda fixa.' +
-        (roiBom ? ' ROI de ' + roiStr + ' está acima da média do setor (' + roiBenchLow + '–' + roiBenchHigh + '%).' : ' ROI de ' + roiStr + ' está abaixo da média do setor — há espaço para melhorar o retorno sobre os ativos.');
-    } else {
-      alertaRent.innerHTML = 'O <strong>ROE de ' + roeStr + '</strong> está <strong>abaixo da Selic (15% a.a.)</strong> — o dinheiro dos sócios rende menos do que a renda fixa. Foco em aumentar margens para superar o custo de oportunidade.' +
-        ' ROI de ' + roiStr + ' — referência do setor: ' + roiBenchLow + '–' + roiBenchHigh + '%.';
-      // muda ícone para atenção
+    var roiBom  = roi >= roiBenchLow;
+    var plNeg   = b.patrimonio_liquido < 0;
+    var lucroNeg = (d.lucro_liquido||0) < 0;
+    if (plNeg) {
+      alertaRent.innerHTML = '<strong>⚠ Patrimônio Líquido negativo</strong> — as dívidas superam os ativos da empresa. O ROE não é calculável de forma significativa nessa situação. Prioridade: recompor o PL com aporte de capital ou lucros retidos.';
       var abEl = alertaRent.closest('.ab');
-      if (abEl) { abEl.classList.remove('aok'); abEl.classList.add('awarn'); }
+      if (abEl) { abEl.classList.remove('aok'); abEl.classList.add('aerror'); }
+    } else {
+      var roeStr = roe.toFixed(1).replace('.',',') + '%';
+      var acimaSelic = roe >= 15;
+      if (acimaSelic && !lucroNeg) {
+        alertaRent.innerHTML = 'O <strong>ROE de ' + roeStr + '</strong> está acima da Selic (15% a.a.), o que significa que a empresa está <strong>criando valor</strong> — o dinheiro investido pelos sócios rende mais do que a renda fixa.' +
+          (roiBom ? ' ROI de ' + roiStr + ' está acima da média do setor (' + roiBenchLow + '–' + roiBenchHigh + '%).' : ' ROI de ' + roiStr + ' está abaixo da média do setor — há espaço para melhorar o retorno sobre os ativos.');
+      } else {
+        alertaRent.innerHTML = 'O <strong>ROE de ' + roeStr + '</strong> está <strong>abaixo da Selic (15% a.a.)</strong> — o dinheiro dos sócios rende menos do que a renda fixa. Foco em aumentar margens para superar o custo de oportunidade.' +
+          ' ROI de ' + roiStr + ' — referência do setor: ' + roiBenchLow + '–' + roiBenchHigh + '%.';
+        var abEl2 = alertaRent.closest('.ab');
+        if (abEl2) { abEl2.classList.remove('aok'); abEl2.classList.add('awarn'); }
+      }
     }
   }
 
@@ -12300,7 +12323,7 @@ function popularDashboard(dados) {
     // Atualiza cards .mc de valuation
     setMC('P/BV', vPBV > 0 ? fmtV(vPBV) : '—', verde, 'PL × ' + multPBV + 'x');
     setMC('P/L',  vPL  > 0 ? fmtV(vPL)  : '—', verde, 'Lucro × ' + multPL + 'x');
-    setMC('EV/EBITDA', vEV > 0 ? fmtV(vEV) : '—', verde, 'EBIT × ' + multEV + 'x');
+    setMC('EV/EBITDA', vEV > 0 ? fmtV(vEV) : '—', verde, '~EBIT estimado × ' + multEV + 'x');
     setMC('PSR',  vPSR > 0 ? fmtV(vPSR) : '—', verde, 'Receita × ' + multPSR + 'x');
 
     // Atualiza barra de faixas
@@ -12982,9 +13005,13 @@ function calcIndicadoresIA(setor, dre, balanco) {
   var liquidez=balanco.passivo_circulante!==0?(balanco.ativo_circulante/Math.abs(balanco.passivo_circulante)):0;
   var ebitda=dre.ebit||0;
   var endividamento=balanco.ativo_total>0?(Math.abs(balanco.passivo_total||0)/balanco.ativo_total*100):0;
+  var despFinAbsI=Math.abs(dre.resultado_financeiro||0);
+  var cobJurosI=despFinAbsI>0?(Math.abs(dre.ebit||0)/despFinAbsI):10;
   var nota=5;
   if(margemLiq>ml*1.5)nota+=2; else if(margemLiq>ml)nota+=1; else if(margemLiq<0)nota-=2; else if(margemLiq<ml*0.5)nota-=1;
   if(ciclo<0)nota+=1; if(roe>20)nota+=1; if(liquidez>1.5)nota+=0.5; if(endividamento>70)nota-=0.5;
+  if(cobJurosI>=3)nota+=1; else if(cobJurosI<1)nota-=2; else if(cobJurosI<1.5)nota-=1;
+  if(pmr>0&&pmr<30)nota+=0.5; else if(pmr>90)nota-=0.5;
   nota=Math.min(10,Math.max(1,nota));
   return { margemBruta:+margemBruta.toFixed(1), margemOp:+margemOp.toFixed(1), margemLiq:+margemLiq.toFixed(1), pmr:+pmr.toFixed(0), pme:+pme.toFixed(0), pmp:+pmp.toFixed(0), ciclo:+ciclo.toFixed(0), roe:+roe.toFixed(1), liquidez:+liquidez.toFixed(2), ebitda:+ebitda.toFixed(0), endividamento:+endividamento.toFixed(1), nota:+nota.toFixed(1), benchmarks:{margemBruta:mb,margemOp:mo,margemLiq:ml,despOp:bm.despOp,cmv:bm.cmv,label:bm.label} };
 }
