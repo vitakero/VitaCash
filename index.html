@@ -11386,7 +11386,7 @@ function popularDashboard(dados) {
   var liqSeca    = b.passivo_circulante && b.passivo_circulante !== 0 ? ((b.ativo_circulante - Math.abs(b.estoques||0)) / Math.abs(b.passivo_circulante)) : 0;
   var liqImed    = b.passivo_circulante && b.passivo_circulante !== 0 ? ((b.caixa||0) / Math.abs(b.passivo_circulante)) : 0;
   var imobPL     = b.patrimonio_liquido > 0 ? (Math.abs(b.ativo_nao_circulante||0) / b.patrimonio_liquido * 100) : 0;
-  var roe        = b.patrimonio_liquido > 0 ? ((d.lucro_liquido||0) / b.patrimonio_liquido * 100) : 0;
+  var roe        = b.patrimonio_liquido !== 0 ? ((d.lucro_liquido||0) / b.patrimonio_liquido * 100) : 0;
 
   // ── Capacidade de Endividamento — atualizar com dados reais ──────
   (function() {
@@ -11626,11 +11626,12 @@ function popularDashboard(dados) {
     'Selic: 15% a.a.');
 
   // ROI, ROIC, ROCE
-  var roi  = b.ativo_total > 0 ? (Math.abs(d.lucro_liquido||0) / b.ativo_total * 100) : 0;
-  var roic = (b.patrimonio_liquido > 0 || dividaAtual > 0)
-    ? (Math.abs(d.ebit||0) * 0.66 / (Math.abs(b.patrimonio_liquido||0) + dividaAtual) * 100) : 0;
-  var capitalEmpregado = b.ativo_total > 0 ? (b.ativo_total - Math.abs(b.ativo_circulante||0)) : 0;
-  var roce = capitalEmpregado > 0 ? (Math.abs(d.ebit||0) / capitalEmpregado * 100) : 0;
+  var roi  = b.ativo_total > 0 ? ((d.lucro_liquido||0) / b.ativo_total * 100) : 0;
+  var dividaLiquida = dividaAtual - Math.abs(b.caixa||0);
+  var capitalInvestido = (b.patrimonio_liquido||0) + dividaLiquida;
+  var roic = capitalInvestido !== 0 ? ((d.ebit||0) * 0.66 / capitalInvestido * 100) : 0;
+  var capitalEmpregado = b.ativo_total > 0 ? (b.ativo_total - Math.abs(b.passivo_circulante||0)) : 0;
+  var roce = capitalEmpregado > 0 ? ((d.ebit||0) / capitalEmpregado * 100) : 0;
 
   // benchmarks por setor para ROI
   var bm2 = _getBenchmark(dados.setor||'', ind);
@@ -12973,11 +12974,11 @@ function calcIndicadoresIA(setor, dre, balanco) {
   var margemOp=recL>0?(dre.ebit/recL*100):0;
   var margemLiq=recL>0?(dre.lucro_liquido/recL*100):0;
   var cmvAbs=Math.abs(dre.cmv||0);
-  var pmr=balanco.contas_a_receber>0&&rec>0?(balanco.contas_a_receber/rec*365):0;
+  var pmr=dre.receita_bruta>0&&balanco.contas_a_receber>0?(balanco.contas_a_receber/dre.receita_bruta*365):0;
   var pme=balanco.estoques>0&&cmvAbs>0?(balanco.estoques/cmvAbs*365):0;
   var pmp=balanco.fornecedores>0&&cmvAbs>0?(balanco.fornecedores/cmvAbs*365):0;
   var ciclo=pmr+pme-pmp;
-  var roe=balanco.patrimonio_liquido>0?(dre.lucro_liquido/balanco.patrimonio_liquido*100):0;
+  var roe=balanco.patrimonio_liquido!==0?(dre.lucro_liquido/balanco.patrimonio_liquido*100):0;
   var liquidez=balanco.passivo_circulante!==0?(balanco.ativo_circulante/Math.abs(balanco.passivo_circulante)):0;
   var ebitda=dre.ebit||0;
   var endividamento=balanco.ativo_total>0?(Math.abs(balanco.passivo_total||0)/balanco.ativo_total*100):0;
