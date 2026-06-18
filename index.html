@@ -11386,7 +11386,7 @@ function popularDashboard(dados) {
   var liqSeca    = b.passivo_circulante && b.passivo_circulante !== 0 ? ((b.ativo_circulante - Math.abs(b.estoques||0)) / Math.abs(b.passivo_circulante)) : 0;
   var liqImed    = b.passivo_circulante && b.passivo_circulante !== 0 ? ((b.caixa||0) / Math.abs(b.passivo_circulante)) : 0;
   var imobPL     = b.patrimonio_liquido > 0 ? (Math.abs(b.ativo_nao_circulante||0) / b.patrimonio_liquido * 100) : 0;
-  var roe        = b.patrimonio_liquido > 0 ? (Math.abs(d.lucro_liquido||0) / b.patrimonio_liquido * 100) : 0;
+  var roe        = b.patrimonio_liquido > 0 ? ((d.lucro_liquido||0) / b.patrimonio_liquido * 100) : 0;
 
   // ── Capacidade de Endividamento — atualizar com dados reais ──────
   (function() {
