@@ -12767,8 +12767,11 @@ window._PROMPT_IA = `Você é um especialista em contabilidade brasileira. Anali
    c) caixa = Caixa e Equivalentes de Caixa + Aplicações Financeiras de Curto Prazo (se separadas no balanço)
       • Alguns balanços separam "Caixa e Equivalentes" de "Títulos e Valores Mobiliários CP" ou "Aplicações Financeiras"
       • Some ambos para obter o caixa total disponível (usado para calcular dívida líquida corretamente)
-9. OBRIGAÇÕES FINANCEIRAS ADICIONAIS (apenas empresas B3/listadas — PMEs deixam 0):
-   Empresas listadas frequentemente têm obrigações financeiras FORA das linhas 2.01.04 e 2.02.01. Extraia separadamente:
+9. OBRIGAÇÕES FINANCEIRAS ADICIONAIS:
+   ▶ COMO IDENTIFICAR SE É EMPRESA B3: O documento é B3/listada se contiver qualquer um destes textos:
+      "DFP", "ITR", "Demonstrações Financeiras Padronizadas", "Informações Trimestrais", "CVM", "Código da Conta"
+      Se NÃO contiver nenhum desses → é PME → deixe obrigacoes_financeiras_cp = 0 e obrigacoes_financeiras_lp = 0
+   Empresas B3 frequentemente têm obrigações financeiras FORA das linhas 2.01.04 e 2.02.01. Extraia separadamente:
    a) obrigacoes_financeiras_cp = soma de todas obrigações financeiras CP que NÃO estão em emprestimos_cp:
       • "Obrigações por Aquisição de Investimentos" CP (earn-outs, pagamentos diferidos de M&A)
       • "Opção de Compra de Participação de Não-Controladores" CP (put options de minoritários)
@@ -12778,16 +12781,15 @@ window._PROMPT_IA = `Você é um especialista em contabilidade brasileira. Anali
       • "Obrigações por Aquisição de Investimentos" LP
       • "Opção de Compra de Participação de Não-Controladores" LP
       • NÃO inclua: provisões fiscais/trabalhistas/cíveis, passivo fiscal diferido
-   ▶ PMEs (sem escala_indicador): obrigacoes_financeiras_cp = 0, obrigacoes_financeiras_lp = 0
-10. ARRENDAMENTOS IFRS 16 SEPARADOS (apenas empresas B3/listadas — PMEs deixam 0):
+10. ARRENDAMENTOS IFRS 16 SEPARADOS:
+   ▶ Mesma regra de identificação da Regra 9 — só preencha se for documento B3/listada. PME → arrendamentos_cp = 0, arrendamentos_lp = 0
    Algumas empresas B3 registram arrendamentos IFRS 16 em linhas SEPARADAS fora de 2.01.04 e 2.02.01.
    a) arrendamentos_cp = valor de "Arrendamentos" ou "Passivo de Arrendamento" CP que apareça como linha SEPARADA no passivo circulante (fora de emprestimos_cp)
       • Só preencha se a linha aparecer FORA do total 2.01.04
       • Se arrendamentos já estão incluídos dentro da linha-pai 2.01.04 → arrendamentos_cp = 0
    b) arrendamentos_lp = valor de "Arrendamentos" ou "Passivo de Arrendamento" LP que apareça como linha SEPARADA no passivo não-circulante (fora de emprestimos_lp)
       • Só preencha se a linha aparecer FORA do total 2.02.01
-      • Se arrendamentos já estão incluídos dentro da linha-pai 2.02.01 → arrendamentos_lp = 0
-   ▶ PMEs (sem escala_indicador): arrendamentos_cp = 0, arrendamentos_lp = 0`;
+      • Se arrendamentos já estão incluídos dentro da linha-pai 2.02.01 → arrendamentos_lp = 0`;
 
 // ── BENCHMARKS POR NICHO (fonte: B3, CVM, IBGE, Sebrae 2023-24) ──────
 // mb=margem bruta  mo=margem op  ml=margem líq  despOp=desp operacionais % receita líq  cmv=CMV % receita líq
